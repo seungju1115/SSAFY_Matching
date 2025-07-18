@@ -84,6 +84,9 @@ feature/PROJ-123/user-login-api
 feature/PROJ-124/password-validation
 ```
 
+#### 4. 브랜치 전략  
+https://claude.ai/public/artifacts/e4a18476-c18a-4a32-8400-0380d1f69e23
+
 ### Jira 컨벤션
 
 #### 1. Story 작성
