@@ -11,3 +11,7 @@ spring:
       enabled: true
   jpa:
     show-sql: true
+#  db 미사용
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
