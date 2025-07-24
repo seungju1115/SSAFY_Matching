@@ -36,8 +36,9 @@ test {
     finalizedBy jacocoTestReport
 }
 
-// SonarQube 실행 전에 테스트 및 커버리지 리포트 생성
-sonarqube.dependsOn test
+sonarqube {
+    dependsOn test, jacocoTestReport
+}
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
