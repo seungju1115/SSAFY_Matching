@@ -6,20 +6,38 @@ plugins {
 	id 'jacoco'
 }
 
-apply plugin: 'jacoco'
+sonarqube {
+    properties {
+        property "sonar.projectKey", "your-project-key"
+        property "sonar.projectName", "Your Project Name"
+        property "sonar.host.url", "http://sonarqube:9000"  // Docker 네트워크 주소
+        property "sonar.sources", "src/main/java"
+        property "sonar.tests", "src/test/java"
+        property "sonar.java.binaries", "build/classes"
+        property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml"
+    }
+}
 
+// Jacoco 설정 (코드 커버리지)
 jacoco {
-	toolVersion = "0.8.8"
+    toolVersion = "0.8.8"
 }
 
 jacocoTestReport {
-	reports {
-		xml.required = true
-		html.required = true
-	}
+    reports {
+        xml.required = true
+        html.required = true
+    }
+    finalizedBy jacocoTestCoverageVerification
 }
 
-test.finalizedBy jacocoTestReport
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+// SonarQube 실행 전에 테스트 및 커버리지 리포트 생성
+sonarqube.dependsOn test
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
