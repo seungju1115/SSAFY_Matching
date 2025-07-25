@@ -1,0 +1,45 @@
+services:
+  backend:
+    build:
+      context: ./demo
+      dockerfile: Dockerfile
+    image: rabent0207/matching-ssafy-backend:latest
+    container_name: spring-backend
+    environment:
+      - SPRING_PROFILES_ACTIVE=local
+      - SERVER_PORT=8080
+      - DB_HOST=
+      - DB_PORT=
+      - DB_NAME=
+      - DB_USERNAME=
+      - DB_PASSWORD=
+      - JWT_KEY=${JWT_KEY}
+    env_file:
+      - .env
+    volumes:
+      - gradle-cache:/root/.gradle  # Gradle 캐시 볼륨
+    restart: always
+    networks:
+      - app-network
+
+  # frontend:
+  #   build:
+  #     context: ./Frontend
+  #   image: rabent0207/matching-ssafy-frontend:latest
+  #   container_name: react-frontend
+  #   restart: always
+  #   ports:
+  #     - "8080:8080" 
+  #   volumes:
+  #     - ./Frontend/nginx.conf:/etc/nginx/nginx.conf # Nginx 설정 마운트
+  #   depends_on:
+  #     - backend
+  #   networks:
+  #     - app-network
+
+volumes:
+  gradle-cache:  # 도커 관리 볼륨 정의
+
+networks:
+  app-network:
+    driver: bridge
