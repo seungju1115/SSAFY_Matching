@@ -1,5 +1,6 @@
 package com.example.demo.chat.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.*;
@@ -7,6 +8,8 @@ import org.springframework.web.socket.config.annotation.*;
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+    @Value("${front.url}")
+    private String frontCORSUrl;
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         //topic 경로로 메시지 송신 가능
@@ -22,7 +25,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // SockJS fallback 가능하게 만듦
-        registry.addEndpoint("/ws-chat").setAllowedOriginPatterns("http://localhost:8081")  // 프론트 포트 주소(필요시 와일드카드 "*"도 가능하나 권장하지 않음)
+        registry.addEndpoint("/ws-chat").setAllowedOriginPatterns(frontCORSUrl)  // 프론트 포트 주소(필요시 와일드카드 "*"도 가능하나 권장하지 않음)
                 .withSockJS();
     }
 }
