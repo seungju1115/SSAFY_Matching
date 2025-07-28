@@ -62,7 +62,7 @@ public class User {
     @Column(name = "project_preference", nullable = false, length = 50)
     @NotBlank
     @Size(max = 50)
-    private ProjectPrefEnum projectPref;
+    private Set<ProjectPrefEnum> projectPref;
 
     @ElementCollection(targetClass = PersonalPrefEnum.class, fetch = FetchType.LAZY)
     @Enumerated(EnumType.STRING)
@@ -73,7 +73,7 @@ public class User {
 
     @Column(name = "project_experience", nullable = true, length = 300)
     @Size(max = 300)
-    private Set<String> projectExp;
+    private String projectExp;
 
     @Column(name="qualification", nullable = true, length = 45)
     @Size(max = 45)
