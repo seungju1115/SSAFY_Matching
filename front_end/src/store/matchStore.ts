@@ -2,7 +2,7 @@
 import { create } from 'zustand'
 
 interface MatchState {
-  matches: []
+  matches: any[]
   setMatches: (matches: any[]) => void
 }
 

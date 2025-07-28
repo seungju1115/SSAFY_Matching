@@ -5,6 +5,6 @@ export const useSocket = () => {
   return {
     connect: () => {},
     disconnect: () => {},
-    emit: (event: string, data: any) => {},
+    emit: (_event: string, _data: any) => {},
   }
 } 

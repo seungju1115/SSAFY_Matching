@@ -6,6 +6,7 @@ export const useMatch = () => {
   
   const findMatches = () => {
     // 매칭 찾기 로직
+    setMatches([]) // 임시
   }
   
   return { matches, findMatches }

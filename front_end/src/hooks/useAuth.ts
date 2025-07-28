@@ -4,8 +4,9 @@ import { useUserStore } from '../store/userStore'
 export const useAuth = () => {
   const { user, setUser } = useUserStore()
   
-  const login = (credentials: any) => {
+  const login = (_credentials: any) => {
     // 로그인 로직
+    setUser(null) // 임시
   }
   
   const logout = () => {

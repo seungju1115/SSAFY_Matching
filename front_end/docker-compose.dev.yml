@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      # 소스 코드 볼륨 마운트 (실시간 수정을 위해)
+      - .:/app
+      # node_modules는 컨테이너의 것을 사용 (성능상 이유)
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true  # Windows Docker에서 파일 변경 감지 개선
+      - WATCHPACK_POLLING=true
+    stdin_open: true
+    tty: true 
+
+    #docker-compose -f docker-compose.dev.yml up

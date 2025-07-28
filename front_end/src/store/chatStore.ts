@@ -2,7 +2,7 @@
 import { create } from 'zustand'
 
 interface ChatState {
-  messages: []
+  messages: any[]
   setMessages: (messages: any[]) => void
 }
 
