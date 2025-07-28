@@ -57,30 +57,33 @@ public class User {
     @Size(max = 50)
     private String wantedPosition;
 
+    @ElementCollection(targetClass = ProjectPrefEnum.class, fetch = FetchType.LAZY)
     @Enumerated(EnumType.STRING)
     @Column(name = "project_preference", nullable = false, length = 50)
     @NotBlank
     @Size(max = 50)
     private ProjectPrefEnum projectPref;
 
+    @ElementCollection(targetClass = PersonalPrefEnum.class, fetch = FetchType.LAZY)
     @Enumerated(EnumType.STRING)
     @Column(name = "personal_preference", nullable = false, length = 50)
     @NotBlank
     @Size(max = 50)
-    private PersonalPrefEnum personalPref;
+    private Set<PersonalPrefEnum> personalPref;
 
     @Column(name = "project_experience", nullable = true, length = 300)
     @Size(max = 300)
-    private String projectExp;
+    private Set<String> projectExp;
 
     @Column(name="qualification", nullable = true, length = 45)
     @Size(max = 45)
     private String qualification;
 
+    @ElementCollection(targetClass = TechEnum.class, fetch = FetchType.LAZY)
     @Enumerated(EnumType.STRING)
     @Column(name="tech_stack",  nullable = true, length = 100)
     @Size(max = 100)
-    private TechEnum techStack;
+    private Set<TechEnum> techStack;
 
     //@ManyToMany
     //@JoinTable(
