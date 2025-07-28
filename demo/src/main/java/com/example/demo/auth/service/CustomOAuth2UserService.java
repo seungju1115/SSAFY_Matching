@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
@@ -24,22 +25,6 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         // 구글로부터 받은 사용자 정보
         OAuth2User oauth2User = new DefaultOAuth2UserService().loadUser(userRequest);
-
-        String email = oauth2User.getAttribute("email");
-        String name = oauth2User.getAttribute("name");
-
-        User user = userRepository.findByEmail(email);
-
-        if (user == null) {
-            user = new User();
-            user.setEmail(email);
-            user.setUsername(name);
-            userRepository.save(user);
-
-            Map<String, Object> attributes = new HashMap<>(oauth2User.getAttributes());
-            attributes.put("isNewUser", true);
-            return new DefaultOAuth2User(oauth2User.getAuthorities(), attributes, "email");
-        }
 
         System.out.println(oauth2User);
         // 커스텀 OAuth2User 반환 가능

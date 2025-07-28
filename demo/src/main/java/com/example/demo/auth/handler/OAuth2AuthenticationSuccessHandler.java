@@ -1,6 +1,7 @@
-package com.example.demo.auth.oauth;
+package com.example.demo.auth.handler;
 
 import com.example.demo.auth.dao.UserRepository;
+import com.example.demo.auth.entity.User;
 import com.example.demo.auth.util.JwtUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,12 +9,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
@@ -33,8 +34,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         String email = oAuth2User.getAttribute("email").toString();
         String username = oAuth2User.getAttribute("name").toString();
 
-        Boolean isNewUser = (Boolean) oAuth2User.getAttribute("isNewUser");
-        System.out.println("isNewUser = " + isNewUser);
+        Optional<User> user = userRepository.findByEmail(email);
 
         String jwt = jwtUtil.generateToken(email, Map.of("name", username));
         System.out.println("JWT: " + jwt);
@@ -55,7 +55,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 //        response.
         // 토큰 전송 테스트용 코드, 토큰을 쿼리 스트링에 담아서 리다이렉트
         String url = "http://localhost:5173";
-        if (isNewUser != null && isNewUser) {
+        if (user.isEmpty()) {
             getRedirectStrategy().sendRedirect(request, response, url + "/signup?token=" + jwt);
         } else {
             getRedirectStrategy().sendRedirect(request, response, url + "/main?token=" + jwt);

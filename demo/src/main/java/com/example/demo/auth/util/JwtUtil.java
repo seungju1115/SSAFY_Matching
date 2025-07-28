@@ -1,6 +1,5 @@
 package com.example.demo.auth.util;
 
-import com.example.demo.auth.service.CustomUserDetailsService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -10,12 +9,14 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -88,11 +89,11 @@ public class JwtUtil {
     // 핵심: 토큰에서 Authentication 객체 생성
     public Authentication getAuthentication(String token) {
         String email = getSubject(token);
-
-        // UserDetailsService를 통해 사용자 정보 조회
-        UserDetails userDetails = new CustomUserDetailsService().loadUserByUsername(email);
-
-        // UsernamePasswordAuthenticationToken 생성 (인증된 상태)
-        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        GrantedAuthority a = new SimpleGrantedAuthority("student");
+        Authentication auth = new UsernamePasswordAuthenticationToken(
+                email,
+                null,
+                List.of(a));
+        return auth;
     }
 }

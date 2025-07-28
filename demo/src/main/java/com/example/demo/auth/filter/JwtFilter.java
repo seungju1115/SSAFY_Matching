@@ -32,6 +32,7 @@ public class JwtFilter extends OncePerRequestFilter {
             // 토큰 검증 후 유저 저장
             if (jwtUtil.validateToken(token)) {
                 Authentication auth = jwtUtil.getAuthentication(token);
+                // 인증 SecurityContext에 등록
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
         }

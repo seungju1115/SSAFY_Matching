@@ -1,8 +1,8 @@
 package com.example.demo.auth.config;
 
 import com.example.demo.auth.filter.JwtFilter;
-import com.example.demo.auth.oauth.OAuth2AuthenticationFailureHandler;
-import com.example.demo.auth.oauth.OAuth2AuthenticationSuccessHandler;
+import com.example.demo.auth.handler.OAuth2AuthenticationFailureHandler;
+import com.example.demo.auth.handler.OAuth2AuthenticationSuccessHandler;
 import com.example.demo.auth.service.CustomOAuth2UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,9 +38,8 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
-                         .userInfoEndpoint(userInfo -> userInfo
-                             .userService(oauth2UserService) // 사용자 정보 후처리 필요 시 주입
-                         ).successHandler(oAuth2AuthenticationSuccessHandler)
+                         .userInfoEndpoint(userInfo -> userInfo.userService(oauth2UserService))
+                        .successHandler(oAuth2AuthenticationSuccessHandler)
                         .failureHandler(oAuth2AuthenticationFailureHandler)
                 )
             // JWT 인증 필터를 OAuth2 로그인 필터 앞이나 앞에 추가
