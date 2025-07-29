@@ -26,9 +26,11 @@ public class JwtFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         String header = request.getHeader("Authorization");
+//        System.out.println("header: " + header);
         // 헤더에서 토큰 추출
         if (header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
+//            System.out.println("token:" + token);
             // 토큰 검증 후 유저 저장
             if (jwtUtil.validateToken(token)) {
                 Authentication auth = jwtUtil.getAuthentication(token);

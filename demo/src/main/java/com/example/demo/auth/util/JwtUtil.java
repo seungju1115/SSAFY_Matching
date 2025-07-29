@@ -49,7 +49,7 @@ public class JwtUtil {
 
         return Jwts.builder()
                 .setSubject(subject) // 사용자 email
-                .addClaims(claims)   // 추가 클레임 name
+                .addClaims(claims)   // 추가 클레임 name, role
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(secretKey, SignatureAlgorithm.HS256)
@@ -89,7 +89,9 @@ public class JwtUtil {
     // 핵심: 토큰에서 Authentication 객체 생성
     public Authentication getAuthentication(String token) {
         String email = getSubject(token);
-        GrantedAuthority a = new SimpleGrantedAuthority("student");
+        String role = parseToken(token).get("role").toString();
+//        System.out.println("role: " + role);
+        GrantedAuthority a = new SimpleGrantedAuthority("ROLE_" + role);
         Authentication auth = new UsernamePasswordAuthenticationToken(
                 email,
                 null,

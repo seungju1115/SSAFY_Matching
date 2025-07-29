@@ -5,16 +5,23 @@ import com.example.demo.auth.Enum.ProjectPrefEnum;
 import com.example.demo.auth.Enum.TechEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "USERS")
+@Table(name = "USERS"
+        , indexes= {
+        @Index(name = "user_major_idx", columnList = "major"),
+        @Index(name = "user_position_idx", columnList = "wanted_position"),
+        @Index(name = "user_team_idx", columnList = "team_id")
+        }
+        )
 @Getter
 @Setter
 public class User {
@@ -54,10 +61,10 @@ public class User {
     private String major;
 
     @Column(name = "last_class", nullable = false)
-    @NotBlank
+    @NotNull
     private Integer lastClass;
 
-    @Column(name = "wanted_postion",  nullable = false,  length = 50)
+    @Column(name = "wanted_position",  nullable = false,  length = 50)
     @NotBlank
     @Size(max = 50)
     private String wantedPosition;
@@ -65,14 +72,14 @@ public class User {
     @ElementCollection(targetClass = ProjectPrefEnum.class, fetch = FetchType.LAZY)
     @Enumerated(EnumType.STRING)
     @Column(name = "project_preference", nullable = false, length = 50)
-    @NotBlank
+    @NotEmpty
     @Size(max = 50)
     private Set<ProjectPrefEnum> projectPref;
 
     @ElementCollection(targetClass = PersonalPrefEnum.class, fetch = FetchType.LAZY)
     @Enumerated(EnumType.STRING)
     @Column(name = "personal_preference", nullable = false, length = 50)
-    @NotBlank
+    @NotEmpty
     @Size(max = 50)
     private Set<PersonalPrefEnum> personalPref;
 
@@ -87,6 +94,7 @@ public class User {
     @ElementCollection(targetClass = TechEnum.class, fetch = FetchType.LAZY)
     @Enumerated(EnumType.STRING)
     @Column(name="tech_stack",  nullable = true, length = 100)
+    @NotEmpty
     @Size(max = 100)
     private Set<TechEnum> techStack;
 

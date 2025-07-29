@@ -2,6 +2,7 @@ package com.example.demo.auth.dto;
 
 import com.example.demo.auth.Enum.PersonalPrefEnum;
 import com.example.demo.auth.Enum.ProjectPrefEnum;
+import com.example.demo.auth.Enum.TechEnum;
 import com.example.demo.auth.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,10 +28,13 @@ public class UserProfileRequest {
         user.setMajor(userProfileRequest.getMajor());
         user.setLastClass(userProfileRequest.getLastClass());
         user.setWantedPosition(userProfileRequest.getWantedPosition());
+        user.getPersonalPref().add(PersonalPrefEnum.valueOf(userProfileRequest.getPersonalPref()));
         //user.setPersonalPref(PersonalPrefEnum.valueOf(userProfileRequest.getPersonalPref()));
+        user.getProjectPref().add(ProjectPrefEnum.valueOf(userProfileRequest.getProjectPref()));
         //user.setProjectPref(ProjectPrefEnum.valueOf(userProfileRequest.getProjectPref()));
         user.setProjectExp(userProfileRequest.getProjectExp());
         user.setQualification(userProfileRequest.getQualification());
+        user.getTechStack().add(TechEnum.valueOf(userProfileRequest.getTechStack()));
         //user.setTechStack();
         return user;
     }

@@ -20,7 +20,7 @@ spring:
             user-name-attribute: sub
 
   datasource:
-    url: jdbc:h2:mem:testdb
+    url: jdbc:h2:~/test
     driver-class-name: org.h2.Driver
     username: sa
     password:
@@ -45,3 +45,6 @@ spring:
 jwt:
   secret: Nzg5ZjE0NzRlM2FjZjY4YzBkMTIzZmFhZjQ1NmY2ZDQ5YTc0MTg0MTNkZWIwZTkxY2YwYTc2ZTVjYmYzYjA3ZQ==
   expiration: 3600000 # 1시간 (ms)
+
+front:
+  url: http://localhost:5173
