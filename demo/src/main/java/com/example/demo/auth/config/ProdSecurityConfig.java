@@ -12,19 +12,19 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-@Profile("local")
+@Profile("prod")
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig {
+public class ProdSecurityConfig {
 
     private final JwtFilter jwtFilter;
     private final CustomOAuth2UserService oauth2UserService;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
     private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
-    public SecurityConfig(CustomOAuth2UserService oauth2UserService,
-                          OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler,
-                          OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler,
-                          JwtFilter jwtFilter) {
+    public ProdSecurityConfig(CustomOAuth2UserService oauth2UserService,
+                              OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler,
+                              OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler,
+                              JwtFilter jwtFilter) {
         this.oauth2UserService = oauth2UserService;
         this.oAuth2AuthenticationSuccessHandler = oAuth2AuthenticationSuccessHandler;
         this.oAuth2AuthenticationFailureHandler = oAuth2AuthenticationFailureHandler;
@@ -37,15 +37,13 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // CSRF 비활성화 (필요에 따라)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/users/login").permitAll()
-                        .anyRequest().permitAll()
+                        .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
                          .userInfoEndpoint(userInfo -> userInfo.userService(oauth2UserService))
                         .successHandler(oAuth2AuthenticationSuccessHandler)
                         .failureHandler(oAuth2AuthenticationFailureHandler)
                 )
-                .headers(headers -> headers
-                        .frameOptions(frameOptions -> frameOptions.disable()))
             // JWT 인증 필터를 OAuth2 로그인 필터 앞이나 앞에 추가
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 

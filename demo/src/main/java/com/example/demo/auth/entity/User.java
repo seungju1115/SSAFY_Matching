@@ -28,6 +28,11 @@ public class User {
     @Size(max = 10)
     private String userName;
 
+    @Column(name="role", length = 10, nullable = false)
+    @NotBlank
+    @Size(max = 10)
+    private String role;
+
     @ManyToOne
     @JoinColumn(name = "team_id")
     private Team team;

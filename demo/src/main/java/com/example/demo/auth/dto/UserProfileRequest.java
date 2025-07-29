@@ -27,11 +27,12 @@ public class UserProfileRequest {
         user.setMajor(userProfileRequest.getMajor());
         user.setLastClass(userProfileRequest.getLastClass());
         user.setWantedPosition(userProfileRequest.getWantedPosition());
-        user.setPersonalPref(PersonalPrefEnum.valueOf(userProfileRequest.getPersonalPref()));
-        user.setProjectPref(ProjectPrefEnum.valueOf(userProfileRequest.getProjectPref()));
+        //user.setPersonalPref(PersonalPrefEnum.valueOf(userProfileRequest.getPersonalPref()));
+        //user.setProjectPref(ProjectPrefEnum.valueOf(userProfileRequest.getProjectPref()));
         user.setProjectExp(userProfileRequest.getProjectExp());
         user.setQualification(userProfileRequest.getQualification());
-        user.setTechStack();
+        //user.setTechStack();
+        return user;
     }
 
 }
