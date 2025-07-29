@@ -1,11 +1,13 @@
 package com.example.demo.chat.service;
 
 import com.example.demo.chat.dao.ChatRoomRepository;
-import com.example.demo.chat.dao.TeamRepository;
-import com.example.demo.chat.dao.UserRepository;
+import com.example.demo.user.dao.UserRepository;
 import com.example.demo.chat.dto.ChatRoomRequest;
 import com.example.demo.chat.dto.ChatRoomResponse;
 import com.example.demo.chat.entity.*;
+import com.example.demo.team.dao.TeamRepository;
+import com.example.demo.team.entity.Team;
+import com.example.demo.user.entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

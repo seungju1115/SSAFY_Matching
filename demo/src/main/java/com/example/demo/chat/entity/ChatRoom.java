@@ -1,5 +1,6 @@
 package com.example.demo.chat.entity;
 
+import com.example.demo.team.entity.Team;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,7 +21,7 @@ public class ChatRoom {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "room_type", nullable = false)
     private RoomType roomType;
 
     @OneToOne

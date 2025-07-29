@@ -1,5 +1,7 @@
-package com.example.demo.chat.entity;
+package com.example.demo.user.entity;
 
+import com.example.demo.chat.entity.ChatRoomMember;
+import com.example.demo.team.entity.Team;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,15 +26,18 @@ public class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<ChatRoomMember> chatRoomMembers = new ArrayList<>();
 
-    //필요함
-    public void addChatRoomMember(ChatRoomMember member) {
-        chatRoomMembers.add(member);
-        member.setUser(this);
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id") // 외래키: users.team_id → team.id
+    private Team team;
 
-    public void removeChatRoomMember(ChatRoomMember member) {
-        chatRoomMembers.remove(member);
-        member.setUser(null);
+    public void setTeam(Team team) {
+        if (this.team != null) {
+            this.team.getMembers().remove(this);
+        }
+        this.team = team;
+        if (team != null && !team.getMembers().contains(this)) {
+            team.getMembers().add(this);
+        }
     }
 }
 

@@ -2,12 +2,12 @@ package com.example.demo.chat.service;
 
 import com.example.demo.chat.dao.ChatMessageRepository;
 import com.example.demo.chat.dao.ChatRoomRepository;
-import com.example.demo.chat.dao.UserRepository;
+import com.example.demo.user.dao.UserRepository;
 import com.example.demo.chat.dto.ChatMessageRequest;
 import com.example.demo.chat.dto.ChatMessageResponse;
 import com.example.demo.chat.entity.ChatMessage;
 import com.example.demo.chat.entity.ChatRoom;
-import com.example.demo.chat.entity.User;
+import com.example.demo.user.entity.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;

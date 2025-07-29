@@ -3,7 +3,7 @@ package com.example.demo.chat.service;
 import com.example.demo.chat.dao.ChatRoomMemberRepository;
 import com.example.demo.chat.entity.ChatRoom;
 import com.example.demo.chat.entity.ChatRoomMember;
-import com.example.demo.chat.entity.User;
+import com.example.demo.user.entity.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

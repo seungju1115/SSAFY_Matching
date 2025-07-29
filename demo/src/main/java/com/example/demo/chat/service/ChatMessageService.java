@@ -2,15 +2,13 @@ package com.example.demo.chat.service;
 
 import com.example.demo.chat.dao.ChatMessageRepository;
 import com.example.demo.chat.dao.ChatRoomRepository;
-import com.example.demo.chat.dao.UserRepository;
+import com.example.demo.user.dao.UserRepository;
 import com.example.demo.chat.dto.ChatMessageRequest;
 import com.example.demo.chat.dto.ChatMessageResponse;
 import com.example.demo.chat.entity.ChatMessage;
 import com.example.demo.chat.entity.ChatRoom;
-import com.example.demo.chat.entity.User;
+import com.example.demo.user.entity.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

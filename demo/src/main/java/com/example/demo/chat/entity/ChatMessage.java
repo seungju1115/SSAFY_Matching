@@ -1,5 +1,6 @@
 package com.example.demo.chat.entity;
 
+import com.example.demo.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

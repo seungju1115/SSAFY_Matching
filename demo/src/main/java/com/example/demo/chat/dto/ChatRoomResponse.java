@@ -3,11 +3,15 @@ package com.example.demo.chat.dto;
 import com.example.demo.chat.entity.RoomType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
+@Setter
 public class ChatRoomResponse {
     private Long roomId;            // 채팅방 ID
     private RoomType roomType;      // TEAM or PRIVATE

@@ -1,13 +1,36 @@
-#spring:
-#  application:
-#    name: demo
-#  datasource:
-#    url: jdbc:h2:mem:testdb
-#    driver-class-name: org.h2.Driver
-#    username: sa
-#    password:
-#  h2:
-#    console:
-#      enabled: true
-#  jpa:
-#    show-sql: true
+spring:
+  application:
+    name: demo
+  datasource:
+    url: jdbc:mysql://localhost:3306/team_ssearch?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: ssafy
+  jpa:
+    hibernate:
+      ddl-auto: update   # create / update / validate 중 선택
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql: true
+    open-in-view=false:
+    properties:
+      hibernate:
+        format_sql: true
+    database-platform: # 설정삭제
+front:
+  url: http://localhost:8081
+
+  #  datasource:
+  #    url: jdbc:h2:mem:testdb
+  #    driver-class-name: org.h2.Driver
+  #    username: sa
+  #    password:
+  #  h2:
+  #    console:
+  #      enabled: true
+  #  jpa:
+  #    show-sql: true
+  #  db 미사용
+#  autoconfigure:
+#    exclude:
+#      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration

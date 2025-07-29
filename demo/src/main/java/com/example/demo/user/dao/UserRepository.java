@@ -1,6 +1,6 @@
-package com.example.demo.chat.dao;
+package com.example.demo.user.dao;
 
-import com.example.demo.chat.entity.User;
+import com.example.demo.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

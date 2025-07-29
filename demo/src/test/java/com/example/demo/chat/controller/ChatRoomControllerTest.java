@@ -1,7 +1,12 @@
 package com.example.demo.chat.controller;
 
 import com.example.demo.chat.dto.ChatMessageResponse;
+import com.example.demo.chat.dto.ChatRoomRequest;
+import com.example.demo.chat.dto.ChatRoomResponse;
+import com.example.demo.chat.entity.RoomType;
 import com.example.demo.chat.service.ChatMessageService;
+import com.example.demo.chat.service.ChatRoomService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -15,7 +20,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ChatRoomController.class)
@@ -27,32 +33,49 @@ class ChatRoomControllerTest {
     @MockBean
     private ChatMessageService chatMessageService;
 
+    @MockBean
+    private ChatRoomService chatRoomService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Test
-    @DisplayName("채팅방 메시지 조회 - 성공")
-    void getChatMessages_Success() throws Exception {
-        Long chatRoomId = 1L;
+    @DisplayName("채팅방 메시지 전체 조회")
+    void getChatMessages() throws Exception {
+        // given
+        ChatMessageResponse message1 = new ChatMessageResponse(1L, 1L, 1L, "안녕하세요", LocalDateTime.of(2025, 7, 28, 10, 0, 0));
+        ChatMessageResponse message2 = new ChatMessageResponse(2L, 1L, 2L, "반갑습니다", LocalDateTime.of(2025, 7, 28, 10, 1, 0));
 
-        ChatMessageResponse msg1 = new ChatMessageResponse(
-                101L, chatRoomId, 201L, "Hello", LocalDateTime.now()
-        );
-        ChatMessageResponse msg2 = new ChatMessageResponse(
-                102L, chatRoomId, 202L, "Hi there!", LocalDateTime.now()
-        );
+        Mockito.when(chatMessageService.getAllMessagesByChatRoom(1L))
+                .thenReturn(List.of(message1, message2));
 
-        Mockito.when(chatMessageService.getAllMessagesByChatRoom(chatRoomId))
-                .thenReturn(List.of(msg1, msg2));
-
-        mockMvc.perform(get("/chatroom/{chatRoomId}/messages", chatRoomId)
-                        .accept(MediaType.APPLICATION_JSON))
+        // when & then
+        mockMvc.perform(get("/chatroom/1/messages"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id", is(101)))
-                .andExpect(jsonPath("$[0].chatRoomId", is(chatRoomId.intValue())))
-                .andExpect(jsonPath("$[0].senderId", is(201)))
-                .andExpect(jsonPath("$[0].message", is("Hello")))
-                .andExpect(jsonPath("$[1].id", is(102)))
-                .andExpect(jsonPath("$[1].chatRoomId", is(chatRoomId.intValue())))
-                .andExpect(jsonPath("$[1].senderId", is(202)))
-                .andExpect(jsonPath("$[1].message", is("Hi there!")));
+                .andExpect(jsonPath("$.size()", is(2)))
+                .andExpect(jsonPath("$[0].message", is("안녕하세요")))
+                .andExpect(jsonPath("$[1].senderId", is(2)));
+    }
+
+    @Test
+    @DisplayName("1:1 채팅방 생성")
+    void createPrivateChatRoom() throws Exception {
+        // given
+        ChatRoomRequest request = new ChatRoomRequest();
+        request.setUser1Id(1L);
+        request.setUser2Id(2L);
+
+        ChatRoomResponse response = new ChatRoomResponse(100L, RoomType.PRIVATE, null);
+
+        Mockito.when(chatRoomService.createPrivateChatRoom(any(ChatRoomRequest.class)))
+                .thenReturn(response);
+
+        // when & then
+        mockMvc.perform(post("/chatroom/private")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.roomId", is(100)))
+                .andExpect(jsonPath("$.roomType", is("PRIVATE")));
     }
 }

@@ -1,9 +1,6 @@
-package com.example.demo.chat.dao;
+package com.example.demo.team.dao;
 
-import com.example.demo.chat.entity.ChatRoom;
-import com.example.demo.chat.entity.RoomType;
-import com.example.demo.chat.entity.Team;
-import jakarta.transaction.Transactional;
+import com.example.demo.team.entity.Team;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
