@@ -2,13 +2,15 @@ package com.example.demo.dashboard.dto;
 
 import lombok.*;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
 @Builder
-public class SummaryResoponseDto {
+public class SummaryResoponseDto implements Serializable {
     private Integer whole;
     private Integer backendDemand;
     private Integer backendSupply;
