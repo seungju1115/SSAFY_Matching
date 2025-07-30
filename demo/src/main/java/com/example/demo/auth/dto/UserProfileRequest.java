@@ -9,34 +9,36 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Set;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserProfileRequest {
+    private String userName;
+    private String userProfile;
     private String major;
     private Integer lastClass;
     private String wantedPosition;
-    private String projectPref;
-    private String personalPref;
+    private Set<ProjectPrefEnum> projectPref;
+    private Set<PersonalPrefEnum> personalPref;
     private String projectExp;
     private String qualification;
-    private String techStack;
+    private Set<TechEnum> techStack;
 
-    public static User toEntity(UserProfileRequest userProfileRequest) {
+    public static User toEntity(UserProfileRequest request) {
         User user = new User();
-        user.setMajor(userProfileRequest.getMajor());
-        user.setLastClass(userProfileRequest.getLastClass());
-        user.setWantedPosition(userProfileRequest.getWantedPosition());
-        user.getPersonalPref().add(PersonalPrefEnum.valueOf(userProfileRequest.getPersonalPref()));
-        //user.setPersonalPref(PersonalPrefEnum.valueOf(userProfileRequest.getPersonalPref()));
-        user.getProjectPref().add(ProjectPrefEnum.valueOf(userProfileRequest.getProjectPref()));
-        //user.setProjectPref(ProjectPrefEnum.valueOf(userProfileRequest.getProjectPref()));
-        user.setProjectExp(userProfileRequest.getProjectExp());
-        user.setQualification(userProfileRequest.getQualification());
-        user.getTechStack().add(TechEnum.valueOf(userProfileRequest.getTechStack()));
-        //user.setTechStack();
+        user.setUserName(request.getUserName());
+        user.setUserProfile(request.getUserProfile());
+        user.setMajor(request.getMajor());
+        user.setLastClass(request.getLastClass());
+        user.setWantedPosition(request.getWantedPosition());
+        user.setProjectPref(request.getProjectPref());
+        user.setPersonalPref(request.getPersonalPref());
+        user.setProjectExp(request.getProjectExp());
+        user.setQualification(request.getQualification());
+        user.setTechStack(request.getTechStack());
         return user;
     }
-
 }

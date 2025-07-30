@@ -50,7 +50,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         // 토큰 전송 테스트용 코드, 토큰을 쿼리 스트링에 담아서 리다이렉트
         if (user.isEmpty()) {
-            getRedirectStrategy().sendRedirect(request, response, url + "/signup?token=" + jwt);
+            getRedirectStrategy().sendRedirect(request, response, url + "/signup");
         } else {
             getRedirectStrategy().sendRedirect(request, response, url + "/main?token=" + jwt);
         }
