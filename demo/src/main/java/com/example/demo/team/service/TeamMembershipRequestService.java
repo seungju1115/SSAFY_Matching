@@ -47,7 +47,12 @@ public class TeamMembershipRequestService {
                                 && req.getStatus() != RequestStatus.REJECTED
                 );
 
-        saveTeamOfferIfNotExist(teamOffer, exists, team, user);
+        if (exists) {
+            System.out.println("이미 초대 요청이 존재합니다.");
+            return;
+        }
+
+        saveTeamOffer(teamOffer, team, user);
         messagingTemplate.convertAndSend("/queue/team/offer/" + teamOffer.getUserId(), teamOffer.getMessage());
     }
 
@@ -63,18 +68,18 @@ public class TeamMembershipRequestService {
                                 && req.getStatus() != RequestStatus.REJECTED
                 );
 
-        saveTeamOfferIfNotExist(teamOffer, exists, team, user);
+        if (exists) {
+            System.out.println("이미 초대 요청이 존재합니다.");
+            return;
+        }
+        saveTeamOffer(teamOffer, team, user);
 
         for (TeamMemberResponse teamMemberResponse : teamService.getTeamMembers(teamOffer.getTeamId())) {
             messagingTemplate.convertAndSend("/queue/team/offer/" + teamMemberResponse.getMemberId(), teamOffer.getMessage());
         }
     }
 
-    private void saveTeamOfferIfNotExist(TeamOffer teamOffer, boolean exists, Team team, User user) {
-        if (exists) {
-            System.out.println("이미 초대 요청이 존재합니다.");
-            return;
-        }
+    private void saveTeamOffer(TeamOffer teamOffer, Team team, User user) {
 
         TeamMembershipRequest request = new TeamMembershipRequest();
         request.setTeam(team);
