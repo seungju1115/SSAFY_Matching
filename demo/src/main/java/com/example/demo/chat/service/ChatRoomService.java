@@ -12,6 +12,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -24,20 +28,39 @@ public class ChatRoomService {
 
     @Transactional
     public ChatRoomResponse createPrivateChatRoom(ChatRoomRequest chatRoomRequest) {
-        ChatRoom chatRoom = new ChatRoom();
-        chatRoom.setRoomType(RoomType.PRIVATE);
+        Long user1Id = chatRoomRequest.getUser1Id();
+        Long user2Id = chatRoomRequest.getUser2Id();
 
-        User user1 = userRepository.findById(chatRoomRequest.getUser1Id())
-                .orElseThrow(() -> new RuntimeException("ChatRoom not found"));
-        User user2 = userRepository.findById(chatRoomRequest.getUser2Id())
-                .orElseThrow(() -> new RuntimeException("ChatRoom not found"));
+        // chatRoomMembers를 미리 로딩
+        User user1 = userRepository.findByIdWithChatRoomMembers(user1Id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user2 = userRepository.findByIdWithChatRoomMembers(user2Id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        chatRoom.addMember(chatMemberService.createChatRoomMember(user1, chatRoom));
-        chatRoom.addMember(chatMemberService.createChatRoomMember(user2, chatRoom));
+        // user1이 속한 PRIVATE 채팅방 목록
+        Set<ChatRoom> user1PrivateRooms = user1.getChatRoomMembers().stream()
+                .map(ChatRoomMember::getChatRoom)
+                .filter(room -> room.getRoomType() == RoomType.PRIVATE)
+                .collect(Collectors.toSet());
 
-        ChatRoom saved = chatRoomRepository.save(chatRoom);
+        // user2가 속한 PRIVATE 채팅방 중, user1과 공통된 방이 있는지 확인
+        Optional<ChatRoom> existingRoomOpt = user2.getChatRoomMembers().stream()
+                .map(ChatRoomMember::getChatRoom)
+                .filter(room -> room.getRoomType() == RoomType.PRIVATE)
+                .filter(user1PrivateRooms::contains)
+                .findFirst();
 
-        return new ChatRoomResponse(saved.getId(), saved.getRoomType(), null);
+        ChatRoom chatRoom = existingRoomOpt.orElseGet(() -> {
+            ChatRoom newRoom = new ChatRoom();
+            newRoom.setRoomType(RoomType.PRIVATE);
+
+            newRoom.addMember(chatMemberService.createChatRoomMember(user1, newRoom));
+            newRoom.addMember(chatMemberService.createChatRoomMember(user2, newRoom));
+
+            return chatRoomRepository.save(newRoom);
+        });
+
+        return new ChatRoomResponse(chatRoom.getId(), chatRoom.getRoomType(), null);
     }
 
     @Transactional

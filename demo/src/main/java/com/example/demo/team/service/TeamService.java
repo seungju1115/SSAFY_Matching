@@ -1,6 +1,9 @@
 package com.example.demo.team.service;
 
+import com.example.demo.chat.dao.ChatRoomRepository;
 import com.example.demo.chat.dto.ChatRoomRequest;
+import com.example.demo.chat.dto.ChatRoomResponse;
+import com.example.demo.chat.entity.ChatRoom;
 import com.example.demo.chat.entity.RoomType;
 import com.example.demo.chat.service.ChatRoomService;
 import com.example.demo.team.dao.TeamRepository;
@@ -24,13 +27,17 @@ public class TeamService {
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
     private final ChatRoomService chatRoomService;
-
     // 1. 팀 생성
     @Transactional
     public TeamResponse createTeam(TeamRequest dto) {
         // 팀장 조회
         User leader = userRepository.findById(dto.getLeaderId())
                 .orElseThrow(() -> new RuntimeException("Leader not found"));
+
+        // ✅ 이미 팀에 소속되어 있는지 확인
+        if (leader.getTeam() != null) {
+            throw new IllegalStateException("이미 팀에 소속된 유저입니다.");
+        }
 
         // 팀 객체 생성
         Team team = new Team();
@@ -153,6 +160,13 @@ public class TeamService {
 
         invitedUser.setTeam(team);
 
+        // ✅ 팀 채팅방에 자동 추가
+        ChatRoomRequest chatRoomRequest = new ChatRoomRequest();
+        chatRoomRequest.setRoomId(team.getChatRoom().getId());
+        chatRoomRequest.setUserId(inviteRequest.getUserId());
+
+        chatRoomService.addMemberToTeamChatRoom(chatRoomRequest);
+        
         List<Long> membersId = new ArrayList<>();
         for (User user : team.getMembers()) {
             membersId.add(user.getId());
