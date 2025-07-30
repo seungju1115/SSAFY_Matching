@@ -29,7 +29,7 @@ public class HazelcastConfig {
     }
 
     @Bean
-    @Profile("prod")
+    @Profile("not used") // 추후 nginx까지 달렸을때 사용
     public Config hazelcastConfigProd() {
         Config config = new Config();
         config.setInstanceName("hazelcast-instance");
