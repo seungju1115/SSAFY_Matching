@@ -1,10 +1,16 @@
 package com.example.demo.team.controller;
 
+import com.example.demo.chat.dto.ChatMessageRequest;
+import com.example.demo.chat.dto.ChatMessageResponse;
 import com.example.demo.response.ApiResponse;
 import com.example.demo.team.dto.*;
+import com.example.demo.team.entity.RequestType;
+import com.example.demo.team.service.TeamMembershipRequestService;
 import com.example.demo.team.service.TeamService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.core.AbstractDestinationResolvingMessagingTemplate;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,7 +21,7 @@ import java.util.List;
 public class TeamController {
 
     private final TeamService teamService;
-
+    private final TeamMembershipRequestService teamMembershipRequestService;
     // 1. 팀 생성
     @PostMapping
     public ResponseEntity<ApiResponse<TeamResponse>> createTeam(@RequestBody TeamRequest teamRequest) {
@@ -63,6 +69,19 @@ public class TeamController {
     public ResponseEntity<ApiResponse<TeamDetailResponse>> inviteMemberTeam(@RequestBody InviteRequest inviteRequest) {
         TeamDetailResponse teamDetailResponse = teamService.inviteMemberTeam(inviteRequest);
         return ResponseEntity.ok(ApiResponse.ok(teamDetailResponse));
+    }
+
+    // 8. 팀 멤버 초대 요청
+    @PostMapping("/offer")
+    public ResponseEntity<ApiResponse<Void>> teamOffer(@RequestBody TeamOffer teamOffer) {
+
+        if (teamOffer.getRequestType() != RequestType.INVITE) {
+            teamMembershipRequestService.requestMemberToTeam(teamOffer);
+        }else{
+            teamMembershipRequestService.requestTeamToMember(teamOffer);
+        }
+
+        return ResponseEntity.ok(ApiResponse.created(null));
     }
 
     // n. 특정 팀의 팀원 조회
