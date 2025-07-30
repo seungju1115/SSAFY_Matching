@@ -1,9 +1,21 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import Home from './pages/Home'
+import Login from './pages/Login'
+import Signup from './pages/Signup'
+import Setup from './pages/Setup'
+import ProfileSetup from './pages/ProfileSetup'
+
 function App() {
   return (
-    <div>
-      <h1>React App 시작!</h1>
-      <p>암더 더더시발시발더 월드.</p>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/setup" element={<Setup />} />
+        <Route path="/profile-setup" element={<ProfileSetup />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 
