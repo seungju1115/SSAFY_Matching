@@ -30,7 +30,7 @@ public class HazelcastConfig {
 
     @Bean
     @Profile("prod")
-    public Config hazelcastConfig() {
+    public Config hazelcastConfigProd() {
         Config config = new Config();
         config.setInstanceName("hazelcast-instance");
 
@@ -75,13 +75,13 @@ public class HazelcastConfig {
     }
 
     @Bean
-    public HazelcastInstance hazelcastInstance() {
-        return Hazelcast.newHazelcastInstance(hazelcastConfig());
+    public HazelcastInstance hazelcastInstance(Config config) {
+        return Hazelcast.newHazelcastInstance(config);
     }
 
     @Bean
-    public CacheManager cacheManager() {
-        return new HazelcastCacheManager(hazelcastInstance());
+    public CacheManager cacheManager(HazelcastInstance hazelcastInstance) {
+        return new HazelcastCacheManager(hazelcastInstance);
     }
 
 }
