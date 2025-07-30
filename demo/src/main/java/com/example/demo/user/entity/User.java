@@ -21,7 +21,8 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String username;
+    @Column(name = "user_name")
+    private String userName;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<ChatRoomMember> chatRoomMembers = new ArrayList<>();

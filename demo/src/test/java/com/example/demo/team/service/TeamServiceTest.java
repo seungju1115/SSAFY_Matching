@@ -15,7 +15,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import com.example.demo.chat.dto.ChatRoomRequest;
 import com.example.demo.team.dto.*;
@@ -53,12 +52,12 @@ class TeamServiceTest {
     void setUp() {
         leader = new User();
         leader.setId(1L);
-        leader.setUsername("leaderUser");
+        leader.setUserName("leaderUser");
         leader.setTeam(null);
 
         team = new Team();
         team.setId(10L);
-        team.setName("TeamA");
+        team.setTeamName("TeamA");
         team.setLeader(leader);
         team.setMembers(new ArrayList<>());
     }
@@ -207,7 +206,7 @@ class TeamServiceTest {
 
         assertThat(members).hasSize(1);
         assertThat(members.get(0).getMemberId()).isEqualTo(leader.getId());
-        assertThat(members.get(0).getUsername()).isEqualTo(leader.getUsername());
+        assertThat(members.get(0).getUsername()).isEqualTo(leader.getUserName());
     }
 }
 

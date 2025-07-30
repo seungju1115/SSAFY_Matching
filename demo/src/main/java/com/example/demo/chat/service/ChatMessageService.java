@@ -60,18 +60,4 @@ public class ChatMessageService {
                 ))
                 .collect(Collectors.toList());
     }
-
-//    public List<ChatMessageResponse> getMessagesByChatRoom(Long chatRoomId, Pageable pageable) {
-//        Page<ChatMessage> page = chatMessageRepository.findByChatRoomIdOrderByCreatedAtAsc(chatRoomId, pageable);
-//
-//        return page.stream()
-//                .map(msg -> new ChatMessageResponse(
-//                        msg.getId(),
-//                        msg.getChatRoom().getId(),
-//                        msg.getSender().getId(),
-//                        msg.getMessage(),
-//                        msg.getCreatedAt()
-//                ))
-//                .collect(Collectors.toList());
-//    }
 }

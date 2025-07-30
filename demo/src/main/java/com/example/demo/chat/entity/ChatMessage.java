@@ -28,9 +28,10 @@ public class ChatMessage {
     private User sender;
 
     @Lob
+    @Column(columnDefinition = "LONGTEXT")
     private String message;
 
-    @Column(updatable = false)
+    @Column(name = "created_at",updatable = false)
     private LocalDateTime createdAt;
 
     @PrePersist

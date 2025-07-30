@@ -23,7 +23,8 @@ public class Team {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    @Column(name = "team_name")
+    private String teamName;
 
     @OneToOne(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
     private ChatRoom chatRoom;

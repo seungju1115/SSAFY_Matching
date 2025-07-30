@@ -52,9 +52,9 @@ class ChatRoomControllerTest {
         // when & then
         mockMvc.perform(get("/chatroom/1/messages"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()", is(2)))
-                .andExpect(jsonPath("$[0].message", is("안녕하세요")))
-                .andExpect(jsonPath("$[1].senderId", is(2)));
+                .andExpect(jsonPath("$.data.size()", is(2)))
+                .andExpect(jsonPath("$.data.[0].message", is("안녕하세요")))
+                .andExpect(jsonPath("$.data.[1].senderId", is(2)));
     }
 
     @Test
@@ -75,7 +75,7 @@ class ChatRoomControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.roomId", is(100)))
-                .andExpect(jsonPath("$.roomType", is("PRIVATE")));
+                .andExpect(jsonPath("$.data.roomId", is(100)))
+                .andExpect(jsonPath("$.data.roomType", is("PRIVATE")));
     }
 }

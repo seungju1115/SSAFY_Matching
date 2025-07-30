@@ -26,7 +26,7 @@ class ChatMemberServiceTest {
         // given
         User user = new User();
         user.setId(1L);
-        user.setUsername("testUser");
+        user.setUserName("testUser");
 
         ChatRoom chatRoom = new ChatRoom();
         chatRoom.setId(10L);

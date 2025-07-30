@@ -6,31 +6,14 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: ssafy
+
   jpa:
     hibernate:
-      ddl-auto: update   # create / update / validate 중 선택
-      naming:
-        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-    show-sql: true
-    open-in-view=false:
+      ddl-auto: validate
+    show-sql: false
+    open-in-view: false  # ← 여기 수정!!
     properties:
       hibernate:
         format_sql: true
-    database-platform: # 설정삭제
 front:
   url: http://localhost:8081
-
-  #  datasource:
-  #    url: jdbc:h2:mem:testdb
-  #    driver-class-name: org.h2.Driver
-  #    username: sa
-  #    password:
-  #  h2:
-  #    console:
-  #      enabled: true
-  #  jpa:
-  #    show-sql: true
-  #  db 미사용
-#  autoconfigure:
-#    exclude:
-#      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration

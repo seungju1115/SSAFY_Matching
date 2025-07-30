@@ -34,7 +34,7 @@ public class TeamService {
 
         // 팀 객체 생성
         Team team = new Team();
-        team.setName(dto.getTeamName());
+        team.setTeamName(dto.getTeamName());
         team.setLeader(leader);
 
         // 팀장도 팀의 멤버로 설정 (양방향 메서드 이용)
@@ -50,7 +50,7 @@ public class TeamService {
 
         chatRoomService.createTeamChatRoom(chatRoomRequest);
 
-        return new TeamResponse(saved.getId(), saved.getName(), saved.getLeader().getId(), saved.getMembers().size());
+        return new TeamResponse(saved.getId(), saved.getTeamName(), saved.getLeader().getId(), saved.getMembers().size());
     }
 
     // 2. 전체 팀 조회
@@ -58,7 +58,7 @@ public class TeamService {
         return teamRepository.findAll().stream()
                 .map(team -> new TeamResponse(
                         team.getId(),
-                        team.getName(),
+                        team.getTeamName(),
                         team.getLeader() != null ? team.getLeader().getId() : null,
                         team.getMembers() != null ? team.getMembers().size() : 0
                 ))
@@ -68,12 +68,12 @@ public class TeamService {
     // 3. 팀 조건 조회
     public List<TeamResponse> searchConditionTeam(TeamRequest teamRequest) {
         return teamRepository.findAll().stream()
-                .filter(team -> teamRequest.getTeamName() == null || team.getName().contains(teamRequest.getTeamName()))
+                .filter(team -> teamRequest.getTeamName() == null || team.getTeamName().contains(teamRequest.getTeamName()))
                 .filter(team -> teamRequest.getLeaderId() == null ||
                         (team.getLeader() != null && team.getLeader().getId().equals(teamRequest.getLeaderId())))
                 .map(team -> new TeamResponse(
                         team.getId(),
-                        team.getName(),
+                        team.getTeamName(),
                         team.getLeader() != null ? team.getLeader().getId() : null,
                         team.getMembers() != null ? team.getMembers().size() : 0
                 ))
@@ -90,7 +90,7 @@ public class TeamService {
             membersId.add(user.getId());
         }
 
-        return new TeamDetailResponse(team.getId(), team.getName(), team.getLeader().getId(), membersId);
+        return new TeamDetailResponse(team.getId(), team.getTeamName(), team.getLeader().getId(), membersId);
     }
 
     // 5. 팀 정보 삭제
@@ -121,7 +121,7 @@ public class TeamService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 팀입니다."));
         // 팀 이름 수정
         if (teamRequest.getTeamName() != null && !teamRequest.getTeamName().isBlank()) {
-            team.setName(teamRequest.getTeamName());
+            team.setTeamName(teamRequest.getTeamName());
         }
 
         // 리더 수정
@@ -136,7 +136,7 @@ public class TeamService {
             membersId.add(user.getId());
         }
 
-        return new TeamDetailResponse(team.getId(), team.getName(), team.getLeader().getId(), membersId);
+        return new TeamDetailResponse(team.getId(), team.getTeamName(), team.getLeader().getId(), membersId);
     }
 
     // 7. 팀 멤버 초대
@@ -158,7 +158,7 @@ public class TeamService {
             membersId.add(user.getId());
         }
 
-        return new TeamDetailResponse(team.getId(), team.getName(), team.getLeader().getId(), membersId);
+        return new TeamDetailResponse(team.getId(), team.getTeamName(), team.getLeader().getId(), membersId);
     }
 
     // n. 팀 멤버 조회
@@ -169,7 +169,7 @@ public class TeamService {
         List<User> members = team.getMembers();
 
         return members.stream()
-                .map(user -> new TeamMemberResponse(user.getId(), user.getUsername()))
+                .map(user -> new TeamMemberResponse(user.getId(), user.getUserName()))
                 .collect(Collectors.toList());
     }
 }
