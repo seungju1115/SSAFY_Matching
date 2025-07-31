@@ -71,7 +71,7 @@ export default function ProfileSetup() {
 
   const handleComplete = () => {
     console.log('Profile setup completed:', profileData)
-    navigate('/profile')
+    navigate('/')
   }
 
   const progress = (step / 2) * 100

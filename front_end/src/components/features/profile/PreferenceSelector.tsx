@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { X, Plus } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
+
 
 interface PreferenceSelectorProps {
   title: string

@@ -9,12 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { 
-  UserDetailSettings as UserDetailSettingsType, 
-  SEMESTER_OPTIONS, 
-  CLASS_OPTIONS, 
-  MAJOR_OPTIONS 
-} from '@/types/user'
+import type { UserDetailSettings as UserDetailSettingsType } from '@/types/user'
+import { SEMESTER_OPTIONS, CLASS_OPTIONS, MAJOR_OPTIONS } from '@/types/user'
 import { authAPI } from '@/api/auth'
 import { CheckCircle2, User, GraduationCap, BookOpen, Users } from 'lucide-react'
 
