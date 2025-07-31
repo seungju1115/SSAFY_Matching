@@ -1,0 +1,49 @@
+services:
+  backend:
+    build:
+      context: ./back_end
+      dockerfile: Dockerfile
+    image: rabent0207/matching-ssafy-backend:latest
+    container_name: spring-backend
+    volumes:
+      - gradle-cache:/root/.gradle  # Gradle 캐시 볼륨
+    restart: unless-stopped
+    networks:
+      - app-network
+    environment:
+      - SPRING_PROFILES_ACTIVE=local
+      # 필요한 환경변수 추가 (DB 설정 등)
+
+  frontend:
+    build:
+      context: ./front_end
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    volumes:
+      # 소스 코드 볼륨 마운트 (실시간 수정을 위해)
+      - .:/app
+      # node_modules는 컨테이너의 것을 사용 (성능상 이유)
+      - /app/node_modules
+      # shadcn/ui 설정 파일들 명시적 마운트
+      - ./components.json:/app/components.json
+      - ./tailwind.config.js:/app/tailwind.config.js
+      - ./src/lib:/app/src/lib
+      - ./src/components/ui:/app/src/components/ui
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true  # Windows Docker에서 파일 변경 감지 개선
+      - WATCHPACK_POLLING=true
+      - VITE_HOST=0.0.0.0  # Vite 호스트 설정
+    stdin_open: true
+    tty: true
+    networks:
+      - app-network
+
+
+volumes:
+  gradle-cache:  # 도커 관리 볼륨 정의
+
+networks:
+  app-network:
+    driver: bridge
