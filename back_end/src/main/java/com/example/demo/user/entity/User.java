@@ -62,7 +62,7 @@ public class User {
 
     @Column(name = "major",  nullable = false)
     @NotBlank
-    private boolean major;
+    private boolean major=false;
 
     @Column(name = "last_class", nullable = false)
     @NotNull

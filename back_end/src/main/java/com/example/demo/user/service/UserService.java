@@ -62,7 +62,7 @@ public class UserService {
         // 전체 및 부분 업데이트
         if (request.getUserName() != null) user.setUserName(request.getUserName());
         if (request.getUserProfile() != null) user.setUserProfile(request.getUserProfile());
-        if (request.getMajor() != null) user.setMajor(request.getMajor());
+        if (request.isMajor()) user.setMajor(true);
         if (request.getLastClass() != null) user.setLastClass(request.getLastClass());
         if (request.getWantedPosition() != null) user.setWantedPosition(request.getWantedPosition());
         if (request.getProjectPref() != null) user.setProjectPref(request.getProjectPref());

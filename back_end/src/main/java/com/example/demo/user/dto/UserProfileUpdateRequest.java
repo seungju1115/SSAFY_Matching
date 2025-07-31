@@ -17,7 +17,7 @@ import java.util.Set;
 public class UserProfileUpdateRequest {
     private String userName;
     private String userProfile;
-    private String major;
+    private boolean major;
     private Integer lastClass;
     private String wantedPosition;
     private Set<ProjectPrefEnum> projectPref;

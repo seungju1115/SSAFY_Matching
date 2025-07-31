@@ -23,7 +23,7 @@ public class UserProfileResponse implements Serializable {
     private String role;
     private String email;
     private String userProfile;
-    private String major;
+    private boolean major;
     private Integer lastClass;
     private String wantedPosition;
     private Set<ProjectPrefEnum> projectPref;
@@ -44,7 +44,7 @@ public class UserProfileResponse implements Serializable {
         response.setRole(user.getRole());
         response.setEmail(user.getEmail());
         response.setUserProfile(user.getUserProfile());
-        response.setMajor(user.getMajor());
+        response.setMajor(user.isMajor());
         response.setLastClass(user.getLastClass());
         response.setWantedPosition(user.getWantedPosition());
         response.setProjectPref(user.getProjectPref());

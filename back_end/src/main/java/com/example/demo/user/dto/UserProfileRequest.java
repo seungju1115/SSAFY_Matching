@@ -18,7 +18,7 @@ import java.util.Set;
 public class UserProfileRequest {
     private String userName;
     private String userProfile;
-    private String major;
+    private boolean major;
     private Integer lastClass;
     private String wantedPosition;
     private Set<ProjectPrefEnum> projectPref;
@@ -31,7 +31,7 @@ public class UserProfileRequest {
         User user = new User();
         user.setUserName(request.getUserName());
         user.setUserProfile(request.getUserProfile());
-        user.setMajor(request.getMajor());
+        user.setMajor(request.isMajor());
         user.setLastClass(request.getLastClass());
         user.setWantedPosition(request.getWantedPosition());
         user.setProjectPref(request.getProjectPref());
