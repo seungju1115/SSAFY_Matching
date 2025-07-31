@@ -4,6 +4,7 @@ import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Setup from './pages/Setup'
 import ProfileSetup from './pages/ProfileSetup'
+import MakeTeam from './pages/MakeTeam/make'
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/setup" element={<Setup />} />
         <Route path="/profile-setup" element={<ProfileSetup />} />
+        <Route path="/make-team" element={<MakeTeam />} />
       </Routes>
     </BrowserRouter>
   )

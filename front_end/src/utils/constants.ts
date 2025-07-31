@@ -11,4 +11,5 @@ export const ROUTES = {
   PROFILE: '/profile',
   MATCHING: '/matching',
   CHAT: '/chat',
+  MAKE_TEAM: '/make-team',
 } 
