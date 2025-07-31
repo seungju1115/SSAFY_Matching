@@ -4,12 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
-public class TeamDetailResponse {
+public class TeamDetailResponse implements Serializable {
     private Long teamId;
     private String teamName;
     private Long leaderId;

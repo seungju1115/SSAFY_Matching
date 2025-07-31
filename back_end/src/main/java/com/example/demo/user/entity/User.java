@@ -60,10 +60,9 @@ public class User {
 
     //private String projectStep;
 
-    @Column(name = "major",  nullable = false, length = 5)
-    @Size(max = 5)
+    @Column(name = "major",  nullable = false)
     @NotBlank
-    private String major;
+    private boolean major;
 
     @Column(name = "last_class", nullable = false)
     @NotNull

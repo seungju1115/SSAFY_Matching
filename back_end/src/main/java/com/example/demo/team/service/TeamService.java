@@ -9,6 +9,8 @@ import com.example.demo.team.dao.TeamRepository;
 import com.example.demo.team.dto.*;
 import com.example.demo.team.entity.Team;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -85,6 +87,7 @@ public class TeamService {
     }
 
     // 4. 팀 정보 조회
+    @Cacheable(value = "longTermCache", key = "'team:' + #teamId")
     public TeamDetailResponse getTeam(Long teamId) {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new RuntimeException("Team not found"));
@@ -99,6 +102,7 @@ public class TeamService {
 
     // 5. 팀 정보 삭제
     @Transactional
+    @CacheEvict(value = "longTermCache", key = "'team:' + #teamId")
     public void deleteTeam(Long teamId) {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 팀입니다."));
@@ -120,6 +124,7 @@ public class TeamService {
 
     // 6. 팀 정보 수정
     @Transactional
+    @CacheEvict(value = "longTermCache", key = "'team:' + #teamId")
     public TeamDetailResponse modifyTeam(TeamRequest teamRequest) {
         Team team = teamRepository.findById(teamRequest.getTeamId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 팀입니다."));
