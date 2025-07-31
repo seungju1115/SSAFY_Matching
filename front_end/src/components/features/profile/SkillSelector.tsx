@@ -68,12 +68,6 @@ export default function SkillSelector({ selectedSkills, onChange }: SkillSelecto
     onChange(selectedSkills.filter(s => s !== skill))
   }
 
-  // 추천 스킬 필터링 (이미 선택된 항목 제외)
-  const filteredSuggestions = SUGGESTED_SKILLS[activeCategory].filter(
-    skill => !selectedSkills.includes(skill) && 
-    skill.toLowerCase().includes(inputValue.toLowerCase())
-  )
-
   return (
     <div className="space-y-6">
       {/* 선택된 스킬 표시 */}

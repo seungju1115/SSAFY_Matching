@@ -7,7 +7,7 @@ import Header from '@/components/layout/Header'
 
 export default function Signup() {
   const navigate = useNavigate()
-  const [isLoading, setIsLoading] = useState(false)
+
   const [error, setError] = useState<string | null>(null)
 
   const handleSignupSuccess = () => {
@@ -17,7 +17,6 @@ export default function Signup() {
 
   const handleSignupError = (error: Error) => {
     setError(error.message)
-    setIsLoading(false)
   }
 
   return (

@@ -1,6 +1,6 @@
 // 인증 관련 API
 import apiClient from './axios'
-import { UserDetailSettings } from '@/types/user'
+import type { UserDetailSettings } from '@/types/user'
 
 export const authAPI = {
   login: (credentials: any) => apiClient.post('/auth/login', credentials),
