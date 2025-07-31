@@ -36,6 +36,7 @@ public class TeamMembershipRequest {
     // 요청 상태: PENDING, ACCEPTED, REJECTED, CANCELED
     @Enumerated(EnumType.STRING)
     @Column(length = 20, nullable = false)
+    @Builder.Default
     private RequestStatus status = RequestStatus.PENDING;
 
     // 요청 메시지 (선택 사항)

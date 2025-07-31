@@ -67,11 +67,11 @@ public class UserService {
         if (request.getQualification() != null) user.setQualification(request.getQualification());
         if (request.getTechStack() != null) user.setTechStack(request.getTechStack());
 
-        if (request.getTeamId() != null) {
-            Team team = teamRepository.findById(request.getTeamId())
-                    .orElseThrow(() -> new EntityNotFoundException("해당 팀이 존재하지 않습니다."));
-            user.setTeam(team);
-        }
+        //if (request.getTeamId() != null) {
+        //    Team team = teamRepository.findById(request.getTeamId())
+        //            .orElseThrow(() -> new EntityNotFoundException("해당 팀이 존재하지 않습니다."));
+        //    user.setTeam(team);
+        //}
 
         return UserProfileResponse.toUserProfileResponse(user);
     }
