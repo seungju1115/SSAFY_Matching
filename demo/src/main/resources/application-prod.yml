@@ -1,7 +1,5 @@
 spring:
   security:
-    headers:
-      frame-options: DISABLE
     oauth2:
       client:
         registration:
@@ -20,31 +18,29 @@ spring:
             user-name-attribute: sub
 
   datasource:
-    url: jdbc:h2:~/test
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
+    url: jdbc:postgresql://postgres:5432/team_search
+    username: postgres  # 또는 원하는 사용자명
+    password: your_password
+    driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.H2Dialect
+        database-platform: org.hibernate.dialect.PostgreSQLDialect
 
   h2:
     console:
       enabled: true
       path: /h2-console
-      settings:
-        web-allow-others: true
-
 
 jwt:
   secret: Nzg5ZjE0NzRlM2FjZjY4YzBkMTIzZmFhZjQ1NmY2ZDQ5YTc0MTg0MTNkZWIwZTkxY2YwYTc2ZTVjYmYzYjA3ZQ==
   expiration: 3600000 # 1시간 (ms)
-
+  
+  # 배포 시 수정 필요
 front:
   url: http://localhost:5173
