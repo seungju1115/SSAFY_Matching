@@ -1,0 +1,35 @@
+ㅞㅡㅡ# 개발 환경용 Dockerfile
+FROM node:22-alpine
+
+# 작업 디렉토리 설정
+WORKDIR /app
+
+# 필수 시스템 패키지 설치
+RUN apk add --no-cache libc6-compat curl
+
+# 개발 환경 변수 설정
+ENV NODE_ENV=development
+
+# package.json과 package-lock.json 복사 (의존성 캐싱 최적화)
+COPY package*.json ./
+
+# 의존성 설치 (개발 의존성 포함)
+# shadcn/ui, Tailwind CSS, TypeScript 등 모든 새 라이브러리 설치
+RUN npm ci --silent && npm cache clean --force
+
+# 소스 코드 복사
+COPY . .
+
+# shadcn/ui 관련 설정 파일들이 제대로 복사되었는지 확인
+RUN echo "Checking shadcn/ui configuration files:" && \
+    ls -la components.json tailwind.config.js src/lib/utils.ts 2>/dev/null || echo "Some config files missing"
+
+# 포트 노출
+EXPOSE 3000
+
+# 헬스체크 추가
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:3000/ || exit 1
+
+# 개발 서버 실행 (호스트 바인딩으로 Docker 외부에서 접근 가능)
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
