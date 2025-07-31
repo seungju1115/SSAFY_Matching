@@ -1,0 +1,21 @@
+services:
+  backend:
+    build:
+      dockerfile: Dockerfile
+    image: rabent0207/matching-ssafy-backend:latest
+    container_name: spring-backend
+    volumes:
+      - gradle-cache:/root/.gradle  # Gradle 캐시 볼륨
+    restart: unless-stopped
+    networks:
+      - app-network
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      # 필요한 환경변수 추가 (DB 설정 등)
+
+volumes:
+  gradle-cache:  # 도커 관리 볼륨 정의
+
+networks:
+  app-network:
+    driver: bridge
