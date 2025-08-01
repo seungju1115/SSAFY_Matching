@@ -2,6 +2,7 @@ package com.example.demo.user.dto;
 
 import com.example.demo.team.entity.Team;
 import com.example.demo.user.Enum.PersonalPrefEnum;
+import com.example.demo.user.Enum.PositionEnum;
 import com.example.demo.user.Enum.ProjectPrefEnum;
 import com.example.demo.user.Enum.TechEnum;
 import com.example.demo.user.entity.User;
@@ -25,7 +26,7 @@ public class UserProfileResponse implements Serializable {
     private String userProfile;
     private boolean major;
     private Integer lastClass;
-    private String wantedPosition;
+    private PositionEnum wantedPosition;
     private Set<ProjectPrefEnum> projectPref;
     private Set<PersonalPrefEnum> personalPref;
     private String projectExp;
