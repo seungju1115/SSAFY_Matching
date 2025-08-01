@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Star, MapPin, Plus, Filter } from "lucide-react"
@@ -36,7 +36,7 @@ export default function DeveloperSection({
     <section>
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8 gap-4">
         <div>
-          <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">등록자 현황</h3>
+          <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">대기자 현황</h3>
           <p className="text-gray-600 text-sm sm:text-base">프로젝트 참여를 원하는 개발자들</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
@@ -56,51 +56,49 @@ export default function DeveloperSection({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
         {developers.map((dev) => (
-          <Card key={dev.id} className="hover:shadow-lg transition-shadow duration-200">
-            <CardHeader className="pb-3">
-              <div className="flex items-start space-x-3">
-                <Avatar className="h-12 w-12 sm:h-16 sm:w-16 flex-shrink-0">
-                  <AvatarImage src={dev.avatar} />
-                  <AvatarFallback className="text-sm">{dev.name[0]}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <CardTitle className="text-base sm:text-lg truncate">{dev.name}</CardTitle>
-                  <CardDescription className="text-sm">{dev.role}</CardDescription>
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 mt-1 sm:mt-2 text-xs sm:text-sm text-gray-600">
-                    <span>경력 {dev.experience}</span>
-                    <div className="flex items-center space-x-1">
-                      <MapPin className="h-3 w-3" />
-                      <span>{dev.location}</span>
-                    </div>
+          <Card key={dev.id} className="hover:shadow-md transition-shadow duration-200 h-fit">
+            <CardContent className="p-4">
+              <div className="space-y-3">
+                {/* 개발자 기본 정보 */}
+                <div className="flex items-center space-x-3">
+                  <Avatar className="h-10 w-10 flex-shrink-0">
+                    <AvatarImage src={dev.avatar} />
+                    <AvatarFallback className="text-sm">{dev.name[0]}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-medium text-sm truncate">{dev.name}</h4>
+                    <p className="text-xs text-gray-600">{dev.role}</p>
+                  </div>
+                  <div className="flex items-center space-x-1 text-xs text-gray-500">
+                    <Star className="h-3 w-3 text-yellow-400 fill-current" />
+                    <span>{dev.rating}</span>
                   </div>
                 </div>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="space-y-3 sm:space-y-4">
-                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">{dev.bio}</p>
-                
-                <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                  {dev.skills.slice(0, 3).map((skill) => (
-                    <Badge key={skill} variant="outline" className="text-xs">{skill}</Badge>
+
+                {/* 기술 스택 */}
+                <div className="flex flex-wrap gap-1">
+                  {dev.skills.slice(0, 2).map((skill) => (
+                    <Badge key={skill} variant="outline" className="text-xs px-2 py-0.5">{skill}</Badge>
                   ))}
-                  {dev.skills.length > 3 && (
-                    <Badge variant="secondary" className="text-xs">+{dev.skills.length - 3}</Badge>
+                  {dev.skills.length > 2 && (
+                    <Badge variant="secondary" className="text-xs px-2 py-0.5">+{dev.skills.length - 2}</Badge>
                   )}
                 </div>
 
-                <div className="flex items-center justify-between text-xs sm:text-sm">
+                {/* 경력 및 위치 */}
+                <div className="flex items-center justify-between text-xs text-gray-600">
+                  <span>경력 {dev.experience}</span>
                   <div className="flex items-center space-x-1">
-                    <Star className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-400 fill-current" />
-                    <span>{dev.rating}</span>
+                    <MapPin className="h-3 w-3" />
+                    <span>{dev.location}</span>
                   </div>
-                  <span>{dev.projects}개 프로젝트 완료</span>
                 </div>
 
+                {/* 프로필 보기 버튼 */}
                 <Button 
-                  className="w-full" 
+                  className="w-full h-8" 
                   size="sm" 
                   variant="outline"
                   onClick={() => onViewProfile?.(dev.id)}
