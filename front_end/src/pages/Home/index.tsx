@@ -1,12 +1,20 @@
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Button } from "@/components/ui/button"
 import { Users, Search } from "lucide-react"
 import Header from "@/components/layout/Header"
 import TeamSection from "@/components/features/home/TeamSection"
 import DeveloperSection from "@/components/features/home/DeveloperSection"
+import TeamsModal from "@/components/features/home/TeamsModal"
+import DevelopersModal from "@/components/features/home/DevelopersModal"
 import { mockTeams, mockDevelopers } from "@/data/mockData"
 
 // Home 페이지 (메인페이지)
 export default function Home() {
+  const navigate = useNavigate();
+  const [isTeamsModalOpen, setIsTeamsModalOpen] = useState(false)
+  const [isDevelopersModalOpen, setIsDevelopersModalOpen] = useState(false)
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* 분리된 Header 컴포넌트 사용 */}
@@ -39,20 +47,41 @@ export default function Home() {
         {/* Team Section */}
         <TeamSection 
           teams={mockTeams}
-          onCreateTeam={() => console.log('팀 생성 클릭')}
-          onViewAll={() => console.log('팀 전체보기 클릭')}
+          onCreateTeam={() => navigate('/make-team') }
+          onViewAll={() => setIsTeamsModalOpen(true)}
           onViewTeam={(teamId) => console.log('팀 보기 클릭:', teamId)}
         />
 
         {/* Developer Section */}
         <DeveloperSection 
           developers={mockDevelopers}
-          onRegister={() => console.log('등록 클릭')}
+          onRegister={() => navigate('/profile-setup')}
           onFilter={() => console.log('필터 클릭')}
-          onViewAll={() => console.log('개발자 전체보기 클릭')}
+          onViewAll={() => setIsDevelopersModalOpen(true)}
           onViewProfile={(developerId) => console.log('프로필 보기 클릭:', developerId)}
         />
       </div>
+
+      {/* 모달들 */}
+      <TeamsModal
+        isOpen={isTeamsModalOpen}
+        onClose={() => setIsTeamsModalOpen(false)}
+        teams={mockTeams}
+        onViewTeam={(teamId) => {
+          console.log('팀 보기 클릭:', teamId)
+          setIsTeamsModalOpen(false)
+        }}
+      />
+
+      <DevelopersModal
+        isOpen={isDevelopersModalOpen}
+        onClose={() => setIsDevelopersModalOpen(false)}
+        developers={mockDevelopers}
+        onViewProfile={(developerId) => {
+          console.log('프로필 보기 클릭:', developerId)
+          setIsDevelopersModalOpen(false)
+        }}
+      />
     </div>
   )
-} 
+}
