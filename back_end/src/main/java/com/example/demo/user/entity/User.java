@@ -1,6 +1,7 @@
 package com.example.demo.user.entity;
 
 import com.example.demo.user.Enum.PersonalPrefEnum;
+import com.example.demo.user.Enum.PositionEnum;
 import com.example.demo.user.Enum.ProjectPrefEnum;
 import com.example.demo.user.Enum.TechEnum;
 import com.example.demo.chat.entity.ChatRoomMember;
@@ -68,10 +69,10 @@ public class User {
     @NotNull
     private Integer lastClass;
 
-    @Column(name = "wanted_position",  nullable = false,  length = 50)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "wanted_position",  nullable = false)
     @NotBlank
-    @Size(max = 50)
-    private String wantedPosition;
+    private PositionEnum wantedPosition;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<ChatRoomMember> chatRoomMembers = new ArrayList<>();

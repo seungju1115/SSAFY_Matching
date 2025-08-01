@@ -22,6 +22,6 @@ public interface UserRepository extends JpaRepository<User,Long> {
             "WHERE u.id = :id")
     Optional<com.example.demo.user.entity.User> findByIdWithChatRoomMembers(@Param("id") Long id);
 
-    @Query(value = "select new com.example.demo.dashboard.dto.UserCountDto(u.team, u.major) from User u")
+    @Query(value = "select new com.example.demo.dashboard.dto.UserCountDto(u.team, u.major, u.wantedPosition) from User u")
     List<UserCountDto> CountUsers();
 }
