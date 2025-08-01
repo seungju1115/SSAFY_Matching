@@ -17,14 +17,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class DashboardController {
     private final DashboardService dashboardService;
 
-    @Cacheable(value = "shortTermCache")
+
     @GetMapping("/graph")
     public DashboardResponseDto getDashboard() {
         DashboardResponseDto dto=dashboardService.getDashboard();
         return dto;
     }
 
-    @Cacheable(value = "shortTermCache")
+
     @GetMapping("/position")
     public SummaryResoponseDto  getPosition() {
         SummaryResoponseDto dto=new SummaryResoponseDto();

@@ -62,7 +62,7 @@ public class HazelcastConfig {
 
         MapConfig shortTermConfig = new MapConfig();
         shortTermConfig.setName("shortTermCache");
-        shortTermConfig.setTimeToLiveSeconds(300);
+        shortTermConfig.setTimeToLiveSeconds(600);
 
         EvictionConfig evictionConfig2 = new EvictionConfig();
         evictionConfig2.setEvictionPolicy(EvictionPolicy.LRU);

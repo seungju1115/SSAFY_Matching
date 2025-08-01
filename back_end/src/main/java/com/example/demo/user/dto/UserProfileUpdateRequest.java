@@ -1,6 +1,7 @@
 package com.example.demo.user.dto;
 
 import com.example.demo.user.Enum.PersonalPrefEnum;
+import com.example.demo.user.Enum.PositionEnum;
 import com.example.demo.user.Enum.ProjectPrefEnum;
 import com.example.demo.user.Enum.TechEnum;
 import lombok.AllArgsConstructor;
@@ -17,9 +18,9 @@ import java.util.Set;
 public class UserProfileUpdateRequest {
     private String userName;
     private String userProfile;
-    private String major;
+    private boolean major;
     private Integer lastClass;
-    private String wantedPosition;
+    private PositionEnum wantedPosition;
     private Set<ProjectPrefEnum> projectPref;
     private Set<PersonalPrefEnum> personalPref;
     private String projectExp;

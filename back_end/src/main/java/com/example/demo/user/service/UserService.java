@@ -8,6 +8,8 @@ import com.example.demo.user.entity.User;
 import com.example.demo.team.dao.TeamRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +30,7 @@ public class UserService {
         return UserProfileResponse.toUserProfileResponse(user);
     }
 
+    @Cacheable(value = "longTermCache", key = "'user:'+ #id")
     @Transactional
     public UserProfileResponse getProfile(Long id){
         User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found"));
@@ -42,6 +45,7 @@ public class UserService {
         return UserProfileResponse.toUserProfileResponse(user);
     }
 
+    @CacheEvict(value = "longTermCache", key = "'user:'+ #id")
     @Transactional
     public void deleteProfile(Long id){
         User user = userRepository.findById(id)
@@ -49,6 +53,7 @@ public class UserService {
         userRepository.delete(user);
     }
 
+    @CacheEvict(value = "longTermCache", key = "'user:'+ #id")
     @Transactional
     public UserProfileResponse updateUserProfile(UserProfileUpdateRequest request, Long id) {
         User user = userRepository.findById(id)
@@ -57,7 +62,7 @@ public class UserService {
         // 전체 및 부분 업데이트
         if (request.getUserName() != null) user.setUserName(request.getUserName());
         if (request.getUserProfile() != null) user.setUserProfile(request.getUserProfile());
-        if (request.getMajor() != null) user.setMajor(request.getMajor());
+        if (request.isMajor()) user.setMajor(true);
         if (request.getLastClass() != null) user.setLastClass(request.getLastClass());
         if (request.getWantedPosition() != null) user.setWantedPosition(request.getWantedPosition());
         if (request.getProjectPref() != null) user.setProjectPref(request.getProjectPref());
@@ -74,5 +79,4 @@ public class UserService {
 
         return UserProfileResponse.toUserProfileResponse(user);
     }
-
 }

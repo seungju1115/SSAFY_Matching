@@ -2,6 +2,7 @@ package com.example.demo.user.dto;
 
 import com.example.demo.team.entity.Team;
 import com.example.demo.user.Enum.PersonalPrefEnum;
+import com.example.demo.user.Enum.PositionEnum;
 import com.example.demo.user.Enum.ProjectPrefEnum;
 import com.example.demo.user.Enum.TechEnum;
 import com.example.demo.user.entity.User;
@@ -10,21 +11,22 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.Set;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserProfileResponse {
+public class UserProfileResponse implements Serializable {
     private Long id;
     private String userName;
     private String role;
     private String email;
     private String userProfile;
-    private String major;
+    private boolean major;
     private Integer lastClass;
-    private String wantedPosition;
+    private PositionEnum wantedPosition;
     private Set<ProjectPrefEnum> projectPref;
     private Set<PersonalPrefEnum> personalPref;
     private String projectExp;
@@ -43,7 +45,7 @@ public class UserProfileResponse {
         response.setRole(user.getRole());
         response.setEmail(user.getEmail());
         response.setUserProfile(user.getUserProfile());
-        response.setMajor(user.getMajor());
+        response.setMajor(user.isMajor());
         response.setLastClass(user.getLastClass());
         response.setWantedPosition(user.getWantedPosition());
         response.setProjectPref(user.getProjectPref());

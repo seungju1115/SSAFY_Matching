@@ -1,6 +1,7 @@
 package com.example.demo;
 
 import com.example.demo.user.Enum.PersonalPrefEnum;
+import com.example.demo.user.Enum.PositionEnum;
 import com.example.demo.user.Enum.ProjectPrefEnum;
 import com.example.demo.user.Enum.TechEnum;
 import com.example.demo.user.dao.UserRepository;
@@ -52,9 +53,9 @@ class DemoApplicationTests {
 		user.setRole("USER");
 		user.setEmail("hong@example.com");
 		user.setUserProfile("열정적인 개발자입니다.");
-		user.setMajor("컴공");
+		user.setMajor(true);
 		user.setLastClass(5);
-		user.setWantedPosition("백엔드 개발자");
+		user.setWantedPosition(PositionEnum.BACKEND);
 		user.setProjectPref(Set.of(ProjectPrefEnum.CHALLENGE, ProjectPrefEnum.STABLE));
 		user.setPersonalPref(Set.of(PersonalPrefEnum.COMMUNICATE, PersonalPrefEnum.CONCENTRATE));
 		user.setTechStack(Set.of(TechEnum.JPA, TechEnum.Spring));
