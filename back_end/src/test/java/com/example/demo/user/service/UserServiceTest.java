@@ -75,7 +75,7 @@ class UserServiceTest {
 
         List<User> mockUsers = Arrays.asList(mockUser1, mockUser2);
         
-        when(userRepository.findUsersWithoutTeamByFilters(null, null, null))
+        when(userRepository.findUsersWithoutTeam())
                 .thenReturn(mockUsers);
 
         List<SearchUserResponse> result = userService.searchUsersWithoutTeam(request);
@@ -86,7 +86,7 @@ class UserServiceTest {
         assertThat(result.get(1).getUserName()).isEqualTo("테스트유저2");
         assertThat(result.get(1).getWantedPosition()).isEqualTo(PositionEnum.FRONTEND);
 
-        verify(userRepository).findUsersWithoutTeamByFilters(null, null, null);
+        verify(userRepository).findUsersWithoutTeam();
     }
 
     @Test
@@ -98,8 +98,7 @@ class UserServiceTest {
 
         List<User> mockUsers = Arrays.asList(mockUser1);
         
-        when(userRepository.findUsersWithoutTeamByFilters(
-                eq(PositionEnum.BACKEND), isNull(), isNull()))
+        when(userRepository.findUsersWithoutTeamByPosition(eq(PositionEnum.BACKEND)))
                 .thenReturn(mockUsers);
 
         List<SearchUserResponse> result = userService.searchUsersWithoutTeam(request);
@@ -108,8 +107,7 @@ class UserServiceTest {
         assertThat(result.get(0).getUserName()).isEqualTo("테스트유저1");
         assertThat(result.get(0).getWantedPosition()).isEqualTo(PositionEnum.BACKEND);
 
-        verify(userRepository).findUsersWithoutTeamByFilters(
-                eq(PositionEnum.BACKEND), isNull(), isNull());
+        verify(userRepository).findUsersWithoutTeamByPosition(eq(PositionEnum.BACKEND));
     }
 
     @Test
@@ -121,9 +119,8 @@ class UserServiceTest {
 
         List<User> mockUsers = Arrays.asList(mockUser1);
         
-        when(userRepository.findUsersWithoutTeamByFilters(
-                isNull(), eq(Set.of(TechEnum.Spring)), isNull()))
-                .thenReturn(mockUsers);
+        when(userRepository.findUsersWithoutTeam())
+                .thenReturn(Arrays.asList(mockUser1, mockUser2));
 
         List<SearchUserResponse> result = userService.searchUsersWithoutTeam(request);
 
@@ -131,8 +128,7 @@ class UserServiceTest {
         assertThat(result.get(0).getUserName()).isEqualTo("테스트유저1");
         assertThat(result.get(0).getTechStack()).contains(TechEnum.Spring);
 
-        verify(userRepository).findUsersWithoutTeamByFilters(
-                isNull(), eq(Set.of(TechEnum.Spring)), isNull());
+        verify(userRepository).findUsersWithoutTeam();
     }
 
     @Test
@@ -144,9 +140,8 @@ class UserServiceTest {
 
         List<User> mockUsers = Arrays.asList(mockUser1);
         
-        when(userRepository.findUsersWithoutTeamByFilters(
-                isNull(), isNull(), eq(Set.of(ProjectPrefEnum.STABLE))))
-                .thenReturn(mockUsers);
+        when(userRepository.findUsersWithoutTeam())
+                .thenReturn(Arrays.asList(mockUser1, mockUser2));
 
         List<SearchUserResponse> result = userService.searchUsersWithoutTeam(request);
 
@@ -154,8 +149,7 @@ class UserServiceTest {
         assertThat(result.get(0).getUserName()).isEqualTo("테스트유저1");
         assertThat(result.get(0).getProjectPref()).contains(ProjectPrefEnum.STABLE);
 
-        verify(userRepository).findUsersWithoutTeamByFilters(
-                isNull(), isNull(), eq(Set.of(ProjectPrefEnum.STABLE)));
+        verify(userRepository).findUsersWithoutTeam();
     }
 
     @Test
@@ -167,10 +161,7 @@ class UserServiceTest {
 
         List<User> mockUsers = Arrays.asList(mockUser1);
         
-        when(userRepository.findUsersWithoutTeamByFilters(
-                eq(PositionEnum.BACKEND), 
-                eq(Set.of(TechEnum.Spring, TechEnum.JPA)), 
-                eq(Set.of(ProjectPrefEnum.STABLE))))
+        when(userRepository.findUsersWithoutTeamByPosition(eq(PositionEnum.BACKEND)))
                 .thenReturn(mockUsers);
 
         List<SearchUserResponse> result = userService.searchUsersWithoutTeam(request);
@@ -181,10 +172,7 @@ class UserServiceTest {
         assertThat(result.get(0).getTechStack()).containsAll(Set.of(TechEnum.Spring, TechEnum.JPA));
         assertThat(result.get(0).getProjectPref()).contains(ProjectPrefEnum.STABLE);
 
-        verify(userRepository).findUsersWithoutTeamByFilters(
-                eq(PositionEnum.BACKEND), 
-                eq(Set.of(TechEnum.Spring, TechEnum.JPA)), 
-                eq(Set.of(ProjectPrefEnum.STABLE)));
+        verify(userRepository).findUsersWithoutTeamByPosition(eq(PositionEnum.BACKEND));
     }
 
     @Test
@@ -194,19 +182,13 @@ class UserServiceTest {
         request.setTechStack(Set.of(TechEnum.Docker));
         request.setProjectPref(Set.of(ProjectPrefEnum.CHALLENGE));
 
-        when(userRepository.findUsersWithoutTeamByFilters(
-                eq(PositionEnum.MISC), 
-                eq(Set.of(TechEnum.Docker)), 
-                eq(Set.of(ProjectPrefEnum.CHALLENGE))))
+        when(userRepository.findUsersWithoutTeamByPosition(eq(PositionEnum.MISC)))
                 .thenReturn(Arrays.asList());
 
         List<SearchUserResponse> result = userService.searchUsersWithoutTeam(request);
 
         assertThat(result).isEmpty();
 
-        verify(userRepository).findUsersWithoutTeamByFilters(
-                eq(PositionEnum.MISC), 
-                eq(Set.of(TechEnum.Docker)), 
-                eq(Set.of(ProjectPrefEnum.CHALLENGE)));
+        verify(userRepository).findUsersWithoutTeamByPosition(eq(PositionEnum.MISC));
     }
 }

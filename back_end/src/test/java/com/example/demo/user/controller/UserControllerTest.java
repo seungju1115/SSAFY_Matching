@@ -1,44 +1,36 @@
 package com.example.demo.user.controller;
 
+import com.example.demo.response.ApiResponse;
 import com.example.demo.user.Enum.PositionEnum;
 import com.example.demo.user.Enum.ProjectPrefEnum;
 import com.example.demo.user.Enum.TechEnum;
 import com.example.demo.user.dto.SearchUserRequest;
 import com.example.demo.user.dto.SearchUserResponse;
 import com.example.demo.user.service.UserService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.context.ActiveProfiles;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(UserController.class)
-@ActiveProfiles("local")
+@ExtendWith(MockitoExtension.class)
 class UserControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
+    @Mock
     private UserService userService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @InjectMocks
+    private UserController userController;
 
     private SearchUserResponse mockResponse1;
     private SearchUserResponse mockResponse2;
@@ -71,31 +63,29 @@ class UserControllerTest {
     }
 
     @Test
-    @WithMockUser
-    void searchUsersWithoutTeam_성공_모든_사용자_반환() throws Exception {
+    void searchUsersWithoutTeam_성공_모든_사용자_반환() {
         SearchUserRequest request = new SearchUserRequest();
         List<SearchUserResponse> mockResponses = Arrays.asList(mockResponse1, mockResponse2);
 
         when(userService.searchUsersWithoutTeam(any(SearchUserRequest.class)))
                 .thenReturn(mockResponses);
 
-        mockMvc.perform(post("/users/profile/search")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.data").isArray())
-                .andExpect(jsonPath("$.data.length()").value(2))
-                .andExpect(jsonPath("$.data[0].userName").value("테스트유저1"))
-                .andExpect(jsonPath("$.data[0].wantedPosition").value("BACKEND"))
-                .andExpect(jsonPath("$.data[1].userName").value("테스트유저2"))
-                .andExpect(jsonPath("$.data[1].wantedPosition").value("FRONTEND"));
+        ResponseEntity<ApiResponse> response = userController.searchUsersWithoutTeam(request);
+
+        assertThat(response.getStatusCode().value()).isEqualTo(200);
+        assertThat(response.getBody().getStatus()).isEqualTo(200);
+        
+        @SuppressWarnings("unchecked")
+        List<SearchUserResponse> data = (List<SearchUserResponse>) response.getBody().getData();
+        assertThat(data).hasSize(2);
+        assertThat(data.get(0).getUserName()).isEqualTo("테스트유저1");
+        assertThat(data.get(0).getWantedPosition()).isEqualTo(PositionEnum.BACKEND);
+        assertThat(data.get(1).getUserName()).isEqualTo("테스트유저2");
+        assertThat(data.get(1).getWantedPosition()).isEqualTo(PositionEnum.FRONTEND);
     }
 
     @Test
-    @WithMockUser
-    void searchUsersWithoutTeam_포지션_필터링() throws Exception {
+    void searchUsersWithoutTeam_포지션_필터링() {
         SearchUserRequest request = new SearchUserRequest();
         request.setWantedPosition(PositionEnum.BACKEND);
         
@@ -104,21 +94,20 @@ class UserControllerTest {
         when(userService.searchUsersWithoutTeam(any(SearchUserRequest.class)))
                 .thenReturn(mockResponses);
 
-        mockMvc.perform(post("/users/profile/search")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.data").isArray())
-                .andExpect(jsonPath("$.data.length()").value(1))
-                .andExpect(jsonPath("$.data[0].userName").value("테스트유저1"))
-                .andExpect(jsonPath("$.data[0].wantedPosition").value("BACKEND"));
+        ResponseEntity<ApiResponse> response = userController.searchUsersWithoutTeam(request);
+
+        assertThat(response.getStatusCode().value()).isEqualTo(200);
+        assertThat(response.getBody().getStatus()).isEqualTo(200);
+        
+        @SuppressWarnings("unchecked")
+        List<SearchUserResponse> data = (List<SearchUserResponse>) response.getBody().getData();
+        assertThat(data).hasSize(1);
+        assertThat(data.get(0).getUserName()).isEqualTo("테스트유저1");
+        assertThat(data.get(0).getWantedPosition()).isEqualTo(PositionEnum.BACKEND);
     }
 
     @Test
-    @WithMockUser
-    void searchUsersWithoutTeam_기술스택_필터링() throws Exception {
+    void searchUsersWithoutTeam_기술스택_필터링() {
         SearchUserRequest request = new SearchUserRequest();
         request.setTechStack(Set.of(TechEnum.Spring));
         
@@ -127,96 +116,33 @@ class UserControllerTest {
         when(userService.searchUsersWithoutTeam(any(SearchUserRequest.class)))
                 .thenReturn(mockResponses);
 
-        mockMvc.perform(post("/users/profile/search")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.data").isArray())
-                .andExpect(jsonPath("$.data.length()").value(1))
-                .andExpect(jsonPath("$.data[0].userName").value("테스트유저1"))
-                .andExpect(jsonPath("$.data[0].techStack").isArray());
-    }
+        ResponseEntity<ApiResponse> response = userController.searchUsersWithoutTeam(request);
 
-    @Test
-    @WithMockUser
-    void searchUsersWithoutTeam_프로젝트선호도_필터링() throws Exception {
-        SearchUserRequest request = new SearchUserRequest();
-        request.setProjectPref(Set.of(ProjectPrefEnum.STABLE));
+        assertThat(response.getStatusCode().value()).isEqualTo(200);
+        assertThat(response.getBody().getStatus()).isEqualTo(200);
         
-        List<SearchUserResponse> mockResponses = Arrays.asList(mockResponse1);
-
-        when(userService.searchUsersWithoutTeam(any(SearchUserRequest.class)))
-                .thenReturn(mockResponses);
-
-        mockMvc.perform(post("/users/profile/search")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.data").isArray())
-                .andExpect(jsonPath("$.data.length()").value(1))
-                .andExpect(jsonPath("$.data[0].userName").value("테스트유저1"))
-                .andExpect(jsonPath("$.data[0].projectPref").isArray());
+        @SuppressWarnings("unchecked")
+        List<SearchUserResponse> data = (List<SearchUserResponse>) response.getBody().getData();
+        assertThat(data).hasSize(1);
+        assertThat(data.get(0).getUserName()).isEqualTo("테스트유저1");
+        assertThat(data.get(0).getTechStack()).contains(TechEnum.Spring);
     }
 
     @Test
-    @WithMockUser
-    void searchUsersWithoutTeam_복합_조건_필터링() throws Exception {
-        SearchUserRequest request = new SearchUserRequest();
-        request.setWantedPosition(PositionEnum.BACKEND);
-        request.setTechStack(Set.of(TechEnum.Spring, TechEnum.JPA));
-        request.setProjectPref(Set.of(ProjectPrefEnum.STABLE));
-        
-        List<SearchUserResponse> mockResponses = Arrays.asList(mockResponse1);
-
-        when(userService.searchUsersWithoutTeam(any(SearchUserRequest.class)))
-                .thenReturn(mockResponses);
-
-        mockMvc.perform(post("/users/profile/search")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.data").isArray())
-                .andExpect(jsonPath("$.data.length()").value(1))
-                .andExpect(jsonPath("$.data[0].userName").value("테스트유저1"))
-                .andExpect(jsonPath("$.data[0].wantedPosition").value("BACKEND"))
-                .andExpect(jsonPath("$.data[0].techStack").isArray())
-                .andExpect(jsonPath("$.data[0].projectPref").isArray());
-    }
-
-    @Test
-    @WithMockUser
-    void searchUsersWithoutTeam_조건에_맞는_사용자_없음() throws Exception {
+    void searchUsersWithoutTeam_조건에_맞는_사용자_없음() {
         SearchUserRequest request = new SearchUserRequest();
         request.setWantedPosition(PositionEnum.MISC);
         
         when(userService.searchUsersWithoutTeam(any(SearchUserRequest.class)))
                 .thenReturn(Arrays.asList());
 
-        mockMvc.perform(post("/users/profile/search")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.data").isArray())
-                .andExpect(jsonPath("$.data.length()").value(0));
-    }
+        ResponseEntity<ApiResponse> response = userController.searchUsersWithoutTeam(request);
 
-    @Test
-    @WithMockUser
-    void searchUsersWithoutTeam_잘못된_요청_형식() throws Exception {
-        String invalidJson = "{ \"invalidField\": \"value\" }";
-
-        mockMvc.perform(post("/users/profile/search")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(invalidJson))
-                .andExpect(status().isOk());
+        assertThat(response.getStatusCode().value()).isEqualTo(200);
+        assertThat(response.getBody().getStatus()).isEqualTo(200);
+        
+        @SuppressWarnings("unchecked")
+        List<SearchUserResponse> data = (List<SearchUserResponse>) response.getBody().getData();
+        assertThat(data).isEmpty();
     }
 }

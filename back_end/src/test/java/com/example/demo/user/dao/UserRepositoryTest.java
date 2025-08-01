@@ -62,47 +62,8 @@ class UserRepositoryTest {
     }
 
     @Test
-    void findUsersWithoutTeamByFilters_포지션으로_필터링() {
-        List<User> result = userRepository.findUsersWithoutTeamByFilters(
-                PositionEnum.BACKEND, null, null);
-
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getUserName()).isEqualTo("테스트유저1");
-        assertThat(result.get(0).getWantedPosition()).isEqualTo(PositionEnum.BACKEND);
-    }
-
-    @Test
-    void findUsersWithoutTeamByFilters_기술스택으로_필터링() {
-        List<User> result = userRepository.findUsersWithoutTeamByFilters(
-                null, Set.of(TechEnum.Spring), null);
-
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getUserName()).isEqualTo("테스트유저1");
-        assertThat(result.get(0).getTechStack()).contains(TechEnum.Spring);
-    }
-
-    @Test
-    void findUsersWithoutTeamByFilters_프로젝트선호도로_필터링() {
-        List<User> result = userRepository.findUsersWithoutTeamByFilters(
-                null, null, Set.of(ProjectPrefEnum.STABLE));
-
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getUserName()).isEqualTo("테스트유저1");
-        assertThat(result.get(0).getProjectPref()).contains(ProjectPrefEnum.STABLE);
-    }
-
-    @Test
-    void findUsersWithoutTeamByFilters_복합_조건_필터링() {
-        List<User> result = userRepository.findUsersWithoutTeamByFilters(
-                PositionEnum.BACKEND, Set.of(TechEnum.Spring), Set.of(ProjectPrefEnum.STABLE));
-
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getUserName()).isEqualTo("테스트유저1");
-    }
-
-    @Test
-    void findUsersWithoutTeamByFilters_조건_없음_모든_팀없는_유저_반환() {
-        List<User> result = userRepository.findUsersWithoutTeamByFilters(null, null, null);
+    void findUsersWithoutTeam_모든_팀없는_유저_반환() {
+        List<User> result = userRepository.findUsersWithoutTeam();
 
         assertThat(result).hasSize(2);
         assertThat(result).extracting(User::getUserName)
@@ -110,9 +71,17 @@ class UserRepositoryTest {
     }
 
     @Test
-    void findUsersWithoutTeamByFilters_조건에_맞지_않는_경우_빈_결과() {
-        List<User> result = userRepository.findUsersWithoutTeamByFilters(
-                PositionEnum.MISC, Set.of(TechEnum.Docker), Set.of(ProjectPrefEnum.CHALLENGE));
+    void findUsersWithoutTeamByPosition_포지션으로_필터링() {
+        List<User> result = userRepository.findUsersWithoutTeamByPosition(PositionEnum.BACKEND);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getUserName()).isEqualTo("테스트유저1");
+        assertThat(result.get(0).getWantedPosition()).isEqualTo(PositionEnum.BACKEND);
+    }
+
+    @Test
+    void findUsersWithoutTeamByPosition_조건에_맞지_않는_경우_빈_결과() {
+        List<User> result = userRepository.findUsersWithoutTeamByPosition(PositionEnum.MISC);
 
         assertThat(result).isEmpty();
     }

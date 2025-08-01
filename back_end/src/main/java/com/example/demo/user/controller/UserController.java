@@ -1,5 +1,7 @@
 package com.example.demo.user.controller;
 
+import com.example.demo.user.dto.SearchUserRequest;
+import com.example.demo.user.dto.SearchUserResponse;
 import com.example.demo.user.dto.UserProfileRequest;
 import com.example.demo.user.dto.UserProfileResponse;
 import com.example.demo.user.dto.UserProfileUpdateRequest;
@@ -8,6 +10,8 @@ import com.example.demo.response.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/users/profile")
@@ -43,5 +47,11 @@ public class UserController {
     public ResponseEntity<ApiResponse> updateProfile(@RequestBody UserProfileUpdateRequest userProfileUpdateRequest, @PathVariable Long id){
         UserProfileResponse userProfileResponse = userService.updateUserProfile(userProfileUpdateRequest, id);
         return ResponseEntity.ok(ApiResponse.ok(userProfileResponse));
+    }
+
+    @PostMapping("/search")
+    public ResponseEntity<ApiResponse> searchUsersWithoutTeam(@RequestBody SearchUserRequest request) {
+        List<SearchUserResponse> users = userService.searchUsersWithoutTeam(request);
+        return ResponseEntity.ok(ApiResponse.ok(users));
     }
 }
