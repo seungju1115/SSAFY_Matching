@@ -56,10 +56,12 @@ public class ChatRoomService {
             ChatRoom newRoom = new ChatRoom();
             newRoom.setRoomType(RoomType.PRIVATE);
 
-            newRoom.addMember(chatMemberService.createChatRoomMember(user1, newRoom));
-            newRoom.addMember(chatMemberService.createChatRoomMember(user2, newRoom));
+            ChatRoom savedRoom = chatRoomRepository.save(newRoom);
 
-            return chatRoomRepository.save(newRoom);
+            newRoom.addMember(chatMemberService.createChatRoomMember(user1, savedRoom));
+            newRoom.addMember(chatMemberService.createChatRoomMember(user2, savedRoom));
+
+            return savedRoom;
         });
 
         return new ChatRoomResponse(chatRoom.getId(), chatRoom.getRoomType(), null);

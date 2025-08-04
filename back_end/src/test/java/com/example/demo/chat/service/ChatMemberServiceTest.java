@@ -3,16 +3,15 @@ package com.example.demo.chat.service;
 import com.example.demo.chat.dao.ChatRoomMemberRepository;
 import com.example.demo.chat.entity.ChatRoom;
 import com.example.demo.chat.entity.ChatRoomMember;
+import com.example.demo.common.exception.BusinessException;
+import com.example.demo.common.exception.ErrorCode;
 import com.example.demo.user.entity.User;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-@ExtendWith(MockitoExtension.class)
 class ChatMemberServiceTest {
 
     @Mock
@@ -21,22 +20,40 @@ class ChatMemberServiceTest {
     @InjectMocks
     private ChatMemberService chatMemberService;
 
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
+
     @Test
-    void createChatRoomMember_shouldCreateMemberWithUserAndChatRoom() {
-        // given
+    void createChatRoomMember_shouldCreateMember_whenNotExists() {
         User user = new User();
-        user.setId(1L);
-        user.setUserName("testUser");
-
         ChatRoom chatRoom = new ChatRoom();
-        chatRoom.setId(10L);
 
-        // when
-        ChatRoomMember member = chatMemberService.createChatRoomMember(user, chatRoom);
+        // 중복 멤버 없음으로 설정
+        when(chatRoomMemberRepository.existsByUserAndChatRoom(user, chatRoom)).thenReturn(false);
 
-        // then
-        assertThat(member).isNotNull();
-        assertThat(member.getUser()).isEqualTo(user);
-        assertThat(member.getChatRoom()).isEqualTo(chatRoom);
+        ChatRoomMember result = chatMemberService.createChatRoomMember(user, chatRoom);
+
+        assertNotNull(result);
+        assertEquals(user, result.getUser());
+        assertEquals(chatRoom, result.getChatRoom());
+
+        verify(chatRoomMemberRepository, times(1)).existsByUserAndChatRoom(user, chatRoom);
+    }
+
+    @Test
+    void createChatRoomMember_shouldThrowException_whenMemberExists() {
+        User user = new User();
+        ChatRoom chatRoom = new ChatRoom();
+
+        // 중복 멤버 있음으로 설정
+        when(chatRoomMemberRepository.existsByUserAndChatRoom(user, chatRoom)).thenReturn(true);
+
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> chatMemberService.createChatRoomMember(user, chatRoom));
+
+        assertEquals(ErrorCode.CHATROOM_MEMBER_ALREADY_EXISTS, exception.getErrorCode());
+        verify(chatRoomMemberRepository, times(1)).existsByUserAndChatRoom(user, chatRoom);
     }
 }
