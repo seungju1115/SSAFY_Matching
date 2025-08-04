@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
@@ -36,7 +37,9 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(
                 c ->
-                        c.requestMatchers("/error", "/users/profile", "/users/login", "/login/oauth2/code/**", "/h2-console/**").permitAll()
+                        c.requestMatchers("/error", "/users/profile", "/users/login", "/login/oauth2/code/**", "/h2-console/**"
+                                , "/team", "/team/search").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/users/profile").permitAll()
                                 .anyRequest().authenticated());
 
         CustomAuthorizationRequestResolver customResolver = 
