@@ -45,39 +45,4 @@ public class ApiResponse<T> {
     public static <T> ApiResponse<T> noContent() {
         return new ApiResponse<>(204, "삭제 성공", null);
     }
-
-    /**
-     * 잘못된 요청 - 400 Bad Request
-     */
-    public static <T> ApiResponse<T> badRequest(String message) {
-        return new ApiResponse<>(400, message, null);
-    }
-
-    /**
-     * 인증 실패 - 401 Unauthorized
-     */
-    public static <T> ApiResponse<T> unauthorized(String message) {
-        return new ApiResponse<>(401, message, null);
-    }
-
-    /**
-     * 권한 없음 - 403 Forbidden
-     */
-    public static <T> ApiResponse<T> forbidden(String message) {
-        return new ApiResponse<>(403, message, null);
-    }
-
-    /**
-     * 자원 없음 - 404 Not Found
-     */
-    public static <T> ApiResponse<T> notFound(String message) {
-        return new ApiResponse<>(404, message, null);
-    }
-
-    /**
-     * 서버 오류 - 500 Internal Server Error
-     */
-    public static <T> ApiResponse<T> internalServerError(String message) {
-        return new ApiResponse<>(500, message, null);
-    }
 }

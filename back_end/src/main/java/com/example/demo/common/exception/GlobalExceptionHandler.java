@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.dao.DataAccessException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import java.util.stream.Collectors;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -17,6 +20,25 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(code.getStatus())
                 .body(new ApiResponse<>(code.getStatus(), code.getMessage(), null));
+    }
+
+    // Valid 처리
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiResponse<Void>> handleValidationException(MethodArgumentNotValidException ex) {
+        ErrorCode errorCode = ErrorCode.INVALID_REQUEST; // 커스텀 코드
+
+        String errorMessage = ex.getBindingResult().getFieldErrors().stream()
+                .map(error -> {
+                    String msg = error.getDefaultMessage();
+                    if (msg.isBlank() || msg == null) {
+                        msg = errorCode.getMessage();
+                    }
+                    return error.getField() + ": " + msg;
+                })
+                .collect(Collectors.joining(", "));
+
+        return ResponseEntity.status(errorCode.getStatus())
+                .body(new ApiResponse<>(errorCode.getStatus(), errorMessage, null));
     }
 
     // db에러 처리

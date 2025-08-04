@@ -5,6 +5,7 @@ import com.example.demo.team.dto.*;
 import com.example.demo.team.entity.RequestType;
 import com.example.demo.team.service.TeamMembershipRequestService;
 import com.example.demo.team.service.TeamService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ public class TeamController {
     private final TeamMembershipRequestService teamMembershipRequestService;
     // 1. 팀 생성
     @PostMapping
-    public ResponseEntity<ApiResponse<TeamResponse>> createTeam(@RequestBody TeamRequest teamRequest) {
+    public ResponseEntity<ApiResponse<TeamResponse>> createTeam(@Valid @RequestBody TeamRequest teamRequest) {
         TeamResponse teamResponse = teamService.createTeam(teamRequest);
         return ResponseEntity.ok(ApiResponse.created(teamResponse));
     }
@@ -34,7 +35,7 @@ public class TeamController {
 
     // 3. 팀 조건 조회
     @GetMapping("/search")
-    public ResponseEntity<ApiResponse<List<TeamResponse>>> searchConditionTeam(@RequestBody TeamRequest teamRequest) {
+    public ResponseEntity<ApiResponse<List<TeamResponse>>> searchConditionTeam(@Valid @RequestBody TeamSearchRequest teamRequest) {
         List<TeamResponse> teamResponses = teamService.searchConditionTeam(teamRequest);
         return ResponseEntity.ok(ApiResponse.ok(teamResponses));
     }
@@ -55,21 +56,21 @@ public class TeamController {
 
     // 6. 팀 정보 수정
     @PutMapping
-    public ResponseEntity<ApiResponse<TeamDetailResponse>> modifyTeam(@RequestBody TeamRequest teamRequest) {
+    public ResponseEntity<ApiResponse<TeamDetailResponse>> modifyTeam(@Valid @RequestBody TeamRequest teamRequest) {
         TeamDetailResponse teamDetailResponse = teamService.modifyTeam(teamRequest);
         return ResponseEntity.ok(ApiResponse.ok(teamDetailResponse));
     }
 
     // 7. 팀 멤버 초대
     @GetMapping("/invitation")
-    public ResponseEntity<ApiResponse<TeamDetailResponse>> inviteMemberTeam(@RequestBody TeamInviteRequest teamInviteRequest) {
+    public ResponseEntity<ApiResponse<TeamDetailResponse>> inviteMemberTeam(@Valid @RequestBody TeamInviteRequest teamInviteRequest) {
         TeamDetailResponse teamDetailResponse = teamService.inviteMemberTeam(teamInviteRequest);
         return ResponseEntity.ok(ApiResponse.ok(teamDetailResponse));
     }
 
     // 8. 팀 멤버 초대 요청
     @PostMapping("/offer")
-    public ResponseEntity<ApiResponse<Void>> teamOffer(@RequestBody TeamOffer teamOffer) {
+    public ResponseEntity<ApiResponse<Void>> teamOffer(@Valid @RequestBody TeamOffer teamOffer) {
 
         if (teamOffer.getRequestType() != RequestType.INVITE) {
             teamMembershipRequestService.requestMemberToTeam(teamOffer);
