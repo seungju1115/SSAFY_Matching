@@ -112,7 +112,7 @@ class TeamServiceTest {
 
         when(teamRepository.findAll()).thenReturn(List.of(team));
 
-        TeamRequest req = new TeamRequest();
+        TeamSearchRequest req = new TeamSearchRequest();
         req.setTeamName("Team");
         req.setLeaderId(1L);
 
