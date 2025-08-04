@@ -4,6 +4,8 @@ import com.example.demo.chat.dao.ChatRoomRepository;
 import com.example.demo.chat.dto.ChatRoomRequest;
 import com.example.demo.chat.dto.ChatRoomResponse;
 import com.example.demo.chat.entity.*;
+import com.example.demo.common.exception.BusinessException;
+import com.example.demo.common.exception.ErrorCode;
 import com.example.demo.team.dao.TeamRepository;
 import com.example.demo.team.entity.Team;
 import com.example.demo.user.dao.UserRepository;
@@ -33,9 +35,9 @@ public class ChatRoomService {
 
         // chatRoomMembers를 미리 로딩
         User user1 = userRepository.findByIdWithChatRoomMembers(user1Id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
         User user2 = userRepository.findByIdWithChatRoomMembers(user2Id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         // user1이 속한 PRIVATE 채팅방 목록
         Set<ChatRoom> user1PrivateRooms = user1.getChatRoomMembers().stream()
@@ -66,13 +68,14 @@ public class ChatRoomService {
     @Transactional
     public ChatRoomResponse createTeamChatRoom(ChatRoomRequest chatRoomRequest) {
         Team team = teamRepository.findById(chatRoomRequest.getTeamId())
-                .orElseThrow(() -> new RuntimeException("Team not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.TEAM_NOT_FOUND));
 
         ChatRoom chatRoom = new ChatRoom();
         chatRoom.setRoomType(RoomType.TEAM);
         chatRoom.setTeam(team);
 
-        User creator = userRepository.getReferenceById(chatRoomRequest.getUserId());
+        User creator = userRepository.findById(chatRoomRequest.getUserId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         chatRoom.addMember(chatMemberService.createChatRoomMember(creator, chatRoom));
 
@@ -84,20 +87,21 @@ public class ChatRoomService {
     @Transactional
     public void addMemberToTeamChatRoom(ChatRoomRequest chatRoomRequest) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomRequest.getRoomId())
-                .orElseThrow(() -> new RuntimeException("ChatRoom not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CHAT_ROOM_NOT_FOUND));
 
         if (chatRoom.getRoomType() != RoomType.TEAM) {
-            throw new IllegalArgumentException("This chat room is not a team chat room.");
+            throw new BusinessException(ErrorCode.INVALID_CHAT_ROOM_TYPE);
         }
 
-        User user = userRepository.getReferenceById(chatRoomRequest.getUserId());
+        User user = userRepository.findById(chatRoomRequest.getUserId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         // 중복 가입 방지
         boolean alreadyMember = chatRoom.getMembers().stream()
                 .anyMatch(member -> member.getUser().getId().equals(chatRoomRequest.getUserId()));
 
         if (alreadyMember) {
-            throw new RuntimeException("User is already a member of this chat room.");
+            throw new BusinessException(ErrorCode.CHATROOM_MEMBER_ALREADY_EXISTS);
         }
 
         chatRoom.addMember(chatMemberService.createChatRoomMember(user, chatRoom));
@@ -108,7 +112,7 @@ public class ChatRoomService {
     @Transactional
     public void deleteChatRoom(Long chatRoomId) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(() -> new RuntimeException("ChatRoom not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CHAT_ROOM_NOT_FOUND));
 
         chatRoomRepository.delete(chatRoom);
     }

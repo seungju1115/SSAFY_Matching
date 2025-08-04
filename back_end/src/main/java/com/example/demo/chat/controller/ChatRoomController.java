@@ -5,9 +5,8 @@ import com.example.demo.chat.dto.ChatRoomRequest;
 import com.example.demo.chat.dto.ChatRoomResponse;
 import com.example.demo.chat.service.ChatMessageService;
 import com.example.demo.chat.service.ChatRoomService;
-import com.example.demo.response.ApiResponse;
+import com.example.demo.common.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,12 +1,12 @@
 package com.example.demo.user.controller;
 
+import com.example.demo.common.response.ApiResponse;
 import com.example.demo.user.dto.SearchUserRequest;
 import com.example.demo.user.dto.SearchUserResponse;
 import com.example.demo.user.dto.UserProfileRequest;
 import com.example.demo.user.dto.UserProfileResponse;
 import com.example.demo.user.dto.UserProfileUpdateRequest;
 import com.example.demo.user.service.UserService;
-import com.example.demo.response.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

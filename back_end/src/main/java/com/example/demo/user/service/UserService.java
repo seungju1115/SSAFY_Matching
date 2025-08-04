@@ -1,5 +1,7 @@
 package com.example.demo.user.service;
 
+import com.example.demo.common.exception.BusinessException;
+import com.example.demo.common.exception.ErrorCode;
 import com.example.demo.user.dao.UserRepository;
 import com.example.demo.user.dto.SearchUserRequest;
 import com.example.demo.user.dto.SearchUserResponse;
@@ -30,15 +32,14 @@ public class UserService {
     @Transactional
     public UserProfileResponse getProfile(){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("User not found"));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
         return UserProfileResponse.toUserProfileResponse(user);
     }
 
     @Cacheable(value = "longTermCache", key = "'user:'+ #id")
     @Transactional
     public UserProfileResponse getProfile(Long id){
-        User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found"));
-
+        User user = userRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
         return UserProfileResponse.toUserProfileResponse(user);
     }
 
@@ -53,7 +54,7 @@ public class UserService {
     @Transactional
     public void deleteProfile(Long id){
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("해당 유저가 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
         userRepository.delete(user);
     }
 
@@ -61,7 +62,7 @@ public class UserService {
     @Transactional
     public UserProfileResponse updateUserProfile(UserProfileUpdateRequest request, Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         // 전체 및 부분 업데이트
         if (request.getUserName() != null) user.setUserName(request.getUserName());

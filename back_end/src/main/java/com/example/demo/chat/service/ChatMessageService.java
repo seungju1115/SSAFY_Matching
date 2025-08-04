@@ -6,6 +6,8 @@ import com.example.demo.chat.dto.ChatMessageRequest;
 import com.example.demo.chat.dto.ChatMessageResponse;
 import com.example.demo.chat.entity.ChatMessage;
 import com.example.demo.chat.entity.ChatRoom;
+import com.example.demo.common.exception.BusinessException;
+import com.example.demo.common.exception.ErrorCode;
 import com.example.demo.user.dao.UserRepository;
 import com.example.demo.user.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -27,10 +29,10 @@ public class ChatMessageService {
     @Transactional
     public ChatMessageResponse saveMessage(ChatMessageRequest dto) {
         ChatRoom chatRoom = chatRoomRepository.findById(dto.getRoomId())
-                .orElseThrow(() -> new RuntimeException("ChatRoom not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CHAT_ROOM_NOT_FOUND));
 
         User sender = userRepository.findById(dto.getSenderId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         ChatMessage message = new ChatMessage();
         message.setChatRoom(chatRoom);

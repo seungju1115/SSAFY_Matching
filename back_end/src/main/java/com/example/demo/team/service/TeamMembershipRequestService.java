@@ -1,5 +1,7 @@
 package com.example.demo.team.service;
 
+import com.example.demo.common.exception.BusinessException;
+import com.example.demo.common.exception.ErrorCode;
 import com.example.demo.team.dao.TeamMembershipRequestRepository;
 import com.example.demo.team.dao.TeamRepository;
 import com.example.demo.team.dto.*;
@@ -19,16 +21,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class TeamMembershipRequestService {
 
-    public final TeamMembershipRequestRepository teamMembershipRequestRepository;
-    public final TeamRepository teamRepository;
-    public final UserRepository userRepository;
+    private final TeamMembershipRequestRepository teamMembershipRequestRepository;
+    private final TeamRepository teamRepository;
+    private final UserRepository userRepository;
     private final TeamService teamService;
     private final SimpMessagingTemplate messagingTemplate;
 
     @Transactional
     public void requestTeamToMember(TeamOffer teamOffer){
-        Team team = teamRepository.findById(teamOffer.getTeamId()).orElseThrow(()-> new RuntimeException("no team"));
-        User user = userRepository.findById(teamOffer.getUserId()).orElseThrow(()-> new RuntimeException("no user"));
+        Team team = teamRepository.findById(teamOffer.getTeamId()).orElseThrow(()-> new BusinessException(ErrorCode.TEAM_NOT_FOUND));
+        User user = userRepository.findById(teamOffer.getUserId()).orElseThrow(()-> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         boolean exists = team.getMembershipRequests().stream()
                 .anyMatch(req ->
@@ -37,10 +39,7 @@ public class TeamMembershipRequestService {
                                 && req.getStatus() != RequestStatus.REJECTED
                 );
 
-        if (exists) {
-            System.out.println("이미 초대 요청이 존재합니다.");
-            return;
-        }
+        if (exists) throw new BusinessException(ErrorCode.TEAM_REQUEST_ALLREADY_EXIST);
 
         saveTeamOffer(teamOffer, team, user);
         messagingTemplate.convertAndSend("/queue/team/offer/" + teamOffer.getUserId(), teamOffer.getMessage());
@@ -48,8 +47,8 @@ public class TeamMembershipRequestService {
 
     @Transactional
     public void requestMemberToTeam(TeamOffer teamOffer) {
-        Team team = teamRepository.findById(teamOffer.getTeamId()).orElseThrow(()-> new RuntimeException("no team"));
-        User user = userRepository.findById(teamOffer.getUserId()).orElseThrow(()-> new RuntimeException("no user"));
+        Team team = teamRepository.findById(teamOffer.getTeamId()).orElseThrow(()-> new BusinessException(ErrorCode.TEAM_NOT_FOUND));
+        User user = userRepository.findById(teamOffer.getUserId()).orElseThrow(()-> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         boolean exists = user.getMembershipRequests().stream()
                 .anyMatch(req ->
@@ -58,10 +57,8 @@ public class TeamMembershipRequestService {
                                 && req.getStatus() != RequestStatus.REJECTED
                 );
 
-        if (exists) {
-            System.out.println("이미 초대 요청이 존재합니다.");
-            return;
-        }
+        if (exists) throw new BusinessException(ErrorCode.TEAM_REQUEST_ALLREADY_EXIST);
+
         saveTeamOffer(teamOffer, team, user);
 
         for (TeamMemberResponse teamMemberResponse : teamService.getTeamMembers(teamOffer.getTeamId())) {
