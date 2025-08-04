@@ -1,6 +1,6 @@
 package com.example.demo.team.controller;
 
-import com.example.demo.response.ApiResponse;
+import com.example.demo.common.response.ApiResponse;
 import com.example.demo.team.dto.*;
 import com.example.demo.team.entity.RequestType;
 import com.example.demo.team.service.TeamMembershipRequestService;
