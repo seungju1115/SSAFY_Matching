@@ -36,7 +36,7 @@ RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Nginx 설정 파일 복사 (SPA 라우팅 지원)
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx.release.conf /etc/nginx/conf.d/default.conf
 
 # 정적 파일 권한 설정
 RUN chown -R nginx:nginx /usr/share/nginx/html && \
