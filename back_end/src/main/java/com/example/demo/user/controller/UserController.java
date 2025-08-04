@@ -60,7 +60,7 @@ public class UserController {
                                     name = "내 프로필 조회 성공",
                                     value = """
                     {
-                        "success": true,
+                        "status": 200,
                         "message": "요청이 성공했습니다",
                         "data": {
                             "id": 1,
@@ -337,7 +337,7 @@ public class UserController {
                                     name = "팀원 검색 결과",
                                     value = """
                     {
-                        "success": true,
+                        "status": 200,
                         "message": "요청이 성공했습니다",
                         "data": [
                             {

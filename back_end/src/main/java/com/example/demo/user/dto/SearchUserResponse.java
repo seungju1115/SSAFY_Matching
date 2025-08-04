@@ -34,7 +34,7 @@ public class SearchUserResponse {
     @Schema(description = "전공 여부", example = "true")
     private boolean major;
 
-    @Schema(description = "기수", example = "13")
+    @Schema(description = "이전 반", example = "7")
     private Integer lastClass;
 
     @Schema(description = "희망 포지션", example = "FRONTEND")
