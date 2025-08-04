@@ -63,7 +63,7 @@ public class TeamController {
                                     name = "팀 생성 성공",
                                     value = """
                     {
-                        "success": true,
+                        "status": 200,
                         "message": "리소스가 성공적으로 생성되었습니다",
                         "data": {
                             "teamId": 1,
@@ -130,7 +130,7 @@ public class TeamController {
                                     name = "팀 목록 조회 성공",
                                     value = """
                     {
-                        "success": true,
+                        "status": 200,
                         "message": "요청이 성공했습니다",
                         "data": [
                             {
@@ -239,7 +239,7 @@ public class TeamController {
                                     name = "팀 상세 정보",
                                     value = """
                     {
-                        "success": true,
+                        "status": 200,
                         "message": "요청이 성공했습니다",
                         "data": {
                             "teamId": 1,

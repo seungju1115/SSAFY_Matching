@@ -29,16 +29,16 @@ public class UserProfileRequest {
     @Schema(description = "전공 여부", example = "true", required = true)
     private boolean major;
 
-    @Schema(description = "기수", example = "13", required = true)
+    @Schema(description = "이전 반", example = "7", required = true)
     private Integer lastClass;
 
     @Schema(description = "희망 포지션", example = "BACKEND", required = true)
     private PositionEnum wantedPosition;
 
-    @Schema(description = "프로젝트 선호도", example = "[\"WEB\", \"MOBILE\"]")
+    @Schema(description = "프로젝트 선호도", example = "[\"도전적인 성향\", \"새로운 기술 적극 사용\"]")
     private Set<ProjectPrefEnum> projectPref;
 
-    @Schema(description = "개인 성향", example = "[\"LEADER\", \"COOPERATIVE\"]")
+    @Schema(description = "개인 성향", example = "[\"내향적인 편\", \"컨벤션 잘 지키는 편\"]")
     private Set<PersonalPrefEnum> personalPref;
 
     @Schema(description = "프로젝트 경험", example = "Spring Boot를 이용한 웹 개발 경험")

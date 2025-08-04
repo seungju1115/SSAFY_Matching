@@ -28,7 +28,7 @@ public class UserProfileResponse implements Serializable {
     @Schema(description = "사용자 이름", example = "홍길동")
     private String userName;
 
-    @Schema(description = "역할", example = "TRAINEE")
+    @Schema(description = "역할", example = "Admin")
     private String role;
 
     @Schema(description = "이메일", example = "hong@example.com")
@@ -40,7 +40,7 @@ public class UserProfileResponse implements Serializable {
     @Schema(description = "전공 여부", example = "true")
     private boolean major;
 
-    @Schema(description = "기수", example = "13")
+    @Schema(description = "이전 반", example = "7")
     private Integer lastClass;
 
     @Schema(description = "희망 포지션", example = "BACKEND")

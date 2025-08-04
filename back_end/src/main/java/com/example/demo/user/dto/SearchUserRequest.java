@@ -26,14 +26,14 @@ public class SearchUserRequest {
     private PositionEnum wantedPosition;
 
     @Schema(
-            description = "기술 스택 (교집합 매칭)",
+            description = "기술 스택",
             example = "[\"JAVA\", \"SPRING\", \"MYSQL\"]"
     )
     private Set<TechEnum> techStack;
 
     @Schema(
-            description = "프로젝트 선호도 (교집합 매칭)",
-            example = "[\"WEB\", \"MOBILE\"]"
+            description = "프로젝트 선호도",
+            example = "[\"도전적인 성향\", \"새로운 기술 적극 사용\"]"
     )
     private Set<ProjectPrefEnum> projectPref;
 }
