@@ -5,9 +5,13 @@ import com.example.demo.chat.dto.ChatRoomRequest;
 import com.example.demo.chat.dto.ChatRoomResponse;
 import com.example.demo.chat.service.ChatMessageService;
 import com.example.demo.chat.service.ChatRoomService;
+import com.example.demo.common.exception.BusinessException;
+import com.example.demo.common.exception.ErrorCode;
 import com.example.demo.common.response.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,7 +31,10 @@ public class ChatRoomController {
     }
 
     @PostMapping("/private")
-    public ResponseEntity<ApiResponse<ChatRoomResponse>> createPrivateChatRoom(@RequestBody ChatRoomRequest chatRoomRequest) {
+    public ResponseEntity<ApiResponse<ChatRoomResponse>> createPrivateChatRoom(@Valid @RequestBody ChatRoomRequest chatRoomRequest) {
+        if (chatRoomRequest.getUser1Id() == null || chatRoomRequest.getUser2Id() == null) {
+            throw new BusinessException(ErrorCode.INVALID_PRIVATEROOM_REQUEST);
+        }
         return ResponseEntity.ok(ApiResponse.created(chatRoomService.createPrivateChatRoom(chatRoomRequest)));
     }
 }

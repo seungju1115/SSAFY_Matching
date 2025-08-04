@@ -5,7 +5,10 @@ import com.example.demo.user.Enum.PositionEnum;
 import com.example.demo.user.Enum.ProjectPrefEnum;
 import com.example.demo.user.Enum.TechEnum;
 import com.example.demo.user.entity.User;
-import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,38 +20,34 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "사용자 프로필 생성 요청")
 public class UserProfileRequest {
-
-    @Schema(description = "사용자 이름", example = "홍길동", required = true)
+    @NotBlank(message = "이름은 필수입니다.")
     private String userName;
 
-    @Schema(description = "자기소개", example = "안녕하세요! 백엔드 개발자를 꿈꾸는 홍길동입니다.")
     private String userProfile;
 
-    @Schema(description = "전공 여부", example = "true", required = true)
     private boolean major;
 
-    @Schema(description = "이전 반", example = "7", required = true)
+    @NotNull(message = "기수는 필수입니다.")
+    @Min(value = 1, message = "기수는 1 이상이어야 합니다.")
     private Integer lastClass;
 
-    @Schema(description = "희망 포지션", example = "BACKEND", required = true)
+    @NotNull(message = "희망 포지션은 필수입니다.")
     private PositionEnum wantedPosition;
 
-    @Schema(description = "프로젝트 선호도", example = "[\"도전적인 성향\", \"새로운 기술 적극 사용\"]")
+    @Size(max = 5, message = "최대 5개의 프로젝트 성향만 선택 가능합니다.")
     private Set<ProjectPrefEnum> projectPref;
 
-    @Schema(description = "개인 성향", example = "[\"내향적인 편\", \"컨벤션 잘 지키는 편\"]")
+    @Size(max = 5, message = "최대 5개의 성격 성향만 선택 가능합니다.")
     private Set<PersonalPrefEnum> personalPref;
 
-    @Schema(description = "프로젝트 경험", example = "Spring Boot를 이용한 웹 개발 경험")
     private String projectExp;
 
-    @Schema(description = "자격증", example = "정보처리기사")
     private String qualification;
 
-    @Schema(description = "기술 스택", example = "[\"JAVA\", \"SPRING\", \"MYSQL\"]")
+    @Size(max = 10, message = "기술 스택은 최대 10개까지 선택 가능합니다.")
     private Set<TechEnum> techStack;
+
 
     public static User toEntity(UserProfileRequest request) {
         User user = new User();

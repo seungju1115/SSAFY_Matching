@@ -7,6 +7,7 @@ import com.example.demo.user.dto.UserProfileRequest;
 import com.example.demo.user.dto.UserProfileResponse;
 import com.example.demo.user.dto.UserProfileUpdateRequest;
 import com.example.demo.user.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,9 +33,9 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse> createProfile(@RequestBody UserProfileRequest userProfileRequest){
+    public ResponseEntity<ApiResponse> createProfile(@Valid @RequestBody UserProfileRequest userProfileRequest){
         UserProfileResponse userProfileResponse = userService.saveProfile(userProfileRequest);
-        return ResponseEntity.ok(ApiResponse.ok(userProfileResponse));
+        return ResponseEntity.ok(ApiResponse.created(userProfileResponse));
     }
 
     @DeleteMapping("{id}")
@@ -44,13 +45,13 @@ public class UserController {
     }
 
     @PatchMapping("{id}")
-    public ResponseEntity<ApiResponse> updateProfile(@RequestBody UserProfileUpdateRequest userProfileUpdateRequest, @PathVariable Long id){
+    public ResponseEntity<ApiResponse> updateProfile(@Valid @RequestBody UserProfileUpdateRequest userProfileUpdateRequest, @PathVariable Long id){
         UserProfileResponse userProfileResponse = userService.updateUserProfile(userProfileUpdateRequest, id);
         return ResponseEntity.ok(ApiResponse.ok(userProfileResponse));
     }
 
     @PostMapping("/search")
-    public ResponseEntity<ApiResponse> searchUsersWithoutTeam(@RequestBody SearchUserRequest request) {
+    public ResponseEntity<ApiResponse> searchUsersWithoutTeam(@Valid @RequestBody SearchUserRequest request) {
         List<SearchUserResponse> users = userService.searchUsersWithoutTeam(request);
         return ResponseEntity.ok(ApiResponse.ok(users));
     }

@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -72,7 +73,7 @@ public class TeamService {
     }
 
     // 3. 팀 조건 조회
-    public List<TeamResponse> searchConditionTeam(TeamRequest teamRequest) {
+    public List<TeamResponse> searchConditionTeam(TeamSearchRequest teamRequest) {
         return teamRepository.findAll().stream()
                 .filter(team -> teamRequest.getTeamName() == null || team.getTeamName().contains(teamRequest.getTeamName()))
                 .filter(team -> teamRequest.getLeaderId() == null ||
@@ -128,20 +129,20 @@ public class TeamService {
     public TeamDetailResponse modifyTeam(TeamRequest teamRequest) {
         Team team = teamRepository.findById(teamRequest.getTeamId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.TEAM_NOT_FOUND));
-        //팀명 중복 시
-//        Team team = teamRepository.findByTeamName(teamRequest.getTeamName());
 
-        // 팀 이름 수정
-//        if (teamRequest.getTeamName() != null && !teamRequest.getTeamName().isBlank()) {
-            team.setTeamName(teamRequest.getTeamName());
-//        }
+        //팀명 중복 시
+        teamRepository.findByTeamName(teamRequest.getTeamName())
+                .ifPresent(team2 -> {
+                    // 이미 존재하는 팀입니다
+                    throw new BusinessException(ErrorCode.TEAM_NAME_ALREADY_EXISTS);
+                });
+
+        team.setTeamName(teamRequest.getTeamName());
 
         // 리더 수정
-//        if (teamRequest.getLeaderId() != null) {
-            User newLeader = userRepository.findById(teamRequest.getLeaderId())
-                    .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-            team.setLeader(newLeader);
-//        }
+        User newLeader = userRepository.findById(teamRequest.getLeaderId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        team.setLeader(newLeader);
 
         List<Long> membersId = new ArrayList<>();
         for (User user : team.getMembers()) {

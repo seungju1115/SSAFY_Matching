@@ -10,6 +10,7 @@ import com.example.demo.common.exception.BusinessException;
 import com.example.demo.common.exception.ErrorCode;
 import com.example.demo.user.dao.UserRepository;
 import com.example.demo.user.entity.User;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +28,7 @@ public class ChatMessageService {
     private final UserRepository userRepository;
 
     @Transactional
-    public ChatMessageResponse saveMessage(ChatMessageRequest dto) {
+    public ChatMessageResponse saveMessage(@Valid ChatMessageRequest dto) {
         ChatRoom chatRoom = chatRoomRepository.findById(dto.getRoomId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.CHAT_ROOM_NOT_FOUND));
 

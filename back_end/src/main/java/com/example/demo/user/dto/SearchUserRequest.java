@@ -3,7 +3,7 @@ package com.example.demo.user.dto;
 import com.example.demo.user.Enum.PositionEnum;
 import com.example.demo.user.Enum.ProjectPrefEnum;
 import com.example.demo.user.Enum.TechEnum;
-import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,25 +15,12 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "팀원 검색 요청")
 public class SearchUserRequest {
-
-    @Schema(
-            description = "희망 포지션",
-            example = "BACKEND",
-            implementation = PositionEnum.class
-    )
     private PositionEnum wantedPosition;
 
-    @Schema(
-            description = "기술 스택",
-            example = "[\"JAVA\", \"SPRING\", \"MYSQL\"]"
-    )
+    @Size(max = 10, message = "기술 스택은 최대 10개까지 선택 가능합니다.")
     private Set<TechEnum> techStack;
 
-    @Schema(
-            description = "프로젝트 선호도",
-            example = "[\"도전적인 성향\", \"새로운 기술 적극 사용\"]"
-    )
+    @Size(max = 5, message = "선호하는 프로젝트 유형은 최대 5개까지 선택 가능합니다.")
     private Set<ProjectPrefEnum> projectPref;
 }
