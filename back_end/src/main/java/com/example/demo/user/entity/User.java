@@ -62,7 +62,6 @@ public class User {
     //private String projectStep;
 
     @Column(name = "major",  nullable = false)
-    @NotBlank
     private boolean major=false;
 
     @Column(name = "last_class", nullable = false)
@@ -71,7 +70,7 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "wanted_position",  nullable = false)
-    @NotBlank
+    @NotNull
     private PositionEnum wantedPosition;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)

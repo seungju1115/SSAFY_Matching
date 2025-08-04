@@ -1,6 +1,8 @@
 package com.example.demo.user.service;
 
 import com.example.demo.user.dao.UserRepository;
+import com.example.demo.user.dto.SearchUserRequest;
+import com.example.demo.user.dto.SearchUserResponse;
 import com.example.demo.user.dto.UserProfileRequest;
 import com.example.demo.user.dto.UserProfileResponse;
 import com.example.demo.user.dto.UserProfileUpdateRequest;
@@ -13,6 +15,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class UserService {
@@ -78,5 +82,42 @@ public class UserService {
         //}
 
         return UserProfileResponse.toUserProfileResponse(user);
+    }
+
+    @Transactional(readOnly = true)
+    public List<SearchUserResponse> searchUsersWithoutTeam(SearchUserRequest request) {
+        List<User> users;
+        
+        if (request.getWantedPosition() != null) {
+            users = userRepository.findUsersWithoutTeamByPosition(request.getWantedPosition());
+        } else {
+            users = userRepository.findUsersWithoutTeam();
+        }
+        
+        return users.stream()
+                .filter(user -> matchesTechStack(user, request.getTechStack()))
+                .filter(user -> matchesProjectPref(user, request.getProjectPref()))
+                .map(SearchUserResponse::fromUser)
+                .collect(java.util.stream.Collectors.toList());
+    }
+    
+    private boolean matchesTechStack(User user, java.util.Set<com.example.demo.user.Enum.TechEnum> techStack) {
+        if (techStack == null || techStack.isEmpty()) {
+            return true;
+        }
+        if (user.getTechStack() == null) {
+            return false;
+        }
+        return user.getTechStack().stream().anyMatch(techStack::contains);
+    }
+    
+    private boolean matchesProjectPref(User user, java.util.Set<com.example.demo.user.Enum.ProjectPrefEnum> projectPref) {
+        if (projectPref == null || projectPref.isEmpty()) {
+            return true;
+        }
+        if (user.getProjectPref() == null) {
+            return false;
+        }
+        return user.getProjectPref().stream().anyMatch(projectPref::contains);
     }
 }
