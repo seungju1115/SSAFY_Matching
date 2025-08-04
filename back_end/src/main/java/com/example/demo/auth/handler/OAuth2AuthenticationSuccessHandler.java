@@ -33,25 +33,31 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+        System.out.println("=== OAuth2AuthenticationSuccessHandler 실행됨 ===");
+        
         // 사용자 이메일 추출 (provider 마다 다를 수 있음)
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         String email = oAuth2User.getAttribute("email").toString();
         String username = oAuth2User.getAttribute("name").toString();
+        
+        System.out.println("사용자 이메일: " + email);
 
         Optional<User> user = userRepository.findByEmail(email);
 
         String jwt = jwtUtil.generateToken(email, Map.of("name", username, "role", "student"));
-//        System.out.println("JWT: " + jwt);
+        System.out.println("JWT: " + jwt);
 
         // Cookie에 담기
 //        Cookie cookie = new Cookie("jwt", jwt);
 //        cookie.setHttpOnly(true);
 
         // 토큰 전송 테스트용 코드, 토큰을 쿼리 스트링에 담아서 리다이렉트
+        String frontendUrl = "http://localhost:8080"; // 포트를 강제로 포함
+
         if (user.isEmpty()) {
-            getRedirectStrategy().sendRedirect(request, response, url + "/oauth/callback?isSignedUp=false&email=" + email);
+            getRedirectStrategy().sendRedirect(request, response, frontendUrl + "/oauth/callback?isSignedUp=false&email=" + email);
         } else {
-            getRedirectStrategy().sendRedirect(request, response, url + "/oauth/callback?isSignedUp=true&token=" + jwt);
+            getRedirectStrategy().sendRedirect(request, response, frontendUrl + "/oauth/callback?isSignedUp=true&token=" + jwt);
         }
     }
 }
