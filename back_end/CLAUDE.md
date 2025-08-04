@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Spring Boot 3.5.3 team matching application backend with the following key features:
+This is a full-stack team matching application with Spring Boot backend and React frontend:
+
+**Backend (Spring Boot 3.5.3)**:
 - OAuth2 authentication (Google) with JWT tokens
 - Real-time chat using WebSockets 
 - Team creation and membership management
@@ -13,9 +15,19 @@ This is a Spring Boot 3.5.3 team matching application backend with the following
 - Hazelcast caching
 - Docker containerization
 
+**Frontend (React + TypeScript + Vite)**:
+- Modern React 19 with TypeScript
+- Shadcn/ui components with Radix UI primitives
+- Tailwind CSS for styling
+- Zustand for state management
+- React Hook Form with Zod validation
+- Axios for API communication
+- Socket.io for real-time features
+
 ## Architecture
 
-The codebase follows standard Spring Boot layered architecture:
+### Backend Architecture
+The backend follows standard Spring Boot layered architecture:
 - **Controllers**: Handle HTTP requests and WebSocket connections
 - **Services**: Business logic layer
 - **Repositories (DAO)**: Data access layer using Spring Data JPA
@@ -23,16 +35,28 @@ The codebase follows standard Spring Boot layered architecture:
 - **DTOs**: Data transfer objects for API requests/responses
 - **Config**: Security, CORS, WebSocket, and caching configuration
 
-Key architectural components:
+Key backend components:
 - **Authentication**: JWT-based with OAuth2 (Google) integration in `auth/` package
 - **Chat System**: WebSocket-based real-time messaging in `chat/` package
 - **Team Management**: Team creation, invitations, and membership in `team/` package
 - **User Management**: User profiles and preferences in `user/` package
 - **Dashboard**: Analytics and summary data in `dashboard/` package
 
+### Frontend Architecture
+The frontend follows feature-based architecture:
+- **Components**: Reusable UI components organized by type (common, layout, features, ui)
+- **Pages**: Route-based page components
+- **Store**: Zustand state management (user, match, chat stores)
+- **API**: Axios-based API layer with service separation
+- **Hooks**: Custom React hooks for reusable logic
+- **Types**: TypeScript definitions for data models
+- **Utils**: Utility functions and constants
+
+OAuth2 login flow: `/users/login/google` endpoint initiates Google OAuth, returns JWT on success.
+
 ## Development Commands
 
-### Build and Run
+### Backend (Spring Boot)
 ```bash
 # Build the project
 ./gradlew build
@@ -48,27 +72,39 @@ Key architectural components:
 
 # Run with local profile (H2 database)
 SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
+
+# Run specific test class
+./gradlew test --tests "com.example.demo.team.controller.TeamControllerTest"
 ```
 
-### Docker
+### Frontend (React)
 ```bash
-# Build and run with Docker Compose
+# Install dependencies
+cd front_end && npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Lint code
+npm run lint
+
+# Preview production build
+npm run preview
+```
+
+### Full-Stack Development
+```bash
+# Run both backend and frontend with Docker
 docker-compose up --build
 
 # Run in background
 docker-compose up -d
-```
 
-### Testing
-```bash
-# Run all tests
-./gradlew test
-
-# Run specific test class
-./gradlew test --tests "com.example.demo.team.controller.TeamControllerTest"
-
-# Run tests with coverage
-./gradlew test jacocoTestReport
+# Development mode with hot reload
+cd front_end && docker-compose -f docker-compose.dev.yml up
 ```
 
 ## Configuration Profiles

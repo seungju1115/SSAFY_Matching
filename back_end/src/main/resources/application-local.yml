@@ -1,3 +1,7 @@
+server:
+  forward-headers-strategy: framework
+  use-forward-headers: true
+
 spring:
   security:
     headers:
@@ -8,7 +12,7 @@ spring:
           google:
             client-id: 191095046109-t21kv1o2632n6rou7pdi26isfkvht1eb.apps.googleusercontent.com
             client-secret: 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
-            redirect-uri: "{baseUrl}/login/oauth2/code/google"
+            redirect-uri: "http://localhost:8080/login/oauth2/code/google"
             scope:
               - profile
               - email
@@ -18,6 +22,11 @@ spring:
             token-uri: https://oauth2.googleapis.com/token
             user-info-uri: https://openidconnect.googleapis.com/v1/userinfo
             user-name-attribute: sub
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2: DEBUG
 
   datasource:
     url: jdbc:h2:~/test
@@ -47,7 +56,7 @@ jwt:
   expiration: 3600000 # 1시간 (ms)
 
 front:
-  url: http://localhost:8081
+  url: http://localhost:8080
 
 springdoc:
   api-docs:
