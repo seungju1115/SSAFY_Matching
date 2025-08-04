@@ -1,6 +1,8 @@
 package com.example.demo.user.service;
 
 import com.example.demo.user.dao.UserRepository;
+import com.example.demo.user.dto.SearchUserRequest;
+import com.example.demo.user.dto.SearchUserResponse;
 import com.example.demo.user.dto.UserProfileRequest;
 import com.example.demo.user.dto.UserProfileResponse;
 import com.example.demo.user.dto.UserProfileUpdateRequest;
@@ -8,9 +10,13 @@ import com.example.demo.user.entity.User;
 import com.example.demo.team.dao.TeamRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class UserService {
@@ -28,6 +34,7 @@ public class UserService {
         return UserProfileResponse.toUserProfileResponse(user);
     }
 
+    @Cacheable(value = "longTermCache", key = "'user:'+ #id")
     @Transactional
     public UserProfileResponse getProfile(Long id){
         User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found"));
@@ -42,6 +49,7 @@ public class UserService {
         return UserProfileResponse.toUserProfileResponse(user);
     }
 
+    @CacheEvict(value = "longTermCache", key = "'user:'+ #id")
     @Transactional
     public void deleteProfile(Long id){
         User user = userRepository.findById(id)
@@ -49,6 +57,7 @@ public class UserService {
         userRepository.delete(user);
     }
 
+    @CacheEvict(value = "longTermCache", key = "'user:'+ #id")
     @Transactional
     public UserProfileResponse updateUserProfile(UserProfileUpdateRequest request, Long id) {
         User user = userRepository.findById(id)
@@ -57,7 +66,7 @@ public class UserService {
         // 전체 및 부분 업데이트
         if (request.getUserName() != null) user.setUserName(request.getUserName());
         if (request.getUserProfile() != null) user.setUserProfile(request.getUserProfile());
-        if (request.getMajor() != null) user.setMajor(request.getMajor());
+        if (request.isMajor()) user.setMajor(true);
         if (request.getLastClass() != null) user.setLastClass(request.getLastClass());
         if (request.getWantedPosition() != null) user.setWantedPosition(request.getWantedPosition());
         if (request.getProjectPref() != null) user.setProjectPref(request.getProjectPref());
@@ -75,4 +84,40 @@ public class UserService {
         return UserProfileResponse.toUserProfileResponse(user);
     }
 
+    @Transactional(readOnly = true)
+    public List<SearchUserResponse> searchUsersWithoutTeam(SearchUserRequest request) {
+        List<User> users;
+        
+        if (request.getWantedPosition() != null) {
+            users = userRepository.findUsersWithoutTeamByPosition(request.getWantedPosition());
+        } else {
+            users = userRepository.findUsersWithoutTeam();
+        }
+        
+        return users.stream()
+                .filter(user -> matchesTechStack(user, request.getTechStack()))
+                .filter(user -> matchesProjectPref(user, request.getProjectPref()))
+                .map(SearchUserResponse::fromUser)
+                .collect(java.util.stream.Collectors.toList());
+    }
+    
+    private boolean matchesTechStack(User user, java.util.Set<com.example.demo.user.Enum.TechEnum> techStack) {
+        if (techStack == null || techStack.isEmpty()) {
+            return true;
+        }
+        if (user.getTechStack() == null) {
+            return false;
+        }
+        return user.getTechStack().stream().anyMatch(techStack::contains);
+    }
+    
+    private boolean matchesProjectPref(User user, java.util.Set<com.example.demo.user.Enum.ProjectPrefEnum> projectPref) {
+        if (projectPref == null || projectPref.isEmpty()) {
+            return true;
+        }
+        if (user.getProjectPref() == null) {
+            return false;
+        }
+        return user.getProjectPref().stream().anyMatch(projectPref::contains);
+    }
 }

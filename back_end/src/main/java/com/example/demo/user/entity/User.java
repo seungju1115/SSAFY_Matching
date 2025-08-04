@@ -1,6 +1,7 @@
 package com.example.demo.user.entity;
 
 import com.example.demo.user.Enum.PersonalPrefEnum;
+import com.example.demo.user.Enum.PositionEnum;
 import com.example.demo.user.Enum.ProjectPrefEnum;
 import com.example.demo.user.Enum.TechEnum;
 import com.example.demo.chat.entity.ChatRoomMember;
@@ -60,19 +61,17 @@ public class User {
 
     //private String projectStep;
 
-    @Column(name = "major",  nullable = false, length = 5)
-    @Size(max = 5)
-    @NotBlank
-    private String major;
+    @Column(name = "major",  nullable = false)
+    private boolean major=false;
 
     @Column(name = "last_class", nullable = false)
     @NotNull
     private Integer lastClass;
 
-    @Column(name = "wanted_position",  nullable = false,  length = 50)
-    @NotBlank
-    @Size(max = 50)
-    private String wantedPosition;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "wanted_position",  nullable = false)
+    @NotNull
+    private PositionEnum wantedPosition;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<ChatRoomMember> chatRoomMembers = new ArrayList<>();

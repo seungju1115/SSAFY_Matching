@@ -2,36 +2,69 @@ package com.example.demo.user.dto;
 
 import com.example.demo.team.entity.Team;
 import com.example.demo.user.Enum.PersonalPrefEnum;
+import com.example.demo.user.Enum.PositionEnum;
 import com.example.demo.user.Enum.ProjectPrefEnum;
 import com.example.demo.user.Enum.TechEnum;
 import com.example.demo.user.entity.User;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.Set;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserProfileResponse {
+@Schema(description = "사용자 프로필 응답")
+public class UserProfileResponse implements Serializable {
+
+    @Schema(description = "사용자 ID", example = "1")
     private Long id;
+
+    @Schema(description = "사용자 이름", example = "홍길동")
     private String userName;
+
+    @Schema(description = "역할", example = "Admin")
     private String role;
+
+    @Schema(description = "이메일", example = "hong@example.com")
     private String email;
+
+    @Schema(description = "자기소개", example = "안녕하세요! 백엔드 개발자를 꿈꾸는 홍길동입니다.")
     private String userProfile;
-    private String major;
+
+    @Schema(description = "전공 여부", example = "true")
+    private boolean major;
+
+    @Schema(description = "이전 반", example = "7")
     private Integer lastClass;
-    private String wantedPosition;
+
+    @Schema(description = "희망 포지션", example = "BACKEND")
+    private PositionEnum wantedPosition;
+
+    @Schema(description = "프로젝트 선호도")
     private Set<ProjectPrefEnum> projectPref;
+
+    @Schema(description = "개인 성향")
     private Set<PersonalPrefEnum> personalPref;
+
+    @Schema(description = "프로젝트 경험", example = "Spring Boot를 이용한 웹 개발 경험")
     private String projectExp;
+
+    @Schema(description = "자격증", example = "정보처리기사")
     private String qualification;
+
+    @Schema(description = "기술 스택")
     private Set<TechEnum> techStack;
 
+    @Schema(description = "소속 팀 ID", example = "5")
     private Long teamId;
+
+    @Schema(description = "소속 팀 이름", example = "프로젝트팀A")
     private String teamName;
 
     public static UserProfileResponse toUserProfileResponse(User user) {
@@ -43,7 +76,7 @@ public class UserProfileResponse {
         response.setRole(user.getRole());
         response.setEmail(user.getEmail());
         response.setUserProfile(user.getUserProfile());
-        response.setMajor(user.getMajor());
+        response.setMajor(user.isMajor());
         response.setLastClass(user.getLastClass());
         response.setWantedPosition(user.getWantedPosition());
         response.setProjectPref(user.getProjectPref());

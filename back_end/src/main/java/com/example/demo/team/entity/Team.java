@@ -1,5 +1,6 @@
 package com.example.demo.team.entity;
 
+import com.example.demo.user.Enum.PersonalPrefEnum;
 import com.example.demo.user.Enum.ProjectPrefEnum;
 import com.example.demo.chat.entity.ChatRoom;
 import com.example.demo.user.entity.User;
@@ -13,6 +14,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "team")
@@ -45,10 +47,10 @@ public class Team {
     @Size(max = 300)
     private String teamDescription;
 
+    @ElementCollection(targetClass = ProjectPrefEnum.class, fetch = FetchType.LAZY)
     @Enumerated(EnumType.STRING)
-    @Column(name = "team_preference",  nullable = true, length = 50)
-    @Size(max = 50)
-    private ProjectPrefEnum teamPreference;
+    @Column(name = "team_preference",  nullable = true)
+    private Set<ProjectPrefEnum> teamPreference;
 
     @OneToOne(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
     private ChatRoom chatRoom;

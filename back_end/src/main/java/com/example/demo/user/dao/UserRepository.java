@@ -1,12 +1,18 @@
 package com.example.demo.user.dao;
 
+import com.example.demo.dashboard.dto.UserCountDto;
+import com.example.demo.user.Enum.PositionEnum;
+import com.example.demo.user.Enum.ProjectPrefEnum;
+import com.example.demo.user.Enum.TechEnum;
 import com.example.demo.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface UserRepository extends JpaRepository<User,Long> {
@@ -19,4 +25,13 @@ public interface UserRepository extends JpaRepository<User,Long> {
             "LEFT JOIN FETCH m.chatRoom " +
             "WHERE u.id = :id")
     Optional<com.example.demo.user.entity.User> findByIdWithChatRoomMembers(@Param("id") Long id);
+
+    @Query(value = "select new com.example.demo.dashboard.dto.UserCountDto(u.team, u.major, u.wantedPosition) from User u")
+    List<UserCountDto> CountUsers();
+
+    @Query("SELECT u FROM User u WHERE u.team IS NULL")
+    List<User> findUsersWithoutTeam();
+    
+    @Query("SELECT u FROM User u WHERE u.team IS NULL AND u.wantedPosition = :wantedPosition")
+    List<User> findUsersWithoutTeamByPosition(@Param("wantedPosition") PositionEnum wantedPosition);
 }
