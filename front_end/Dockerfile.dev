@@ -1,4 +1,4 @@
-ㅞㅡㅡ# 개발 환경용 Dockerfile
+# 개발 환경용 Dockerfile
 FROM node:22-alpine
 
 # 작업 디렉토리 설정
