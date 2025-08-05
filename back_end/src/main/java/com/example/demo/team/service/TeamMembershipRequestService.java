@@ -34,7 +34,7 @@ public class TeamMembershipRequestService {
         User user = userRepository.findById(teamOffer.getUserId()).orElseThrow(()-> new RuntimeException("no user"));
 
         String key=team.getId() + "+" + user.getId();
-        FencedLock lock=hazelcastInstance.getCPSubsystem().getLock()
+        FencedLock lock=hazelcastInstance.getCPSubsystem().getLock(key);
 
         boolean exists = team.getMembershipRequests().stream()
                 .anyMatch(req ->
