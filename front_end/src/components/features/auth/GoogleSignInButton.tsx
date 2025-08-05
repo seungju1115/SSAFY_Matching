@@ -13,10 +13,8 @@ export function GoogleSignInButton({
 }: GoogleSignInButtonProps) {
   const handleGoogleSignIn = async () => {
     try {
-      // 실제 구현에서는 Firebase Auth 또는 다른 OAuth 제공자를 통해 구글 로그인을 구현합니다
-      console.log('Google Sign In clicked')
-      // 성공 시 콜백 호출
-      onSuccess?.()
+      // 백엔드 OAuth 로그인 API로 리다이렉트
+      window.location.href = 'http://localhost:8080/api/users/login/'
     } catch (error) {
       console.error('Google Sign In failed:', error)
       // 에러 시 콜백 호출

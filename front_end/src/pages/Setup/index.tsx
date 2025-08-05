@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { 
@@ -16,6 +16,9 @@ import { CheckCircle2, User, GraduationCap, BookOpen, Users } from 'lucide-react
 
 export default function Setup() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const email = location.state?.email || ''
+  
   const [settings, setSettings] = useState<UserDetailSettingsType>({
     semester: '',
     classNumber: '',
@@ -39,8 +42,19 @@ export default function Setup() {
 
     setIsLoading(true)
     try {
-      await authAPI.updateUserDetails(settings)
-      console.log('User detail settings saved successfully:', settings)
+      // 신규 사용자인 경우 회원가입 API 호출
+      if (email) {
+        await authAPI.register({
+          email,
+          ...settings
+        })
+        console.log('User registered successfully:', { email, ...settings })
+      } else {
+        // 기존 사용자인 경우 설정 업데이트
+        await authAPI.updateUserDetails(settings)
+        console.log('User detail settings saved successfully:', settings)
+      }
+      
       localStorage.setItem('userDetailSettings', JSON.stringify(settings))
       navigate('/')
     } catch (error) {
@@ -62,15 +76,23 @@ export default function Setup() {
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">프로필 설정</h1>
           <p className="text-gray-600">Match SSAFY를 시작하기 위한 마지막 단계입니다</p>
-          
+          {email && (
+            <div className="mt-4 px-4 py-2 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-800">
+                <span className="font-semibold">가입 이메일:</span> {email}
+              </p>
+            </div>
+          )}
 
         </div>
 
         <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
           <CardHeader className="text-center pb-6">
-            <CardTitle className="text-xl text-gray-800">기본 정보 입력</CardTitle>
+            <CardTitle className="text-xl text-gray-800">
+              {email ? '회원가입 완료' : '기본 정보 입력'}
+            </CardTitle>
             <CardDescription>
-              매칭을 위해 필요한 정보를 입력해주세요
+              {email ? '매칭을 위해 필요한 추가 정보를 입력해주세요' : '매칭을 위해 필요한 정보를 입력해주세요'}
             </CardDescription>
           </CardHeader>
           
@@ -187,7 +209,7 @@ export default function Setup() {
                 ) : (
                   <div className="flex items-center space-x-2">
                     <CheckCircle2 className="w-5 h-5" />
-                    <span>설정 완료</span>
+                    <span>{email ? '회원가입 완료' : '설정 완료'}</span>
                   </div>
                 )}
               </Button>
