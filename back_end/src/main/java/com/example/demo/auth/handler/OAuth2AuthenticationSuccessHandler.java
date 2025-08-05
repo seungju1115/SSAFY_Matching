@@ -52,12 +52,12 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 //        cookie.setHttpOnly(true);
 
         // 토큰 전송 테스트용 코드, 토큰을 쿼리 스트링에 담아서 리다이렉트
-        String frontendUrl = "http://localhost:8080"; // 포트를 강제로 포함
+//        String frontendUrl = "http://localhost:8080"; // 포트를 강제로 포함
 
         if (user.isEmpty()) {
-            getRedirectStrategy().sendRedirect(request, response, frontendUrl + "/oauth/callback?isSignedUp=false&email=" + email);
+            getRedirectStrategy().sendRedirect(request, response, url + "/oauth/callback?isSignedUp=false&email=" + email);
         } else {
-            getRedirectStrategy().sendRedirect(request, response, frontendUrl + "/oauth/callback?isSignedUp=true&token=" + jwt);
+            getRedirectStrategy().sendRedirect(request, response, url + "/oauth/callback?isSignedUp=true&token=" + jwt);
         }
     }
 }
