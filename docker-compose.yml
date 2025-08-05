@@ -19,9 +19,9 @@ services:
   frontend:
     build:
       context: ./front_end
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile.nginx
     ports:
-      - "8080:3000"
+      - "8080:80"
     volumes:
       # 소스 코드 볼륨 마운트 (실시간 수정을 위해)
       - ./front_end:/app
