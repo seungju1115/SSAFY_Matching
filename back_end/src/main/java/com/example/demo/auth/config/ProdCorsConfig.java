@@ -8,10 +8,9 @@ import org.springframework.web.cors.CorsConfigurationSource;
 
 import java.util.List;
 
-@Profile("local")
+@Profile("prod")
 @Configuration
-public class CorsConfig {
-
+public class ProdCorsConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
