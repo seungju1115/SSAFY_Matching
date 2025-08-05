@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -34,15 +35,19 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(
                 c ->
-                        c.requestMatchers("/users/profile", "/users/login", "/h2-console/**").permitAll()
+                        c.requestMatchers("/error", "/users/profile", "/users/login", "/login/oauth2/code/**", "/h2-console/**"
+                                        , "/team", "/team/search", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/users/profile").permitAll()
                                 .anyRequest().authenticated());
 
         http.oauth2Login(oauth2 -> oauth2
-                .authorizationEndpoint(authorization -> authorization
-                        .baseUri("/users/login"))
-                .userInfoEndpoint(userInfo -> userInfo.userService(oauth2UserService))
-                .successHandler(oAuth2AuthenticationSuccessHandler)
-                .failureHandler(oAuth2AuthenticationFailureHandler)
+                        .authorizationEndpoint(authorization -> authorization
+                                .baseUri("/users/login"))
+                        .redirectionEndpoint(redirection -> redirection
+                                .baseUri("/login/oauth2/code/*"))
+                        .userInfoEndpoint(userInfo -> userInfo.userService(oauth2UserService))
+                        .successHandler(oAuth2AuthenticationSuccessHandler)
+                        .failureHandler(oAuth2AuthenticationFailureHandler)
         );
 
         // h2-console 이용을 위한 설정
