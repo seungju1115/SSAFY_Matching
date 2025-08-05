@@ -38,7 +38,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(
                 c ->
                         c.requestMatchers("/error", "/users/profile", "/users/login", "/login/oauth2/code/**", "/h2-console/**"
-                                , "/team", "/team/search").permitAll()
+                                        , "/team", "/team/search", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/users/profile").permitAll()
                                 .anyRequest().authenticated());
 
@@ -46,14 +46,13 @@ public class SecurityConfig {
                 new CustomAuthorizationRequestResolver(clientRegistrationRepository, "/users/login");
 
         http.oauth2Login(oauth2 -> oauth2
-                .authorizationEndpoint(authorization -> authorization
-                        .baseUri("/users/login"))
-//                        .authorizationRequestResolver(customResolver))
-                .redirectionEndpoint(redirection -> redirection
-                        .baseUri("/login/oauth2/code/*"))
-                .userInfoEndpoint(userInfo -> userInfo.userService(oauth2UserService))
-                .successHandler(oAuth2AuthenticationSuccessHandler)
-                .failureHandler(oAuth2AuthenticationFailureHandler)
+                        .authorizationEndpoint(authorization -> authorization
+                                .baseUri("/users/login"))
+                        .redirectionEndpoint(redirection -> redirection
+                                .baseUri("/login/oauth2/code/*"))
+                        .userInfoEndpoint(userInfo -> userInfo.userService(oauth2UserService))
+                        .successHandler(oAuth2AuthenticationSuccessHandler)
+                        .failureHandler(oAuth2AuthenticationFailureHandler)
         );
 
         // h2-console 이용을 위한 설정

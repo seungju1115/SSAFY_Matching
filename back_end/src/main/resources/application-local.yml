@@ -1,6 +1,5 @@
 server:
-  forward-headers-strategy: framework
-  use-forward-headers: true
+  forward-headers-strategy: framework # 스프링에서 프록시 전달 헤더를 자동으로 인식하도록 설정.
 
 spring:
   security:
