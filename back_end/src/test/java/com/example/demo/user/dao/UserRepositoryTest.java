@@ -1,7 +1,7 @@
 package com.example.demo.user.dao;
 
 import com.example.demo.user.Enum.PositionEnum;
-import com.example.demo.user.Enum.ProjectPrefEnum;
+import com.example.demo.user.Enum.ProjectGoalEnum;
 import com.example.demo.user.Enum.TechEnum;
 import com.example.demo.user.Enum.PersonalPrefEnum;
 import com.example.demo.user.entity.User;
@@ -40,8 +40,8 @@ class UserRepositoryTest {
         userWithoutTeam1.setMajor(true);
         userWithoutTeam1.setLastClass(1);
         userWithoutTeam1.setWantedPosition(PositionEnum.BACKEND);
-        userWithoutTeam1.setTechStack(Set.of(TechEnum.Spring, TechEnum.JPA));
-        userWithoutTeam1.setProjectPref(Set.of(ProjectPrefEnum.STABLE));
+        userWithoutTeam1.setTechStack(Set.of(TechEnum.SPRING, TechEnum.JPA));
+        userWithoutTeam1.setProjectPref(Set.of(ProjectGoalEnum.STUDY));
         userWithoutTeam1.setPersonalPref(Set.of(PersonalPrefEnum.values()[0]));
         userWithoutTeam1.setTeam(null);
 
@@ -52,8 +52,8 @@ class UserRepositoryTest {
         userWithoutTeam2.setMajor(false);
         userWithoutTeam2.setLastClass(2);
         userWithoutTeam2.setWantedPosition(PositionEnum.FRONTEND);
-        userWithoutTeam2.setTechStack(Set.of(TechEnum.MySQL));
-        userWithoutTeam2.setProjectPref(Set.of(ProjectPrefEnum.CHALLENGE));
+        userWithoutTeam2.setTechStack(Set.of(TechEnum.MYSQL));
+        userWithoutTeam2.setProjectPref(Set.of(ProjectGoalEnum.QUICK));
         userWithoutTeam2.setPersonalPref(Set.of(PersonalPrefEnum.values()[0]));
         userWithoutTeam2.setTeam(null);
 
@@ -81,7 +81,7 @@ class UserRepositoryTest {
 
     @Test
     void findUsersWithoutTeamByPosition_조건에_맞지_않는_경우_빈_결과() {
-        List<User> result = userRepository.findUsersWithoutTeamByPosition(PositionEnum.MISC);
+        List<User> result = userRepository.findUsersWithoutTeamByPosition(PositionEnum.AI);
 
         assertThat(result).isEmpty();
     }

@@ -1,7 +1,7 @@
 package com.example.demo.user.service;
 
 import com.example.demo.user.Enum.PositionEnum;
-import com.example.demo.user.Enum.ProjectPrefEnum;
+import com.example.demo.user.Enum.ProjectGoalEnum;
 import com.example.demo.user.Enum.TechEnum;
 import com.example.demo.user.Enum.PersonalPrefEnum;
 import com.example.demo.user.dao.UserRepository;
@@ -44,8 +44,8 @@ class UserServiceTest {
         mockUser1.setMajor(true);
         mockUser1.setLastClass(1);
         mockUser1.setWantedPosition(PositionEnum.BACKEND);
-        mockUser1.setTechStack(Set.of(TechEnum.Spring, TechEnum.JPA));
-        mockUser1.setProjectPref(Set.of(ProjectPrefEnum.STABLE));
+        mockUser1.setTechStack(Set.of(TechEnum.SPRING, TechEnum.JPA));
+        mockUser1.setProjectPref(Set.of(ProjectGoalEnum.STUDY));
         mockUser1.setPersonalPref(Set.of(PersonalPrefEnum.values()[0]));
         mockUser1.setProjectExp("Spring Boot 프로젝트 경험");
         mockUser1.setQualification("정보처리기사");
@@ -58,8 +58,8 @@ class UserServiceTest {
         mockUser2.setMajor(false);
         mockUser2.setLastClass(2);
         mockUser2.setWantedPosition(PositionEnum.FRONTEND);
-        mockUser2.setTechStack(Set.of(TechEnum.MySQL));
-        mockUser2.setProjectPref(Set.of(ProjectPrefEnum.CHALLENGE));
+        mockUser2.setTechStack(Set.of(TechEnum.MYSQL));
+        mockUser2.setProjectPref(Set.of(ProjectGoalEnum.QUICK));
         mockUser2.setPersonalPref(Set.of(PersonalPrefEnum.values()[0]));
         mockUser2.setProjectExp("React 프로젝트 경험");
         mockUser2.setQualification("웹디자인기능사");
@@ -114,7 +114,7 @@ class UserServiceTest {
     void searchUsersWithoutTeam_기술스택_필터링() {
         SearchUserRequest request = new SearchUserRequest();
         request.setWantedPosition(null);
-        request.setTechStack(Set.of(TechEnum.Spring));
+        request.setTechStack(Set.of(TechEnum.SPRING));
         request.setProjectPref(null);
 
         List<User> mockUsers = Arrays.asList(mockUser1);
@@ -126,7 +126,7 @@ class UserServiceTest {
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getUserName()).isEqualTo("테스트유저1");
-        assertThat(result.get(0).getTechStack()).contains(TechEnum.Spring);
+        assertThat(result.get(0).getTechStack()).contains(TechEnum.SPRING);
 
         verify(userRepository).findUsersWithoutTeam();
     }
@@ -136,7 +136,7 @@ class UserServiceTest {
         SearchUserRequest request = new SearchUserRequest();
         request.setWantedPosition(null);
         request.setTechStack(null);
-        request.setProjectPref(Set.of(ProjectPrefEnum.STABLE));
+        request.setProjectPref(Set.of(ProjectGoalEnum.STUDY));
 
         List<User> mockUsers = Arrays.asList(mockUser1);
         
@@ -147,7 +147,7 @@ class UserServiceTest {
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getUserName()).isEqualTo("테스트유저1");
-        assertThat(result.get(0).getProjectPref()).contains(ProjectPrefEnum.STABLE);
+        assertThat(result.get(0).getProjectPref()).contains(ProjectGoalEnum.STUDY);
 
         verify(userRepository).findUsersWithoutTeam();
     }
@@ -156,8 +156,8 @@ class UserServiceTest {
     void searchUsersWithoutTeam_모든_조건_복합_필터링() {
         SearchUserRequest request = new SearchUserRequest();
         request.setWantedPosition(PositionEnum.BACKEND);
-        request.setTechStack(Set.of(TechEnum.Spring, TechEnum.JPA));
-        request.setProjectPref(Set.of(ProjectPrefEnum.STABLE));
+        request.setTechStack(Set.of(TechEnum.SPRING, TechEnum.JPA));
+        request.setProjectPref(Set.of(ProjectGoalEnum.STUDY));
 
         List<User> mockUsers = Arrays.asList(mockUser1);
         
@@ -169,8 +169,8 @@ class UserServiceTest {
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getUserName()).isEqualTo("테스트유저1");
         assertThat(result.get(0).getWantedPosition()).isEqualTo(PositionEnum.BACKEND);
-        assertThat(result.get(0).getTechStack()).containsAll(Set.of(TechEnum.Spring, TechEnum.JPA));
-        assertThat(result.get(0).getProjectPref()).contains(ProjectPrefEnum.STABLE);
+        assertThat(result.get(0).getTechStack()).containsAll(Set.of(TechEnum.SPRING, TechEnum.JPA));
+        assertThat(result.get(0).getProjectPref()).contains(ProjectGoalEnum.STUDY);
 
         verify(userRepository).findUsersWithoutTeamByPosition(eq(PositionEnum.BACKEND));
     }
@@ -178,17 +178,17 @@ class UserServiceTest {
     @Test
     void searchUsersWithoutTeam_조건에_맞는_사용자_없음() {
         SearchUserRequest request = new SearchUserRequest();
-        request.setWantedPosition(PositionEnum.MISC);
-        request.setTechStack(Set.of(TechEnum.Docker));
-        request.setProjectPref(Set.of(ProjectPrefEnum.CHALLENGE));
+        request.setWantedPosition(PositionEnum.AI);
+        request.setTechStack(Set.of(TechEnum.DOCKER));
+        request.setProjectPref(Set.of(ProjectGoalEnum.QUICK));
 
-        when(userRepository.findUsersWithoutTeamByPosition(eq(PositionEnum.MISC)))
+        when(userRepository.findUsersWithoutTeamByPosition(eq(PositionEnum.AI)))
                 .thenReturn(Arrays.asList());
 
         List<SearchUserResponse> result = userService.searchUsersWithoutTeam(request);
 
         assertThat(result).isEmpty();
 
-        verify(userRepository).findUsersWithoutTeamByPosition(eq(PositionEnum.MISC));
+        verify(userRepository).findUsersWithoutTeamByPosition(eq(PositionEnum.AI));
     }
 }

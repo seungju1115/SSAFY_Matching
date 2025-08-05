@@ -3,7 +3,7 @@ package com.example.demo.user.dto;
 import com.example.demo.team.entity.Team;
 import com.example.demo.user.Enum.PersonalPrefEnum;
 import com.example.demo.user.Enum.PositionEnum;
-import com.example.demo.user.Enum.ProjectPrefEnum;
+import com.example.demo.user.Enum.ProjectGoalEnum;
 import com.example.demo.user.Enum.TechEnum;
 import com.example.demo.user.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -47,7 +47,7 @@ public class UserProfileResponse implements Serializable {
     private PositionEnum wantedPosition;
 
     @Schema(description = "프로젝트 선호도")
-    private Set<ProjectPrefEnum> projectPref;
+    private Set<ProjectGoalEnum> projectPref;
 
     @Schema(description = "개인 성향")
     private Set<PersonalPrefEnum> personalPref;

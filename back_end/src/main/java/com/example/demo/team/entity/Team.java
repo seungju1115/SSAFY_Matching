@@ -1,7 +1,6 @@
 package com.example.demo.team.entity;
 
-import com.example.demo.user.Enum.PersonalPrefEnum;
-import com.example.demo.user.Enum.ProjectPrefEnum;
+import com.example.demo.user.Enum.ProjectGoalEnum;
 import com.example.demo.chat.entity.ChatRoom;
 import com.example.demo.user.entity.User;
 import jakarta.persistence.*;
@@ -47,10 +46,10 @@ public class Team {
     @Size(max = 300)
     private String teamDescription;
 
-    @ElementCollection(targetClass = ProjectPrefEnum.class, fetch = FetchType.LAZY)
+    @ElementCollection(targetClass = ProjectGoalEnum.class, fetch = FetchType.LAZY)
     @Enumerated(EnumType.STRING)
     @Column(name = "team_preference",  nullable = true)
-    private Set<ProjectPrefEnum> teamPreference;
+    private Set<ProjectGoalEnum> teamPreference;
 
     @OneToOne(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
     private ChatRoom chatRoom;

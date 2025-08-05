@@ -2,7 +2,7 @@ package com.example.demo.user.controller;
 
 import com.example.demo.response.ApiResponse;
 import com.example.demo.user.Enum.PositionEnum;
-import com.example.demo.user.Enum.ProjectPrefEnum;
+import com.example.demo.user.Enum.ProjectGoalEnum;
 import com.example.demo.user.Enum.TechEnum;
 import com.example.demo.user.dto.SearchUserRequest;
 import com.example.demo.user.dto.SearchUserResponse;
@@ -44,8 +44,8 @@ class UserControllerTest {
         mockResponse1.setMajor(true);
         mockResponse1.setLastClass(1);
         mockResponse1.setWantedPosition(PositionEnum.BACKEND);
-        mockResponse1.setTechStack(Set.of(TechEnum.Spring, TechEnum.JPA));
-        mockResponse1.setProjectPref(Set.of(ProjectPrefEnum.STABLE));
+        mockResponse1.setTechStack(Set.of(TechEnum.SPRING, TechEnum.JPA));
+        mockResponse1.setProjectPref(Set.of(ProjectGoalEnum.STUDY));
         mockResponse1.setProjectExp("Spring Boot 프로젝트 경험");
         mockResponse1.setQualification("정보처리기사");
 
@@ -56,8 +56,8 @@ class UserControllerTest {
         mockResponse2.setMajor(false);
         mockResponse2.setLastClass(2);
         mockResponse2.setWantedPosition(PositionEnum.FRONTEND);
-        mockResponse2.setTechStack(Set.of(TechEnum.MySQL));
-        mockResponse2.setProjectPref(Set.of(ProjectPrefEnum.CHALLENGE));
+        mockResponse2.setTechStack(Set.of(TechEnum.MYSQL));
+        mockResponse2.setProjectPref(Set.of(ProjectGoalEnum.QUICK));
         mockResponse2.setProjectExp("React 프로젝트 경험");
         mockResponse2.setQualification("웹디자인기능사");
     }
@@ -109,7 +109,7 @@ class UserControllerTest {
     @Test
     void searchUsersWithoutTeam_기술스택_필터링() {
         SearchUserRequest request = new SearchUserRequest();
-        request.setTechStack(Set.of(TechEnum.Spring));
+        request.setTechStack(Set.of(TechEnum.SPRING));
         
         List<SearchUserResponse> mockResponses = Arrays.asList(mockResponse1);
 
@@ -125,13 +125,13 @@ class UserControllerTest {
         List<SearchUserResponse> data = (List<SearchUserResponse>) response.getBody().getData();
         assertThat(data).hasSize(1);
         assertThat(data.get(0).getUserName()).isEqualTo("테스트유저1");
-        assertThat(data.get(0).getTechStack()).contains(TechEnum.Spring);
+        assertThat(data.get(0).getTechStack()).contains(TechEnum.SPRING);
     }
 
     @Test
     void searchUsersWithoutTeam_조건에_맞는_사용자_없음() {
         SearchUserRequest request = new SearchUserRequest();
-        request.setWantedPosition(PositionEnum.MISC);
+        request.setWantedPosition(PositionEnum.AI);
         
         when(userService.searchUsersWithoutTeam(any(SearchUserRequest.class)))
                 .thenReturn(Arrays.asList());

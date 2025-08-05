@@ -35,6 +35,7 @@ public enum TechEnum {
     GO("Go"),
     RUBY_ON_RAILS("Ruby on Rails"),
     PHP("PHP"),
+    JPA("JPA"),
 
     // Database
     MYSQL("MySQL"),

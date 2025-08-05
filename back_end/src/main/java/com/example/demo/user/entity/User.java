@@ -2,7 +2,7 @@ package com.example.demo.user.entity;
 
 import com.example.demo.user.Enum.PersonalPrefEnum;
 import com.example.demo.user.Enum.PositionEnum;
-import com.example.demo.user.Enum.ProjectPrefEnum;
+import com.example.demo.user.Enum.ProjectGoalEnum;
 import com.example.demo.user.Enum.TechEnum;
 import com.example.demo.chat.entity.ChatRoomMember;
 import com.example.demo.team.entity.Team;
@@ -94,12 +94,12 @@ public class User {
     @Size(max = 100)
     private Set<TechEnum> techStack;
 
-    @ElementCollection(targetClass = ProjectPrefEnum.class, fetch = FetchType.LAZY)
+    @ElementCollection(targetClass = ProjectGoalEnum.class, fetch = FetchType.LAZY)
     @Enumerated(EnumType.STRING)
     @Column(name = "project_preference", nullable = false, length = 50)
     @NotEmpty
     @Size(max = 50)
-    private Set<ProjectPrefEnum> projectPref;
+    private Set<ProjectGoalEnum> projectPref;
 
     @ElementCollection(targetClass = PersonalPrefEnum.class, fetch = FetchType.LAZY)
     @Enumerated(EnumType.STRING)

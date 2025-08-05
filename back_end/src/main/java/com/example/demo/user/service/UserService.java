@@ -1,5 +1,6 @@
 package com.example.demo.user.service;
 
+import com.example.demo.user.Enum.ProjectGoalEnum;
 import com.example.demo.user.dao.UserRepository;
 import com.example.demo.user.dto.SearchUserRequest;
 import com.example.demo.user.dto.SearchUserResponse;
@@ -111,7 +112,7 @@ public class UserService {
         return user.getTechStack().stream().anyMatch(techStack::contains);
     }
     
-    private boolean matchesProjectPref(User user, java.util.Set<com.example.demo.user.Enum.ProjectPrefEnum> projectPref) {
+    private boolean matchesProjectPref(User user, java.util.Set<ProjectGoalEnum> projectPref) {
         if (projectPref == null || projectPref.isEmpty()) {
             return true;
         }
