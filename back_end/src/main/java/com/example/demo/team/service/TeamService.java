@@ -54,7 +54,7 @@ public class TeamService {
 
         chatRoomService.createTeamChatRoom(chatRoomRequest);
 
-        return new TeamResponse(saved.getId(), saved.getTeamName(), saved.getLeader().getId(), saved.getMembers().size());
+        return new TeamResponse(saved.getId(),saved.getChatRoom().getId() , saved.getTeamName(), saved.getLeader().getId(), saved.getMembers().size());
     }
 
     // 2. 전체 팀 조회
@@ -62,6 +62,7 @@ public class TeamService {
         return teamRepository.findAll().stream()
                 .map(team -> new TeamResponse(
                         team.getId(),
+                        team.getChatRoom().getId(),
                         team.getTeamName(),
                         team.getLeader() != null ? team.getLeader().getId() : null,
                         team.getMembers() != null ? team.getMembers().size() : 0
@@ -77,6 +78,7 @@ public class TeamService {
                         (team.getLeader() != null && team.getLeader().getId().equals(teamRequest.getLeaderId())))
                 .map(team -> new TeamResponse(
                         team.getId(),
+                        team.getChatRoom().getId(),
                         team.getTeamName(),
                         team.getLeader() != null ? team.getLeader().getId() : null,
                         team.getMembers() != null ? team.getMembers().size() : 0
@@ -95,7 +97,7 @@ public class TeamService {
             membersId.add(user.getId());
         }
 
-        return new TeamDetailResponse(team.getId(), team.getTeamName(), team.getLeader().getId(), membersId);
+        return new TeamDetailResponse(team.getId(),team.getChatRoom().getId() ,team.getTeamName(), team.getLeader().getId(), membersId);
     }
 
     // 5. 팀 정보 삭제
@@ -143,7 +145,7 @@ public class TeamService {
             membersId.add(user.getId());
         }
 
-        return new TeamDetailResponse(team.getId(), team.getTeamName(), team.getLeader().getId(), membersId);
+        return new TeamDetailResponse(team.getId(), team.getChatRoom().getId() ,team.getTeamName(), team.getLeader().getId(), membersId);
     }
 
     // 7. 팀 멤버 초대
@@ -172,7 +174,7 @@ public class TeamService {
             membersId.add(user.getId());
         }
 
-        return new TeamDetailResponse(team.getId(), team.getTeamName(), team.getLeader().getId(), membersId);
+        return new TeamDetailResponse(team.getId(), team.getChatRoom().getId() ,team.getTeamName(), team.getLeader().getId(), membersId);
     }
 
     // n. 팀 멤버 조회
