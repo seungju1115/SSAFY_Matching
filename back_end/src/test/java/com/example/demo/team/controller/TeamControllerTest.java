@@ -107,7 +107,7 @@ class TeamControllerTest {
         expectedResponse.setTeamName("테스트 팀");
         expectedResponse.setLeaderId(100L);
         expectedResponse.setMemberCount(1);
-        when(teamService.createTeam(any(TeamRequest.class)))
+        when(teamService.createTeam(any(TeamCreateRequest.class)))
                 .thenReturn(expectedResponse);
         mockMvc.perform(post("/team")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -158,7 +158,7 @@ class TeamControllerTest {
 
         List<TeamResponse> filteredTeams = List.of(team1, team2);
 
-        when(teamService.searchConditionTeam(any(TeamSearchRequest.class)))
+        when(teamService.searchConditionTeam(any(TeamRequest.class)))
                 .thenReturn(filteredTeams);
 
         teamSearchRequest.setLeaderId(null);    // 리더 ID는 조건 없이 검색
@@ -180,7 +180,7 @@ class TeamControllerTest {
     void searchConditionTeam_shouldReturn400WithInvalidFilteredTeams() throws Exception {
         List<TeamResponse> filteredTeams = List.of(team1, team2);
 
-        when(teamService.searchConditionTeam(any(TeamSearchRequest.class)))
+        when(teamService.searchConditionTeam(any(TeamRequest.class)))
                 .thenReturn(filteredTeams);
 
         teamSearchRequest.setTeamName("1");    // 리더 ID는 조건 없이 검색

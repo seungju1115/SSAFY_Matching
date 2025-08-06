@@ -217,7 +217,7 @@ class TeamServiceTest {
 
         assertThat(members).hasSize(1);
         assertThat(members.get(0).getMemberId()).isEqualTo(leader.getId());
-        assertThat(members.get(0).getUsername()).isEqualTo(leader.getUserName());
+        assertThat(members.get(0).getUserName()).isEqualTo(leader.getUserName());
     }
 }
 

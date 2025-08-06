@@ -15,9 +15,9 @@ import com.example.demo.team.dto.TeamRequest;
 import com.example.demo.team.dto.TeamSearchRequest;
 import com.example.demo.team.entity.RequestType;
 import com.example.demo.team.entity.Team;
-import com.example.demo.user.Enum.PersonalPrefEnum;
+import com.example.demo.user.Enum.ProjectViveEnum;
 import com.example.demo.user.Enum.PositionEnum;
-import com.example.demo.user.Enum.ProjectPrefEnum;
+import com.example.demo.user.Enum.ProjectGoalEnum;
 import com.example.demo.user.Enum.TechEnum;
 import com.example.demo.user.dao.UserRepository;
 import com.example.demo.user.entity.User;
@@ -87,9 +87,9 @@ public class TeamIntegrationTest {
         user1.setMajor(true);
         user1.setLastClass(1);
         user1.setWantedPosition(PositionEnum.BACKEND);
-        user1.setTechStack(new HashSet<>(Arrays.asList(TechEnum.JPA, TechEnum.MyBatis)));
-        user1.setProjectPref(new HashSet<>(Arrays.asList(ProjectPrefEnum.CHALLENGE)));
-        user1.setPersonalPref(new HashSet<>(Arrays.asList(PersonalPrefEnum.COMMUNICATE)));
+        user1.setTechStack(new HashSet<>(Arrays.asList(TechEnum.JPA, TechEnum.MYSQL)));
+        user1.setProjectGoal(new HashSet<>(Arrays.asList(ProjectGoalEnum.QUICK)));
+        user1.setProjectVive(new HashSet<>(Arrays.asList(ProjectViveEnum.CASUAL)));
 
         // User 2
         user2 = new User();
@@ -99,9 +99,9 @@ public class TeamIntegrationTest {
         user2.setMajor(false);
         user2.setLastClass(2);
         user2.setWantedPosition(PositionEnum.FRONTEND);
-        user2.setTechStack(new HashSet<>(Arrays.asList(TechEnum.Docker, TechEnum.MySQL)));
-        user2.setProjectPref(new HashSet<>(Arrays.asList(ProjectPrefEnum.STABLE)));
-        user2.setPersonalPref(new HashSet<>(Arrays.asList(PersonalPrefEnum.CONCENTRATE)));
+        user2.setTechStack(new HashSet<>(Arrays.asList(TechEnum.DOCKER, TechEnum.MYSQL)));
+        user2.setProjectGoal(new HashSet<>(Arrays.asList(ProjectGoalEnum.STUDY)));
+        user2.setProjectVive(new HashSet<>(Arrays.asList(ProjectViveEnum.CASUAL)));
 
         // User 3
         user3 = new User();
@@ -111,9 +111,9 @@ public class TeamIntegrationTest {
         user3.setMajor(true);
         user3.setLastClass(3);
         user3.setWantedPosition(PositionEnum.FRONTEND);
-        user3.setTechStack(new HashSet<>(Arrays.asList(TechEnum.MyBatis)));
-        user3.setProjectPref(new HashSet<>(Arrays.asList(ProjectPrefEnum.CHALLENGE)));
-        user3.setPersonalPref(new HashSet<>(Arrays.asList(PersonalPrefEnum.CONCENTRATE)));
+        user3.setTechStack(new HashSet<>(Arrays.asList(TechEnum.MYSQL)));
+        user3.setProjectGoal(new HashSet<>(Arrays.asList(ProjectGoalEnum.QUICK)));
+        user3.setProjectVive(new HashSet<>(Arrays.asList(ProjectViveEnum.CASUAL)));
 
         userRepository.saveAll(List.of(user1, user2, user3));
 
@@ -122,7 +122,7 @@ public class TeamIntegrationTest {
         team1.setTeamDomain("testteamdomain123"); // 최소 길이 10 이상이어야 함
         team1.setMemberWanted("백엔드 개발자 모집");
         team1.setTeamDescription("통합 테스트용 팀 설명입니다.");
-        team1.setTeamPreference(new HashSet<>(Arrays.asList(ProjectPrefEnum.CHALLENGE, ProjectPrefEnum.STABLE))); // ✅ 가변 Set
+        team1.setTeamPreference(new HashSet<>(Arrays.asList(ProjectGoalEnum.QUICK, ProjectGoalEnum.STUDY))); // ✅ 가변 Set
         team1.setLeader(user2);
         ChatRoom chatRoom1 = new ChatRoom();
         chatRoom1.setTeam(team1);
