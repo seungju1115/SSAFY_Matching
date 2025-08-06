@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,6 +42,7 @@ public class TeamService {
         Team team = new Team();
         team.setTeamName(dto.getTeamName());
         team.setLeader(leader);
+        team.setTeamDomain(dto.getTeamDomain());
 
         // 팀장도 팀의 멤버로 설정 (양방향 메서드 이용)
         leader.setTeam(team); // 내부적으로 team.getMembers().add(this) 포함됨
@@ -57,7 +57,7 @@ public class TeamService {
 
         chatRoomService.createTeamChatRoom(chatRoomRequest);
 
-        return new TeamResponse(saved.getId(), saved.getTeamName(), saved.getLeader().getId(), saved.getMembers().size());
+        return new TeamResponse(saved.getId(),saved.getChatRoom().getId(),saved.getTeamName(), saved.getLeader().getId(), saved.getMembers().size());
     }
 
     // 2. 전체 팀 조회
@@ -65,6 +65,7 @@ public class TeamService {
         return teamRepository.findAll().stream()
                 .map(team -> new TeamResponse(
                         team.getId(),
+                        team.getChatRoom().getId(),
                         team.getTeamName(),
                         team.getLeader().getId(),
                         team.getMembers().size()
@@ -80,6 +81,7 @@ public class TeamService {
                         (team.getLeader() != null && team.getLeader().getId().equals(teamRequest.getLeaderId())))
                 .map(team -> new TeamResponse(
                         team.getId(),
+                        team.getChatRoom().getId(),
                         team.getTeamName(),
                         team.getLeader().getId(),
                         team.getMembers().size()
@@ -98,7 +100,7 @@ public class TeamService {
             membersId.add(user.getId());
         }
 
-        return new TeamDetailResponse(team.getId(), team.getTeamName(), team.getLeader().getId(), membersId);
+        return new TeamDetailResponse(team.getId(),team.getChatRoom().getId(), team.getTeamName(), team.getLeader().getId(), membersId);
     }
 
     // 5. 팀 정보 삭제
@@ -114,11 +116,6 @@ public class TeamService {
                 member.setTeam(null); // 안전하게 순회
             }
         }
-
-        // 양방향 관계 정리 (옵션)
-//        if (team.getChatRoom() != null) {
-//            team.setChatRoom(null); // 양방향 동기화용
-//        }
 
         teamRepository.delete(team);
     }
@@ -138,7 +135,7 @@ public class TeamService {
                 });
 
         team.setTeamName(teamRequest.getTeamName());
-
+        team.setTeamDomain(teamRequest.getTeamDomain());
         // 리더 수정
         User newLeader = userRepository.findById(teamRequest.getLeaderId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
@@ -149,7 +146,7 @@ public class TeamService {
             membersId.add(user.getId());
         }
 
-        return new TeamDetailResponse(team.getId(), team.getTeamName(), team.getLeader().getId(), membersId);
+        return new TeamDetailResponse(team.getId(),team.getChatRoom().getId(), team.getTeamName(), team.getLeader().getId(), membersId);
     }
 
     // 7. 팀 멤버 초대
@@ -178,7 +175,7 @@ public class TeamService {
             membersId.add(user.getId());
         }
 
-        return new TeamDetailResponse(team.getId(), team.getTeamName(), team.getLeader().getId(), membersId);
+        return new TeamDetailResponse(team.getId(), team.getChatRoom().getId(),team.getTeamName(), team.getLeader().getId(), membersId);
     }
 
     // n. 팀 멤버 조회
