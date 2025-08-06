@@ -14,6 +14,7 @@ import type { UserDetailSettings as UserDetailSettingsType } from '@/types/user'
 import { CLASS_OPTIONS } from '@/types/user'
 import { authAPI } from '@/api/auth'
 import { CheckCircle2, User, BookOpen, Users } from 'lucide-react'
+import apiClient from '@/api/axios'
 
 export default function Setup() {
   const navigate = useNavigate()
@@ -42,7 +43,19 @@ export default function Setup() {
 
     setIsLoading(true)
     try {
-      // 신규 사용자인 경우 회원가입 API 호출
+      // 사용자 프로필 API 호출을 위한 데이터 준비
+      const userProfileData = {
+        email: email || '',
+        userName: settings.name,
+        lastClass: parseInt(settings.classNumber),
+        major: settings.isMajor
+      }
+      
+      // 프로필 API 호출
+      await apiClient.post('/users/profile', userProfileData)
+      console.log('User profile created successfully:', userProfileData)
+      
+      // 기존 인증 로직도 유지 (필요에 따라)
       if (email) {
         await authAPI.register({
           email,
