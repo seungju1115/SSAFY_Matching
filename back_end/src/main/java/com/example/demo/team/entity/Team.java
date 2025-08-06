@@ -35,10 +35,15 @@ public class Team {
     private String teamName;
 
     // 각 역할별 필요 인원 수, 만약 역할이 추가된다면 별도 엔티티로 작성해야 함.
+    @Column(columnDefinition = "int default 0")
     private int backendCount;
+    @Column(columnDefinition = "int default 0")
     private int frontendCount;
+    @Column(columnDefinition = "int default 0")
     private int aiCount;
+    @Column(columnDefinition = "int default 0")
     private int pmCount;
+    @Column(columnDefinition = "int default 0")
     private int designCount;
 
     @Column(name = "team_domain", nullable = false, length = 50)
