@@ -29,13 +29,20 @@ public class Team {
     @Column(name = "team_id")
     private Long id;
 
-    @Column(name = "team_name", nullable = false, length = 20)
+    @Column(name = "team_name", nullable = true, length = 20)
     @Size(min = 2, max = 20)
-    @NotBlank
+//    @NotBlank 처음에 팀 생성 시 팀 이름이 없기 때문에 주석처리
     private String teamName;
 
+    // 각 역할별 필요 인원 수, 만약 역할이 추가된다면 별도 엔티티로 작성해야 함.
+    private int backendCount;
+    private int frontendCount;
+    private int aiCount;
+    private int pmCount;
+    private int designCount;
+
     @Column(name = "team_domain", nullable = false, length = 50)
-    @Size(min = 10, max = 50)
+    @Size(min = 2, max = 50)
     @NotBlank
     private String teamDomain;
 
