@@ -2,6 +2,7 @@ package com.example.demo.team.entity;
 
 import com.example.demo.user.Enum.ProjectGoalEnum;
 import com.example.demo.chat.entity.ChatRoom;
+import com.example.demo.user.Enum.ProjectViveEnum;
 import com.example.demo.user.entity.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -50,6 +51,11 @@ public class Team {
     @Enumerated(EnumType.STRING)
     @Column(name = "team_preference",  nullable = true)
     private Set<ProjectGoalEnum> teamPreference;
+
+    @ElementCollection(targetClass = ProjectViveEnum.class, fetch = FetchType.LAZY)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "team_vive",  nullable = true)
+    private Set<ProjectViveEnum> teamVive;
 
     @OneToOne(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
     private ChatRoom chatRoom;

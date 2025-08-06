@@ -45,7 +45,7 @@ class UserControllerTest {
         mockResponse1.setLastClass(1);
         mockResponse1.setWantedPosition(PositionEnum.BACKEND);
         mockResponse1.setTechStack(Set.of(TechEnum.SPRING, TechEnum.JPA));
-        mockResponse1.setProjectPref(Set.of(ProjectGoalEnum.STUDY));
+        mockResponse1.setProjectGoal(Set.of(ProjectGoalEnum.STUDY));
         mockResponse1.setProjectExp("Spring Boot 프로젝트 경험");
         mockResponse1.setQualification("정보처리기사");
 
@@ -57,7 +57,7 @@ class UserControllerTest {
         mockResponse2.setLastClass(2);
         mockResponse2.setWantedPosition(PositionEnum.FRONTEND);
         mockResponse2.setTechStack(Set.of(TechEnum.MYSQL));
-        mockResponse2.setProjectPref(Set.of(ProjectGoalEnum.QUICK));
+        mockResponse2.setProjectGoal(Set.of(ProjectGoalEnum.QUICK));
         mockResponse2.setProjectExp("React 프로젝트 경험");
         mockResponse2.setQualification("웹디자인기능사");
     }

@@ -144,7 +144,7 @@ class UserServiceTest {
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getUserName()).isEqualTo("테스트유저1");
-        assertThat(result.get(0).getProjectPref()).contains(ProjectGoalEnum.STUDY);
+        assertThat(result.get(0).getProjectGoal()).contains(ProjectGoalEnum.STUDY);
 
         verify(userRepository).findUsersWithoutTeam();
     }
@@ -167,7 +167,7 @@ class UserServiceTest {
         assertThat(result.get(0).getUserName()).isEqualTo("테스트유저1");
         assertThat(result.get(0).getWantedPosition()).isEqualTo(PositionEnum.BACKEND);
         assertThat(result.get(0).getTechStack()).containsAll(Set.of(TechEnum.SPRING, TechEnum.JPA));
-        assertThat(result.get(0).getProjectPref()).contains(ProjectGoalEnum.STUDY);
+        assertThat(result.get(0).getProjectGoal()).contains(ProjectGoalEnum.STUDY);
 
         verify(userRepository).findUsersWithoutTeamByPosition(eq(PositionEnum.BACKEND));
     }
