@@ -22,10 +22,10 @@ spring:
             user-info-uri: https://openidconnect.googleapis.com/v1/userinfo
             user-name-attribute: sub
 
-logging:
-  level:
-    org.springframework.security: DEBUG
-    org.springframework.security.oauth2: DEBUG
+  logging:
+    level:
+      org.springframework.security: DEBUG
+      org.springframework.security.oauth2: DEBUG
 
   datasource:
     url: jdbc:h2:~/test

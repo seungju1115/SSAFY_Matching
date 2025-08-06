@@ -73,5 +73,5 @@ public class DashboardResponseDto implements Serializable {
         }
         """
     )
-    private Map<String, Integer> domain;
+    private Map<String, Long> domain;
 }

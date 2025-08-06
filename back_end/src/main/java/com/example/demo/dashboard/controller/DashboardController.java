@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/dashboard")
@@ -100,10 +102,27 @@ public class DashboardController {
             )
     })
     @GetMapping("/graph")
-    @Cacheable(value = "dashboardCache", key = "'graph'")
-    public DashboardResponseDto getDashboard() {
+    public ResponseEntity<DashboardResponseDto> getDashboard() {
+        dashboardService.getDashboard();
+
+        long time = System.nanoTime();
         DashboardResponseDto dto = dashboardService.getDashboard();
-        return dto;
+        long elapsed = System.nanoTime() - time;
+        return ResponseEntity.ok()
+                .header("X-Execution-Time-Ms", String.valueOf(elapsed))
+                .body(dto);
+    }
+
+    @GetMapping("/graphnocache")
+    public ResponseEntity<DashboardResponseDto> getDashboardnoCache() {
+        dashboardService.getDashboardNoCache();
+
+        long time = System.nanoTime();
+        DashboardResponseDto dto = dashboardService.getDashboardNoCache();
+        long elapsed = System.nanoTime() - time;
+        return ResponseEntity.ok()
+                .header("X-Execution-Time-Ms", String.valueOf(elapsed))
+                .body(dto);
     }
 
     @Operation(
