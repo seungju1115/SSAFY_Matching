@@ -11,9 +11,10 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import type { UserDetailSettings as UserDetailSettingsType } from '@/types/user'
-import { SEMESTER_OPTIONS, CLASS_OPTIONS, MAJOR_TRACK_OPTIONS, NON_MAJOR_TRACK_OPTIONS } from '@/types/user'
+import { CLASS_OPTIONS } from '@/types/user'
 import { authAPI } from '@/api/auth'
-import { CheckCircle2, User, GraduationCap, BookOpen, Users } from 'lucide-react'
+import { CheckCircle2, User, BookOpen, Users } from 'lucide-react'
+import apiClient from '@/api/axios'
 
 export default function Setup() {
   const navigate = useNavigate()
@@ -22,42 +23,54 @@ export default function Setup() {
   
   const [settings, setSettings] = useState<UserDetailSettingsType>({
     name: '',
-    semester: '',
     classNumber: '',
-    major: '',
     isMajor: true
   })
   const [isLoading, setIsLoading] = useState(false)
 
 
   const handleSettingChange = (field: keyof UserDetailSettingsType, value: string | boolean) => {
-    setSettings(prev => {
-      const newSettings = { ...prev, [field]: value };
-      // 전공 구분이 변경되면 전공 트랙 선택을 초기화
-      if (field === 'isMajor') {
-        newSettings.major = '';
-      }
-      return newSettings;
-    });
+    setSettings((prev: UserDetailSettingsType) => ({
+      ...prev,
+      [field]: value
+    }));
   }
 
   const handleComplete = async () => {
-    if (!settings.name || !settings.semester || !settings.classNumber || !settings.major) {
+    if (!settings.name || !settings.classNumber || settings.isMajor === undefined) {
       return
     }
 
     setIsLoading(true)
     try {
-      // 신규 사용자인 경우 회원가입 API 호출
+      // 사용자 프로필 API 호출을 위한 데이터 준비
+      const userProfileData = {
+        email: email || '',
+        userName: settings.name,
+        lastClass: parseInt(settings.classNumber),
+        major: settings.isMajor
+      }
+      
+      // 프로필 API 호출
+      await apiClient.post('/users/profile', userProfileData)
+      console.log('User profile created successfully:', userProfileData)
+      
+      // 기존 인증 로직도 유지 (필요에 따라)
       if (email) {
         await authAPI.register({
           email,
-          ...settings
+          ...settings,
+          semester: '',  // 빈 값으로 설정
+          major: ''      // 빈 값으로 설정
         })
         console.log('User registered successfully:', { email, ...settings })
       } else {
         // 기존 사용자인 경우 설정 업데이트
-        await authAPI.updateUserDetails(settings)
+        await authAPI.updateUserDetails({
+          ...settings,
+          semester: '',  // 빈 값으로 설정
+          major: ''      // 빈 값으로 설정
+        })
         console.log('User detail settings saved successfully:', settings)
       }
       
@@ -70,7 +83,7 @@ export default function Setup() {
     }
   }
 
-  const isFormComplete = settings.name && settings.semester && settings.classNumber && settings.major
+  const isFormComplete = settings.name && settings.classNumber && settings.isMajor !== undefined
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
@@ -118,25 +131,22 @@ export default function Setup() {
                 className="w-full h-12 text-base"
               />
             </div>
-            {/* 학기 선택 */}
+            {/* 반 선택 */}
             <div className="space-y-3">
               <div className="flex items-center space-x-2">
-                <GraduationCap className="w-5 h-5 text-blue-600" />
-                <label className="text-sm font-semibold text-gray-700">학기</label>
-                {settings.semester && <CheckCircle2 className="w-4 h-4 text-green-500" />}
+                <Users className="w-5 h-5 text-green-600" />
+                <label className="text-sm font-semibold text-gray-700">반</label>
+                {settings.classNumber && <CheckCircle2 className="w-4 h-4 text-green-500" />}
               </div>
               <Select
-                value={settings.semester}
-                onValueChange={(value) => {
-                  handleSettingChange('semester', value)
-                  handleSettingChange('classNumber', '') // 학기 변경시 반 초기화
-                }}
+                value={settings.classNumber}
+                onValueChange={(value) => handleSettingChange('classNumber', value)}
               >
                 <SelectTrigger className="w-full h-12 text-base">
-                  <SelectValue placeholder="학기를 선택하세요" />
+                  <SelectValue placeholder="반을 선택하세요" />
                 </SelectTrigger>
                 <SelectContent>
-                  {SEMESTER_OPTIONS.map((option) => (
+                  {CLASS_OPTIONS.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
                     </SelectItem>
@@ -144,32 +154,6 @@ export default function Setup() {
                 </SelectContent>
               </Select>
             </div>
-
-            {/* 반 선택 */}
-            {settings.semester && (
-              <div className="space-y-3 animate-in slide-in-from-top-2 duration-300">
-                <div className="flex items-center space-x-2">
-                  <Users className="w-5 h-5 text-green-600" />
-                  <label className="text-sm font-semibold text-gray-700">반</label>
-                  {settings.classNumber && <CheckCircle2 className="w-4 h-4 text-green-500" />}
-                </div>
-                <Select
-                  value={settings.classNumber}
-                  onValueChange={(value) => handleSettingChange('classNumber', value)}
-                >
-                  <SelectTrigger className="w-full h-12 text-base">
-                    <SelectValue placeholder={`${settings.semester}학기 반을 선택하세요`} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {CLASS_OPTIONS.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {settings.semester}학기 {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
 
             {/* 전공 구분 선택 */}
             <div className="space-y-3">
@@ -191,29 +175,7 @@ export default function Setup() {
               </Select>
             </div>
 
-            {/* 전공 트랙 선택 */}
-            <div className="space-y-3">
-              <div className="flex items-center space-x-2">
-                <GraduationCap className="w-5 h-5 text-orange-600" />
-                <label className="text-sm font-semibold text-gray-700">전공 트랙</label>
-                {settings.major && <CheckCircle2 className="w-4 h-4 text-green-500" />}
-              </div>
-              <Select
-                value={settings.major}
-                onValueChange={(value) => handleSettingChange('major', value)}
-              >
-                <SelectTrigger className="w-full h-12 text-base">
-                  <SelectValue placeholder="전공 트랙을 선택하세요" />
-                </SelectTrigger>
-                <SelectContent>
-                  {(settings.isMajor ? MAJOR_TRACK_OPTIONS : NON_MAJOR_TRACK_OPTIONS).map((option: { value: string; label: string }) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+
 
             {/* 완료 버튼 */}
             <div className="pt-6">
