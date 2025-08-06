@@ -5,6 +5,8 @@ services:
       dockerfile: Dockerfile
     image: rabent0207/matching-ssafy-backend:latest
     container_name: spring-backend
+    ports:
+      - "8081:8080"
     volumes:
       - gradle-cache:/root/.gradle  # Gradle 캐시 볼륨
     restart: unless-stopped
@@ -17,19 +19,19 @@ services:
   frontend:
     build:
       context: ./front_end
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.nginx
     ports:
       - "8080:80"
     volumes:
       # 소스 코드 볼륨 마운트 (실시간 수정을 위해)
-      - .:/app
+      - ./front_end:/app
       # node_modules는 컨테이너의 것을 사용 (성능상 이유)
       - /app/node_modules
       # shadcn/ui 설정 파일들 명시적 마운트
-      - ./components.json:/app/components.json
-      - ./tailwind.config.js:/app/tailwind.config.js
-      - ./src/lib:/app/src/lib
-      - ./src/components/ui:/app/src/components/ui
+      - ./front_end/components.json:/app/components.json
+      - ./front_end/tailwind.config.js:/app/tailwind.config.js
+      - ./front_end/src/lib:/app/src/lib
+      - ./front_end/src/components/ui:/app/src/components/ui
     environment:
       - NODE_ENV=development
       - CHOKIDAR_USEPOLLING=true  # Windows Docker에서 파일 변경 감지 개선

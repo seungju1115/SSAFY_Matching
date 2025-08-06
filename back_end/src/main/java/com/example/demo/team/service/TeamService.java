@@ -28,7 +28,7 @@ public class TeamService {
     private final ChatRoomService chatRoomService;
     // 1. 팀 생성
     @Transactional
-    public TeamResponse createTeam(TeamRequest dto) {
+    public TeamResponse createTeam(TeamRequest dto) { // 팀장만 생성 가능
         // 팀장 조회
         User leader = userRepository.findById(dto.getLeaderId())
                 .orElseThrow(() -> new RuntimeException("Leader not found"));
