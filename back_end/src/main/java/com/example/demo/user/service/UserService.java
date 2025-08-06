@@ -1,5 +1,6 @@
 package com.example.demo.user.service;
 
+import com.example.demo.user.Enum.ProjectGoalEnum;
 import com.example.demo.user.dao.UserRepository;
 import com.example.demo.user.dto.SearchUserRequest;
 import com.example.demo.user.dto.SearchUserResponse;
@@ -69,8 +70,8 @@ public class UserService {
         if (request.isMajor()) user.setMajor(true);
         if (request.getLastClass() != null) user.setLastClass(request.getLastClass());
         if (request.getWantedPosition() != null) user.setWantedPosition(request.getWantedPosition());
-        if (request.getProjectPref() != null) user.setProjectPref(request.getProjectPref());
-        if (request.getPersonalPref() != null) user.setPersonalPref(request.getPersonalPref());
+        if (request.getProjectGoal() != null) user.setProjectGoal(request.getProjectGoal());
+        if (request.getProjectVive() != null) user.setProjectVive(request.getProjectVive());
         if (request.getProjectExp() != null) user.setProjectExp(request.getProjectExp());
         if (request.getQualification() != null) user.setQualification(request.getQualification());
         if (request.getTechStack() != null) user.setTechStack(request.getTechStack());
@@ -111,13 +112,13 @@ public class UserService {
         return user.getTechStack().stream().anyMatch(techStack::contains);
     }
     
-    private boolean matchesProjectPref(User user, java.util.Set<com.example.demo.user.Enum.ProjectPrefEnum> projectPref) {
+    private boolean matchesProjectPref(User user, java.util.Set<ProjectGoalEnum> projectPref) {
         if (projectPref == null || projectPref.isEmpty()) {
             return true;
         }
-        if (user.getProjectPref() == null) {
+        if (user.getProjectGoal() == null) {
             return false;
         }
-        return user.getProjectPref().stream().anyMatch(projectPref::contains);
+        return user.getProjectGoal().stream().anyMatch(projectPref::contains);
     }
 }

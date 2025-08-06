@@ -42,8 +42,8 @@ public class DashboardService {
         }
 
 
-        int matched_back = 0, matched_front = 0, matched_misc = 0;
-        int unmatched_back = 0, unmatched_front = 0, unmatched_misc = 0;
+        int matched_back = 0, matched_front = 0, matched_ai = 0, matched_design=0, matched_pm=0;
+        int unmatched_back = 0, unmatched_front = 0, unmatched_ai = 0, unmatched_design=0, unmatched_pm=0;
 
         for (UserCountDto user : users) {
             boolean hasTeam = user.getTeam() != null;
@@ -56,9 +56,17 @@ public class DashboardService {
                     if (hasTeam) matched_front++;
                     else unmatched_front++;
                     break;
-                case MISC:
-                    if (hasTeam) matched_misc++;
-                    else unmatched_misc++;
+                case AI:
+                    if (hasTeam) matched_ai++;
+                    else unmatched_ai++;
+                    break;
+                case DESIGN:
+                    if (hasTeam) matched_design++;
+                    else unmatched_design++;
+                    break;
+                case PM:
+                    if (hasTeam) matched_pm++;
+                    else unmatched_pm++;
                     break;
             }
         }
@@ -78,10 +86,14 @@ public class DashboardService {
                 .unmatchedUnmajor(unmatched_unmajor)
                 .matched_back(matched_back)
                 .matched_front(matched_front)
-                .matched_misc(matched_misc)
+                .matched_ai(matched_ai)
+                .matched_design(matched_design)
+                .matched_pm(matched_pm)
                 .unmatched_back(unmatched_back)
                 .unmatched_front(unmatched_front)
-                .unmatched_misc(unmatched_misc)
+                .unmatched_ai(unmatched_ai)
+                .unmatched_design(unmatched_design)
+                .unmatched_pm(unmatched_pm)
                 .domain(map)
                 .build();
     }

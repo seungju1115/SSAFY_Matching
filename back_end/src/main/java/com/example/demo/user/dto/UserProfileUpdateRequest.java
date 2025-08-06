@@ -1,9 +1,6 @@
 package com.example.demo.user.dto;
 
-import com.example.demo.user.Enum.PersonalPrefEnum;
-import com.example.demo.user.Enum.PositionEnum;
-import com.example.demo.user.Enum.ProjectPrefEnum;
-import com.example.demo.user.Enum.TechEnum;
+import com.example.demo.user.Enum.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -35,10 +32,10 @@ public class UserProfileUpdateRequest {
     private PositionEnum wantedPosition;
 
     @Schema(description = "프로젝트 선호도", example = "[\"도전적인 성향\", \"새로운 기술 적극 사용\"]")
-    private Set<ProjectPrefEnum> projectPref;
+    private Set<ProjectGoalEnum> projectGoal;
 
     @Schema(description = "개인 성향", example = "[\"내향적인 편\", \"컨벤션 잘 지키는 편\"]")
-    private Set<PersonalPrefEnum> personalPref;
+    private Set<ProjectViveEnum> projectVive;
 
     @Schema(description = "프로젝트 경험", example = "추가된 프로젝트 경험")
     private String projectExp;

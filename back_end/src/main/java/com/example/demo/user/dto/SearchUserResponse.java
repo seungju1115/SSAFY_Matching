@@ -1,9 +1,6 @@
 package com.example.demo.user.dto;
 
-import com.example.demo.user.Enum.PersonalPrefEnum;
-import com.example.demo.user.Enum.PositionEnum;
-import com.example.demo.user.Enum.ProjectPrefEnum;
-import com.example.demo.user.Enum.TechEnum;
+import com.example.demo.user.Enum.*;
 import com.example.demo.user.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -44,10 +41,10 @@ public class SearchUserResponse {
     private Set<TechEnum> techStack;
 
     @Schema(description = "프로젝트 선호도")
-    private Set<ProjectPrefEnum> projectPref;
+    private Set<ProjectGoalEnum> projectGoal;
 
     @Schema(description = "개인 성향")
-    private Set<PersonalPrefEnum> personalPref;
+    private Set<ProjectViveEnum> projectVive;
 
     @Schema(description = "프로젝트 경험", example = "React 기반 SPA 개발 경험")
     private String projectExp;
@@ -64,8 +61,8 @@ public class SearchUserResponse {
         dto.setLastClass(user.getLastClass());
         dto.setWantedPosition(user.getWantedPosition());
         dto.setTechStack(user.getTechStack());
-        dto.setProjectPref(user.getProjectPref());
-        dto.setPersonalPref(user.getPersonalPref());
+        dto.setProjectGoal(user.getProjectGoal());
+        dto.setProjectVive(user.getProjectVive());
         dto.setProjectExp(user.getProjectExp());
         dto.setQualification(user.getQualification());
         return dto;
