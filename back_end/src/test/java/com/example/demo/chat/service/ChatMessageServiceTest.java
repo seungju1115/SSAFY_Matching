@@ -10,7 +10,9 @@ import com.example.demo.common.exception.BusinessException;
 import com.example.demo.common.exception.ErrorCode;
 import com.example.demo.user.dao.UserRepository;
 import com.example.demo.user.entity.User;
+import net.bytebuddy.utility.dispatcher.JavaDispatcher;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import java.time.LocalDateTime;
@@ -33,38 +35,55 @@ class ChatMessageServiceTest {
     @InjectMocks
     private ChatMessageService chatMessageService;
 
+    private ChatRoom chatRoom;
+    private User user;
+    private ChatMessage chatMessage1,chatMessage2,savedMessage;
+    private ChatMessageRequest chatMessageRequest;
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-    }
-
-    @Test
-    void saveMessage_success() {
-        // 준비
-        ChatMessageRequest request = new ChatMessageRequest();
-        request.setRoomId(1L);
-        request.setSenderId(2L);
-        request.setMessage("Hello");
-
-        ChatRoom chatRoom = new ChatRoom();
+        chatRoom = new ChatRoom();
         chatRoom.setId(1L);
 
-        User sender = new User();
-        sender.setId(2L);
+        user = new User();
+        user.setId(2L);
 
-        ChatMessage savedMessage = new ChatMessage();
+        chatMessage1 = new ChatMessage();
+        chatMessage1.setId(10L);
+        chatMessage1.setChatRoom(chatRoom);
+        chatMessage1.setSender(user);
+        chatMessage1.setMessage("Hello");
+        chatMessage1.setCreatedAt(LocalDateTime.now());
+
+        chatMessage2 = new ChatMessage();
+        chatMessage2.setId(11L);
+        chatMessage2.setChatRoom(chatRoom);
+        chatMessage2.setSender(user);
+        chatMessage2.setMessage("msg2");
+        chatMessage2.setCreatedAt(LocalDateTime.now());
+
+        savedMessage = new ChatMessage();
         savedMessage.setId(10L);
         savedMessage.setChatRoom(chatRoom);
-        savedMessage.setSender(sender);
+        savedMessage.setSender(user);
         savedMessage.setMessage("Hello");
         savedMessage.setCreatedAt(LocalDateTime.now());
 
-        when(chatRoomRepository.findById(1L)).thenReturn(Optional.of(chatRoom));
-        when(userRepository.findById(2L)).thenReturn(Optional.of(sender));
+        chatMessageRequest = new ChatMessageRequest();
+        chatMessageRequest.setRoomId(1L);
+        chatMessageRequest.setSenderId(10L);
+        chatMessageRequest.setMessage("Hello");
+    }
+
+    @Test
+    @DisplayName("채팅 저장 성공")
+    void saveMessage_success() {
+        when(chatRoomRepository.findById(chatMessageRequest.getRoomId())).thenReturn(Optional.of(chatRoom));
+        when(userRepository.findById(chatMessageRequest.getSenderId())).thenReturn(Optional.of(user));
         when(chatMessageRepository.save(any(ChatMessage.class))).thenReturn(savedMessage);
 
         // 실행
-        ChatMessageResponse response = chatMessageService.saveMessage(request);
+        ChatMessageResponse response = chatMessageService.saveMessage(chatMessageRequest);
 
         // 검증
         assertNotNull(response);
@@ -74,81 +93,51 @@ class ChatMessageServiceTest {
         assertEquals("Hello", response.getMessage());
         assertNotNull(response.getCreatedAt());
 
-        verify(chatRoomRepository).findById(1L);
-        verify(userRepository).findById(2L);
+        verify(chatRoomRepository).findById(chatMessageRequest.getRoomId());
+        verify(userRepository).findById(chatMessageRequest.getSenderId());
         verify(chatMessageRepository).save(any(ChatMessage.class));
     }
 
     @Test
+    @DisplayName("채팅 저장 실패 - 채팅 룸 없음")
     void saveMessage_chatRoomNotFound() {
-        ChatMessageRequest request = new ChatMessageRequest();
-        request.setRoomId(1L);
-        request.setSenderId(2L);
-        request.setMessage("Hello");
-
-        when(chatRoomRepository.findById(1L)).thenReturn(Optional.empty());
+        when(chatRoomRepository.findById(chatRoom.getId())).thenReturn(Optional.empty());
 
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> chatMessageService.saveMessage(request));
+                () -> chatMessageService.saveMessage(chatMessageRequest));
 
         assertEquals(ErrorCode.CHAT_ROOM_NOT_FOUND, exception.getErrorCode());
-        verify(chatRoomRepository).findById(1L);
+        verify(chatRoomRepository).findById(chatRoom.getId());
         verify(userRepository, never()).findById(any());
         verify(chatMessageRepository, never()).save(any());
     }
 
     @Test
+    @DisplayName("채팅 저장 실패 - 유저 없음")
     void saveMessage_senderNotFound() {
-        ChatMessageRequest request = new ChatMessageRequest();
-        request.setRoomId(1L);
-        request.setSenderId(2L);
-        request.setMessage("Hello");
-
-        ChatRoom chatRoom = new ChatRoom();
-        chatRoom.setId(1L);
-
-        when(chatRoomRepository.findById(1L)).thenReturn(Optional.of(chatRoom));
-        when(userRepository.findById(2L)).thenReturn(Optional.empty());
+        when(chatRoomRepository.findById(chatRoom.getId())).thenReturn(Optional.of(chatRoom));
+        when(userRepository.findById(chatMessageRequest.getSenderId())).thenReturn(Optional.empty());
 
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> chatMessageService.saveMessage(request));
+                () -> chatMessageService.saveMessage(chatMessageRequest));
 
         assertEquals(ErrorCode.USER_NOT_FOUND, exception.getErrorCode());
-        verify(chatRoomRepository).findById(1L);
-        verify(userRepository).findById(2L);
+        verify(chatRoomRepository).findById(chatRoom.getId());
+        verify(userRepository).findById(chatMessageRequest.getSenderId());
         verify(chatMessageRepository, never()).save(any());
     }
 
     @Test
+    @DisplayName("채팅방 채팅 로그 조회")
     void getAllMessagesByChatRoom_success() {
-        ChatRoom chatRoom = new ChatRoom();
-        chatRoom.setId(1L);
-
-        User sender = new User();
-        sender.setId(2L);
-
-        ChatMessage message1 = new ChatMessage();
-        message1.setId(10L);
-        message1.setChatRoom(chatRoom);
-        message1.setSender(sender);
-        message1.setMessage("msg1");
-        message1.setCreatedAt(LocalDateTime.now());
-
-        ChatMessage message2 = new ChatMessage();
-        message2.setId(11L);
-        message2.setChatRoom(chatRoom);
-        message2.setSender(sender);
-        message2.setMessage("msg2");
-        message2.setCreatedAt(LocalDateTime.now());
-
         when(chatMessageRepository.findByChatRoomIdOrderByCreatedAtAsc(1L))
-                .thenReturn(List.of(message1, message2));
+                .thenReturn(List.of(chatMessage1, chatMessage2));
 
         List<ChatMessageResponse> responses = chatMessageService.getAllMessagesByChatRoom(1L);
 
         assertEquals(2, responses.size());
-        assertEquals("msg1", responses.get(0).getMessage());
-        assertEquals("msg2", responses.get(1).getMessage());
+        assertEquals(chatMessage1.getMessage(), responses.get(0).getMessage());
+        assertEquals(chatMessage2.getMessage(), responses.get(1).getMessage());
 
         verify(chatMessageRepository).findByChatRoomIdOrderByCreatedAtAsc(1L);
     }

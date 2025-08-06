@@ -58,8 +58,8 @@ public class ChatRoomService {
 
             ChatRoom savedRoom = chatRoomRepository.save(newRoom);
 
-            newRoom.addMember(chatMemberService.createChatRoomMember(user1, savedRoom));
-            newRoom.addMember(chatMemberService.createChatRoomMember(user2, savedRoom));
+            chatMemberService.createChatRoomMember(user1, savedRoom);
+            chatMemberService.createChatRoomMember(user2, savedRoom);
 
             return savedRoom;
         });
@@ -72,14 +72,15 @@ public class ChatRoomService {
         Team team = teamRepository.findById(chatRoomRequest.getTeamId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.TEAM_NOT_FOUND));
 
+        User creator = userRepository.findById(chatRoomRequest.getUserId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+
         ChatRoom chatRoom = new ChatRoom();
         chatRoom.setRoomType(RoomType.TEAM);
         chatRoom.setTeam(team);
 
-        User creator = userRepository.findById(chatRoomRequest.getUserId())
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-
-        chatRoom.addMember(chatMemberService.createChatRoomMember(creator, chatRoom));
+        chatMemberService.createChatRoomMember(creator, chatRoom);
 
         ChatRoom saved = chatRoomRepository.save(chatRoom);
 
@@ -106,7 +107,7 @@ public class ChatRoomService {
             throw new BusinessException(ErrorCode.CHATROOM_MEMBER_ALREADY_EXISTS);
         }
 
-        chatRoom.addMember(chatMemberService.createChatRoomMember(user, chatRoom));
+        chatMemberService.createChatRoomMember(user, chatRoom);
 
         chatRoomRepository.save(chatRoom);  // 변경사항 저장
     }
@@ -118,4 +119,5 @@ public class ChatRoomService {
 
         chatRoomRepository.delete(chatRoom);
     }
+
 }

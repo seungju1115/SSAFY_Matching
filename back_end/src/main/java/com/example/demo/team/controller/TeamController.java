@@ -34,7 +34,7 @@ public class TeamController {
     }
 
     // 3. 팀 조건 조회
-    @GetMapping("/search")
+    @PostMapping("/search")
     public ResponseEntity<ApiResponse<List<TeamResponse>>> searchConditionTeam(@Valid @RequestBody TeamSearchRequest teamRequest) {
         List<TeamResponse> teamResponses = teamService.searchConditionTeam(teamRequest);
         return ResponseEntity.ok(ApiResponse.ok(teamResponses));
@@ -62,7 +62,7 @@ public class TeamController {
     }
 
     // 7. 팀 멤버 초대
-    @GetMapping("/invitation")
+    @PostMapping("/invitation")
     public ResponseEntity<ApiResponse<TeamDetailResponse>> inviteMemberTeam(@Valid @RequestBody TeamInviteRequest teamInviteRequest) {
         TeamDetailResponse teamDetailResponse = teamService.inviteMemberTeam(teamInviteRequest);
         return ResponseEntity.ok(ApiResponse.ok(teamDetailResponse));
@@ -83,7 +83,7 @@ public class TeamController {
 
     // n. 특정 팀의 팀원 조회
     @GetMapping("/{teamId}/members")
-    public List<TeamMemberResponse> getTeamMembers(@PathVariable Long teamId) {
-        return teamService.getTeamMembers(teamId);
+    public ResponseEntity<ApiResponse<List<TeamMemberResponse>>> getTeamMembers(@PathVariable Long teamId) {
+        return ResponseEntity.ok(ApiResponse.ok(teamService.getTeamMembers(teamId)));
     }
 }

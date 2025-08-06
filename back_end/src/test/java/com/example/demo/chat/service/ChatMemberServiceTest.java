@@ -7,6 +7,7 @@ import com.example.demo.common.exception.BusinessException;
 import com.example.demo.common.exception.ErrorCode;
 import com.example.demo.user.entity.User;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,16 +21,18 @@ class ChatMemberServiceTest {
     @InjectMocks
     private ChatMemberService chatMemberService;
 
+    private User user;
+    private ChatRoom chatRoom;
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        user = new User();
+        chatRoom = new ChatRoom();
     }
 
     @Test
+    @DisplayName("채팅 룸 맴버 중간 테이블 생성 성공")
     void createChatRoomMember_shouldCreateMember_whenNotExists() {
-        User user = new User();
-        ChatRoom chatRoom = new ChatRoom();
-
         // 중복 멤버 없음으로 설정
         when(chatRoomMemberRepository.existsByUserAndChatRoom(user, chatRoom)).thenReturn(false);
 
@@ -43,10 +46,8 @@ class ChatMemberServiceTest {
     }
 
     @Test
+    @DisplayName("채팅 룸 맴버 중간 테이블 생성 실패 - 이미 등록된 맴버")
     void createChatRoomMember_shouldThrowException_whenMemberExists() {
-        User user = new User();
-        ChatRoom chatRoom = new ChatRoom();
-
         // 중복 멤버 있음으로 설정
         when(chatRoomMemberRepository.existsByUserAndChatRoom(user, chatRoom)).thenReturn(true);
 
