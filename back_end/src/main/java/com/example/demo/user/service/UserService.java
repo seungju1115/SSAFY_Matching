@@ -70,8 +70,8 @@ public class UserService {
         if (request.isMajor()) user.setMajor(true);
         if (request.getLastClass() != null) user.setLastClass(request.getLastClass());
         if (request.getWantedPosition() != null) user.setWantedPosition(request.getWantedPosition());
-        if (request.getProjectPref() != null) user.setProjectPref(request.getProjectPref());
-        if (request.getPersonalPref() != null) user.setPersonalPref(request.getPersonalPref());
+        if (request.getProjectGoal() != null) user.setProjectGoal(request.getProjectGoal());
+        if (request.getProjectVive() != null) user.setProjectVive(request.getProjectVive());
         if (request.getProjectExp() != null) user.setProjectExp(request.getProjectExp());
         if (request.getQualification() != null) user.setQualification(request.getQualification());
         if (request.getTechStack() != null) user.setTechStack(request.getTechStack());
@@ -116,9 +116,9 @@ public class UserService {
         if (projectPref == null || projectPref.isEmpty()) {
             return true;
         }
-        if (user.getProjectPref() == null) {
+        if (user.getProjectGoal() == null) {
             return false;
         }
-        return user.getProjectPref().stream().anyMatch(projectPref::contains);
+        return user.getProjectGoal().stream().anyMatch(projectPref::contains);
     }
 }
