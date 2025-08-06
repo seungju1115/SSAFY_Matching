@@ -1,6 +1,8 @@
 package com.example.demo.team.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -27,4 +29,12 @@ public class TeamRequest {
             required = true
     )
     private Long leaderId;
+
+    @Schema(
+            description = "팀 도메인"
+    )
+    @NotNull(message = "도메인은 필수입니다.")
+    @Size(min=10)
+    private String teamDomain;
+
 }
