@@ -40,7 +40,6 @@ public class TeamMembershipRequestService {
 
         String key=team.getId() + "+" + user.getId();
         FencedLock lock=hazelcastInstance.getCPSubsystem().getLock(key);
-        lock.lock();
         try {
             if(lock.tryLock(5, TimeUnit.SECONDS)) {
                 try {
@@ -77,7 +76,6 @@ public class TeamMembershipRequestService {
 
         String key=team.getId() + "+" + user.getId();
         FencedLock lock=hazelcastInstance.getCPSubsystem().getLock(key);
-        lock.lock();
         try {
             if(lock.tryLock(5, TimeUnit.SECONDS)) {
                 try {
