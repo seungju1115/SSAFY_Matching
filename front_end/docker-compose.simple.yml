@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  frontend-simple:
+    image: node:22-alpine
+    working_dir: /app
+    volumes:
+      # 전체 프로젝트 마운트
+      - .:/app
+      # node_modules 캐시 (성능 향상)
+      - node_modules_cache:/app/node_modules
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    # 개발 서버 실행 명령어
+    command: |
+      sh -c "
+        echo '🚀 Installing dependencies...' &&
+        npm ci --silent &&
+        echo '✅ Dependencies installed!' &&
+        echo '🎨 Starting development server with shadcn/ui...' &&
+        npm run dev -- --host 0.0.0.0
+      "
+    stdin_open: true
+    tty: true
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  node_modules_cache:
+
+# 실행 명령어:
+# docker-compose -f docker-compose.simple.yml up
+# 
+# 접속: http://localhost:3001
+# 
+# 장점: Dockerfile 불필요, 설정 간단
+# 단점: 매번 npm install 실행 (느림) 
