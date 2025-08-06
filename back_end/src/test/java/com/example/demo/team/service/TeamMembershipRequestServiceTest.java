@@ -14,6 +14,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.cp.CPSubsystem;
+import com.hazelcast.cp.lock.FencedLock;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -40,12 +43,26 @@ class TeamMembershipRequestServiceTest {
     @Mock
     SimpMessagingTemplate messagingTemplate;
 
+    @Mock
+    HazelcastInstance hazelcastInstance;
+
+    @Mock
+    CPSubsystem cpSubsystem;
+
+    @Mock
+    FencedLock fencedLock;
+
     Team team;
     User user;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+
+        // Hazelcast Mock 설정
+        when(hazelcastInstance.getCPSubsystem()).thenReturn(cpSubsystem);
+        when(cpSubsystem.getLock(anyString())).thenReturn(fencedLock);
+        when(fencedLock.tryLock(anyLong(), any())).thenReturn(true);
 
         // 공통 데이터 세팅
         team = new Team();

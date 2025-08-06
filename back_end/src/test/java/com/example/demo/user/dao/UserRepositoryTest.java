@@ -7,7 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -16,6 +19,7 @@ import static org.assertj.core.api.Assertions.*;
 
 @DataJpaTest
 @ActiveProfiles("local")
+@Sql(scripts = "/test-data-cleanup.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class UserRepositoryTest {
 
     @Autowired
@@ -30,6 +34,8 @@ class UserRepositoryTest {
 
     @BeforeEach
     void setUp() {
+        // @Transactional 롤백을 사용하므로 별도 데이터 정리 불필요
+
         userWithoutTeam1 = new User();
         userWithoutTeam1.setUserName("테스트유저1");
         userWithoutTeam1.setRole("ROLE_USER");

@@ -41,7 +41,7 @@ public class SecurityConfig {
                                         , "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/team","/team/search").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/users/profile").permitAll()
-                                .anyRequest().authenticated());
+                                .anyRequest().permitAll()); // 개발용으로 다 열어놈
 
         CustomAuthorizationRequestResolver customResolver = 
                 new CustomAuthorizationRequestResolver(clientRegistrationRepository, "/users/login");
