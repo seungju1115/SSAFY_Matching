@@ -1,9 +1,6 @@
 package com.example.demo.user.entity;
 
-import com.example.demo.user.Enum.PersonalPrefEnum;
-import com.example.demo.user.Enum.PositionEnum;
-import com.example.demo.user.Enum.ProjectGoalEnum;
-import com.example.demo.user.Enum.TechEnum;
+import com.example.demo.user.Enum.*;
 import com.example.demo.chat.entity.ChatRoomMember;
 import com.example.demo.team.entity.Team;
 import com.example.demo.team.entity.TeamMembershipRequest;
@@ -99,14 +96,14 @@ public class User {
     @Column(name = "project_preference", nullable = false, length = 50)
     @NotEmpty
     @Size(max = 50)
-    private Set<ProjectGoalEnum> projectPref;
+    private Set<ProjectGoalEnum> projectGoal;
 
-    @ElementCollection(targetClass = PersonalPrefEnum.class, fetch = FetchType.LAZY)
+    @ElementCollection(targetClass = ProjectViveEnum.class, fetch = FetchType.LAZY)
     @Enumerated(EnumType.STRING)
     @Column(name = "personal_preference", nullable = false, length = 50)
     @NotEmpty
     @Size(max = 50)
-    private Set<PersonalPrefEnum> personalPref;
+    private Set<ProjectViveEnum> ProjectVive;
 
     //@ManyToMany
     //@JoinTable(

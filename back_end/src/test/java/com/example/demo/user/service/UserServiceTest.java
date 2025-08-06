@@ -1,9 +1,6 @@
 package com.example.demo.user.service;
 
-import com.example.demo.user.Enum.PositionEnum;
-import com.example.demo.user.Enum.ProjectGoalEnum;
-import com.example.demo.user.Enum.TechEnum;
-import com.example.demo.user.Enum.PersonalPrefEnum;
+import com.example.demo.user.Enum.*;
 import com.example.demo.user.dao.UserRepository;
 import com.example.demo.user.dto.SearchUserRequest;
 import com.example.demo.user.dto.SearchUserResponse;
@@ -45,8 +42,8 @@ class UserServiceTest {
         mockUser1.setLastClass(1);
         mockUser1.setWantedPosition(PositionEnum.BACKEND);
         mockUser1.setTechStack(Set.of(TechEnum.SPRING, TechEnum.JPA));
-        mockUser1.setProjectPref(Set.of(ProjectGoalEnum.STUDY));
-        mockUser1.setPersonalPref(Set.of(PersonalPrefEnum.values()[0]));
+        mockUser1.setProjectGoal(Set.of(ProjectGoalEnum.STUDY));
+        mockUser1.setProjectVive(Set.of(ProjectViveEnum.values()[0]));
         mockUser1.setProjectExp("Spring Boot 프로젝트 경험");
         mockUser1.setQualification("정보처리기사");
         mockUser1.setTeam(null);
@@ -59,8 +56,8 @@ class UserServiceTest {
         mockUser2.setLastClass(2);
         mockUser2.setWantedPosition(PositionEnum.FRONTEND);
         mockUser2.setTechStack(Set.of(TechEnum.MYSQL));
-        mockUser2.setProjectPref(Set.of(ProjectGoalEnum.QUICK));
-        mockUser2.setPersonalPref(Set.of(PersonalPrefEnum.values()[0]));
+        mockUser2.setProjectGoal(Set.of(ProjectGoalEnum.QUICK));
+        mockUser2.setProjectVive(Set.of(ProjectViveEnum.values()[0]));
         mockUser2.setProjectExp("React 프로젝트 경험");
         mockUser2.setQualification("웹디자인기능사");
         mockUser2.setTeam(null);

@@ -1,10 +1,7 @@
 package com.example.demo.user.dto;
 
 import com.example.demo.team.entity.Team;
-import com.example.demo.user.Enum.PersonalPrefEnum;
-import com.example.demo.user.Enum.PositionEnum;
-import com.example.demo.user.Enum.ProjectGoalEnum;
-import com.example.demo.user.Enum.TechEnum;
+import com.example.demo.user.Enum.*;
 import com.example.demo.user.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -47,10 +44,10 @@ public class UserProfileResponse implements Serializable {
     private PositionEnum wantedPosition;
 
     @Schema(description = "프로젝트 선호도")
-    private Set<ProjectGoalEnum> projectPref;
+    private Set<ProjectGoalEnum> projectGoal;
 
     @Schema(description = "개인 성향")
-    private Set<PersonalPrefEnum> personalPref;
+    private Set<ProjectViveEnum> projectVive;
 
     @Schema(description = "프로젝트 경험", example = "Spring Boot를 이용한 웹 개발 경험")
     private String projectExp;
@@ -79,8 +76,8 @@ public class UserProfileResponse implements Serializable {
         response.setMajor(user.isMajor());
         response.setLastClass(user.getLastClass());
         response.setWantedPosition(user.getWantedPosition());
-        response.setProjectPref(user.getProjectPref());
-        response.setPersonalPref(user.getPersonalPref());
+        response.setProjectGoal(user.getProjectGoal());
+        response.setProjectVive(user.getProjectVive());
         response.setProjectExp(user.getProjectExp());
         response.setQualification(user.getQualification());
         response.setTechStack(user.getTechStack());
