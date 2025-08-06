@@ -20,9 +20,9 @@ export interface LoginCredentials {
 // 상세 설정을 위한 타입
 export interface UserDetailSettings {
   name: string
-  semester: string
+  semester?: string
   classNumber: string
-  major: string
+  major?: string
   isMajor: boolean
 }
 
@@ -33,7 +33,7 @@ export const SEMESTER_OPTIONS = [
 ] as const
 
 // 반 옵션 (1반부터 12반까지)
-export const CLASS_OPTIONS = Array.from({ length: 12 }, (_, i) => ({
+export const CLASS_OPTIONS = Array.from({ length: 20 }, (_, i) => ({
   value: String(i + 1),
   label: `${i + 1}반`
 }))
