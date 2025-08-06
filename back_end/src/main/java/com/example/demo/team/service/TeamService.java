@@ -1,5 +1,7 @@
 package com.example.demo.team.service;
 
+import com.example.demo.common.exception.BusinessException;
+import com.example.demo.common.exception.ErrorCode;
 import com.example.demo.user.dao.UserRepository;
 import com.example.demo.user.entity.User;
 import com.example.demo.chat.dto.ChatRoomRequest;
@@ -31,12 +33,10 @@ public class TeamService {
     public TeamResponse createTeam(TeamRequest dto) { // 팀장만 생성 가능
         // 팀장 조회
         User leader = userRepository.findById(dto.getLeaderId())
-                .orElseThrow(() -> new RuntimeException("Leader not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         // ✅ 이미 팀에 소속되어 있는지 확인
-        if (leader.getTeam() != null) {
-            throw new IllegalStateException("이미 팀에 소속된 유저입니다.");
-        }
+        if (leader.getTeam() != null) throw new BusinessException(ErrorCode.USER_ALLREADY_HAS_TEAM);
 
         // 팀 객체 생성
         Team team = new Team();
@@ -65,8 +65,8 @@ public class TeamService {
                 .map(team -> new TeamResponse(
                         team.getId(),
                         team.getTeamName(),
-                        team.getLeader() != null ? team.getLeader().getId() : null,
-                        team.getMembers() != null ? team.getMembers().size() : 0
+                        team.getLeader().getId(),
+                        team.getMembers().size()
                 ))
                 .collect(Collectors.toList());
     }
@@ -80,8 +80,8 @@ public class TeamService {
                 .map(team -> new TeamResponse(
                         team.getId(),
                         team.getTeamName(),
-                        team.getLeader() != null ? team.getLeader().getId() : null,
-                        team.getMembers() != null ? team.getMembers().size() : 0
+                        team.getLeader().getId(),
+                        team.getMembers().size()
                 ))
                 .collect(Collectors.toList());
     }
@@ -90,7 +90,7 @@ public class TeamService {
     @Cacheable(value = "longTermCache", key = "'team:' + #teamId")
     public TeamDetailResponse getTeam(Long teamId) {
         Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new RuntimeException("Team not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.TEAM_NOT_FOUND));
 
         List<Long> membersId = new ArrayList<>();
         for (User user : team.getMembers()) {
@@ -105,7 +105,7 @@ public class TeamService {
     @CacheEvict(value = "longTermCache", key = "'team:' + #teamId")
     public void deleteTeam(Long teamId) {
         Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 팀입니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.TEAM_NOT_FOUND));
 
         // 멤버들의 team 참조 해제 (연관관계 주인: User.team)
         if (team.getMembers() != null) {
@@ -115,9 +115,9 @@ public class TeamService {
         }
 
         // 양방향 관계 정리 (옵션)
-        if (team.getChatRoom() != null) {
-            team.setChatRoom(null); // 양방향 동기화용
-        }
+//        if (team.getChatRoom() != null) {
+//            team.setChatRoom(null); // 양방향 동기화용
+//        }
 
         teamRepository.delete(team);
     }
@@ -127,18 +127,21 @@ public class TeamService {
     @CacheEvict(value = "longTermCache", key = "'team:' + #teamId")
     public TeamDetailResponse modifyTeam(TeamRequest teamRequest) {
         Team team = teamRepository.findById(teamRequest.getTeamId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 팀입니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.TEAM_NOT_FOUND));
+        //팀명 중복 시
+//        Team team = teamRepository.findByTeamName(teamRequest.getTeamName());
+
         // 팀 이름 수정
-        if (teamRequest.getTeamName() != null && !teamRequest.getTeamName().isBlank()) {
+//        if (teamRequest.getTeamName() != null && !teamRequest.getTeamName().isBlank()) {
             team.setTeamName(teamRequest.getTeamName());
-        }
+//        }
 
         // 리더 수정
-        if (teamRequest.getLeaderId() != null) {
+//        if (teamRequest.getLeaderId() != null) {
             User newLeader = userRepository.findById(teamRequest.getLeaderId())
-                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+                    .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
             team.setLeader(newLeader);
-        }
+//        }
 
         List<Long> membersId = new ArrayList<>();
         for (User user : team.getMembers()) {
@@ -151,13 +154,13 @@ public class TeamService {
     // 7. 팀 멤버 초대
     public TeamDetailResponse inviteMemberTeam(TeamInviteRequest teamInviteRequest) {
         User invitedUser = userRepository.findById(teamInviteRequest.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
         Team team = teamRepository.findById(teamInviteRequest.getTeamId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.TEAM_NOT_FOUND));
 
         // 이미 팀에 소속된 사용자라면 예외 처리
         if (invitedUser.getTeam() != null && invitedUser.getTeam().getId().equals(team.getId())) {
-            throw new RuntimeException("해당 사용자는 이미 이 팀에 속해 있습니다.");
+            throw new BusinessException(ErrorCode.USER_ALLREADY_HAS_TEAM);
         }
 
         invitedUser.setTeam(team);
@@ -180,7 +183,7 @@ public class TeamService {
     // n. 팀 멤버 조회
     public List<TeamMemberResponse> getTeamMembers(Long teamId) {
         Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new RuntimeException("Team not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.TEAM_NOT_FOUND));
 
         List<User> members = team.getMembers();
 

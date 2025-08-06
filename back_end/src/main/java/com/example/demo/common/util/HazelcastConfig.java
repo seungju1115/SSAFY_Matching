@@ -1,4 +1,4 @@
-package com.example.demo.config;
+package com.example.demo.common.util;
 
 import com.hazelcast.config.*;
 import com.hazelcast.core.Hazelcast;

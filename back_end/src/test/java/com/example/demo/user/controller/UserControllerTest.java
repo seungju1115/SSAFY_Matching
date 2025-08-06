@@ -1,6 +1,6 @@
 package com.example.demo.user.controller;
 
-import com.example.demo.response.ApiResponse;
+import com.example.demo.common.response.ApiResponse;
 import com.example.demo.user.Enum.PositionEnum;
 import com.example.demo.user.Enum.ProjectPrefEnum;
 import com.example.demo.user.Enum.TechEnum;
