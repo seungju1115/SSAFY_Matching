@@ -10,11 +10,6 @@ export default function Signup() {
 
   const [error, setError] = useState<string | null>(null)
 
-  const handleSignupSuccess = () => {
-    // 회원가입 성공 시 상세 설정 페이지로 이동
-    navigate('/setup')
-  }
-
   const handleSignupError = (error: Error) => {
     setError(error.message)
   }
@@ -42,7 +37,6 @@ export default function Signup() {
             <div className="space-y-4">
               <GoogleSignInButton 
                 className="py-6 text-base sm:text-lg"
-                onSuccess={handleSignupSuccess}
                 onError={handleSignupError}
               />
             </div>

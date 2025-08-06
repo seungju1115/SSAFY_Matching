@@ -2,13 +2,11 @@ import { Button } from "@/components/ui/button"
 
 interface GoogleSignInButtonProps {
   className?: string
-  onSuccess?: () => void
   onError?: (error: Error) => void
 }
 
 export function GoogleSignInButton({
   className,
-  onSuccess,
   onError
 }: GoogleSignInButtonProps) {
   const handleGoogleSignIn = async () => {
