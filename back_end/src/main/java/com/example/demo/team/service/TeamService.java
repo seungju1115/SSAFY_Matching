@@ -28,9 +28,9 @@ public class TeamService {
     private final ChatRoomService chatRoomService;
     // 1. 팀 생성
     @Transactional
-    public TeamResponse createTeam(TeamRequest dto) { // 팀장만 생성 가능
+    public TeamResponse createTeam(TeamCreateRequest request) { // 팀장만 생성 가능
         // 팀장 조회
-        User leader = userRepository.findById(dto.getLeaderId())
+        User leader = userRepository.findById(request.getLeaderId())
                 .orElseThrow(() -> new RuntimeException("Leader not found"));
 
         // ✅ 이미 팀에 소속되어 있는지 확인
@@ -38,10 +38,8 @@ public class TeamService {
             throw new IllegalStateException("이미 팀에 소속된 유저입니다.");
         }
 
-        // 팀 객체 생성
-        Team team = new Team();
-        team.setTeamName(dto.getTeamName());
-        team.setLeader(leader);
+        // TeamCreateRequest를 Team으로 변환
+        Team team = TeamCreateRequest.toTeam(request, leader);
 
         // 팀장도 팀의 멤버로 설정 (양방향 메서드 이용)
         leader.setTeam(team); // 내부적으로 team.getMembers().add(this) 포함됨
@@ -52,7 +50,7 @@ public class TeamService {
         ChatRoomRequest chatRoomRequest = new ChatRoomRequest();
         chatRoomRequest.setRoomType(RoomType.TEAM);
         chatRoomRequest.setTeamId(saved.getId());
-        chatRoomRequest.setUserId(dto.getLeaderId());
+        chatRoomRequest.setUserId(request.getLeaderId());
 
         chatRoomService.createTeamChatRoom(chatRoomRequest);
 

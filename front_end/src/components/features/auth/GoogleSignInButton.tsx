@@ -12,7 +12,7 @@ export function GoogleSignInButton({
   const handleGoogleSignIn = async () => {
     try {
       // 백엔드 OAuth 로그인 API로 리다이렉트
-      window.location.href = 'http://localhost:8080/api/users/login/'
+      window.location.href = 'http://localhost:8080/api/users/login/google'
     } catch (error) {
       console.error('Google Sign In failed:', error)
       // 에러 시 콜백 호출

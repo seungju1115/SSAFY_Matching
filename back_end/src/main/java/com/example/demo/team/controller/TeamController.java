@@ -90,11 +90,11 @@ public class TeamController {
             @Parameter(
                     description = "생성할 팀 정보",
                     required = true,
-                    schema = @Schema(implementation = TeamRequest.class)
+                    schema = @Schema(implementation = TeamCreateRequest.class)
             )
-            @Valid @RequestBody TeamRequest teamRequest
+            @Valid @RequestBody TeamCreateRequest teamCreateRequest
     ) {
-        TeamResponse teamResponse = teamService.createTeam(teamRequest);
+        TeamResponse teamResponse = teamService.createTeam(teamCreateRequest);
         return ResponseEntity.ok(ApiResponse.created(teamResponse));
     }
 

@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTeam } from '@/hooks/useTeam'
+import type { TeamCreateRequest, ProjectGoalEnum, ProjectViveEnum } from '@/types/team'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -35,6 +37,7 @@ interface TeamData {
 
 export default function MakeTeam() {
   const navigate = useNavigate()
+  const { createTeam, isLoading } = useTeam()
   const [teamData, setTeamData] = useState<TeamData>({
     domains: [],
     projectPreferences: [],
@@ -70,6 +73,37 @@ export default function MakeTeam() {
     '유연한 시간', '정해진 시간', '온라인 중심', '오프라인 중심'
   ]
 
+  // UI 텍스트를 백엔드 enum으로 매핑
+  const projectPreferenceToEnumMapping: Record<string, ProjectGoalEnum> = {
+    '취업우선': 'JOB',
+    '수상목표': 'AWARD', 
+    '개발경험우선': 'PROFESSIONAL',
+    '포트폴리오중심': 'PORTFOLIO',
+    '학습중심': 'STUDY',
+    '혁신추구': 'IDEA',
+    '실무경험': 'PROFESSIONAL',
+    '창업지향': 'IDEA',
+    '오픈소스': 'STUDY',
+    '사회공헌': 'IDEA',
+    '빠른개발': 'QUICK',
+    '완성도추구': 'QUALITY'
+  }
+
+  const atmosphereToEnumMapping: Record<string, ProjectViveEnum> = {
+    '반말 지향': 'CASUAL',
+    '존대 지향': 'FORMAL',
+    '편한 분위기': 'COMFY',
+    '체계적 분위기': 'RULE',
+    '자유로운': 'DEMOCRACY',
+    '규칙적인': 'RULE',
+    '소통 활발': 'DEMOCRACY',
+    '집중 중시': 'LEADER',
+    '유연한 시간': 'AGILE',
+    '정해진 시간': 'WATERFALL',
+    '온라인 중심': 'AGILE',
+    '오프라인 중심': 'DEMOCRACY'
+  }
+
   // 태그 추가/제거 함수
   const toggleTag = (category: 'domains' | 'projectPreferences' | 'teamAtmosphere', tag: string) => {
     setTeamData(prev => ({
@@ -91,11 +125,41 @@ export default function MakeTeam() {
     }))
   }
 
+  // TeamData를 TeamCreateRequest로 매핑
+  const mapTeamDataToRequest = (data: TeamData): TeamCreateRequest => {
+    // enum으로 매핑
+    const mappedPreferences = data.projectPreferences
+      .map(pref => projectPreferenceToEnumMapping[pref])
+      .filter(Boolean)
+    
+    const mappedAtmosphere = data.teamAtmosphere
+      .map(atm => atmosphereToEnumMapping[atm])
+      .filter(Boolean)
+
+    return {
+      leaderId: 1, // TODO: 실제 로그인한 사용자 ID로 변경
+      teamDomain: data.domains.join(', '), // 도메인들을 문자열로 결합
+      teamDescription: data.introduction,
+      teamPreference: mappedPreferences,
+      teamVive: mappedAtmosphere,
+      backendCount: data.roleDistribution.backend,
+      frontendCount: data.roleDistribution.frontend,
+      aiCount: data.roleDistribution.ai,
+      pmCount: data.roleDistribution.pm,
+      designCount: data.roleDistribution.design
+    }
+  }
+
   // 팀 생성 처리
-  const handleCreateTeam = () => {
-    console.log('팀 생성 데이터:', teamData)
-    // API 호출 로직 추가
-    navigate('/')
+  const handleCreateTeam = async () => {
+    try {
+      const teamRequest = mapTeamDataToRequest(teamData)
+      console.log('팀 생성 요청 데이터:', teamRequest)
+      await createTeam(teamRequest)
+      navigate('/')
+    } catch (error) {
+      console.error('팀 생성 실패:', error)
+    }
   }
 
   // 전체 팀원 수 계산
@@ -348,11 +412,11 @@ export default function MakeTeam() {
           <div className="flex justify-center mt-16">
             <Button
               onClick={handleCreateTeam}
-              disabled={totalMembers === 0 || teamData.domains.length === 0 || !teamData.introduction.trim()}
+              disabled={isLoading || totalMembers === 0 || teamData.domains.length === 0 || !teamData.introduction.trim()}
               className="group w-64 h-16 text-lg font-semibold bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               <Users className="h-6 w-6 mr-2" />
-              팀 생성하기
+              {isLoading ? '생성 중...' : '팀 생성하기'}
             </Button>
           </div>
         </div>
