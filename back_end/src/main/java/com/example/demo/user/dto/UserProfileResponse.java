@@ -72,19 +72,20 @@ public class UserProfileResponse implements Serializable {
         response.setUserName(user.getUserName());
         response.setRole(user.getRole());
         response.setEmail(user.getEmail());
-        response.setUserProfile(user.getUserProfile());
         response.setMajor(user.isMajor());
         response.setLastClass(user.getLastClass());
-        response.setWantedPosition(user.getWantedPosition());
-        response.setProjectGoal(user.getProjectGoal());
-        response.setProjectVive(user.getProjectVive());
-        response.setProjectExp(user.getProjectExp());
-        response.setQualification(user.getQualification());
-        response.setTechStack(user.getTechStack());
+
+        if (user.getUserProfile() != null) response.setUserProfile(user.getUserProfile());
+        if (user.getWantedPosition() != null) response.setWantedPosition(user.getWantedPosition());
+        if (user.getProjectGoal() != null) response.setProjectGoal(user.getProjectGoal());
+        if (user.getProjectVive() != null) response.setProjectVive(user.getProjectVive());
+        if (user.getProjectExp() != null) response.setProjectExp(user.getProjectExp());
+        if (user.getQualification() != null) response.setQualification(user.getQualification());
+        if (user.getTechStack() != null) response.setTechStack(user.getTechStack());
 
         if (team != null) {
             response.setTeamId(team.getId());
-            response.setTeamName(team.getTeamName());
+            if (team.getTeamName() != null) response.setTeamName(team.getTeamName());
         }
 
         return response;
