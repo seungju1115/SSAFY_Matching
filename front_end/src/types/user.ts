@@ -19,6 +19,7 @@ export interface LoginCredentials {
 
 // 상세 설정을 위한 타입
 export interface UserDetailSettings {
+  name: string
   semester: string
   classNumber: string
   major: string
@@ -37,14 +38,14 @@ export const CLASS_OPTIONS = Array.from({ length: 12 }, (_, i) => ({
   label: `${i + 1}반`
 }))
 
-// 전공 옵션 (SSAFY 전공 트랙 기준)
-export const MAJOR_OPTIONS = [
+// 전공자 트랙 옵션
+export const MAJOR_TRACK_OPTIONS = [
+  { value: 'java', label: 'Java' },
   { value: 'embedded', label: '임베디드' },
-  { value: 'mobile', label: '모바일' },
-  { value: 'web', label: '웹' },
-  { value: 'ai', label: 'AI' },
-  { value: 'data', label: '데이터' },
-  { value: 'game', label: '게임' },
-  { value: 'blockchain', label: '블록체인' },
-  { value: 'iot', label: 'IoT' },
-] as const 
+] as const
+
+// 비전공자 트랙 옵션
+export const NON_MAJOR_TRACK_OPTIONS = [
+  { value: 'python', label: 'Python' },
+  { value: 'java', label: 'Java' },
+] as const

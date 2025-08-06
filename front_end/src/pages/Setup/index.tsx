@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { 
   Select,
   SelectContent,
@@ -10,7 +11,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import type { UserDetailSettings as UserDetailSettingsType } from '@/types/user'
-import { SEMESTER_OPTIONS, CLASS_OPTIONS, MAJOR_OPTIONS } from '@/types/user'
+import { SEMESTER_OPTIONS, CLASS_OPTIONS, MAJOR_TRACK_OPTIONS, NON_MAJOR_TRACK_OPTIONS } from '@/types/user'
 import { authAPI } from '@/api/auth'
 import { CheckCircle2, User, GraduationCap, BookOpen, Users } from 'lucide-react'
 
@@ -20,6 +21,7 @@ export default function Setup() {
   const email = location.state?.email || ''
   
   const [settings, setSettings] = useState<UserDetailSettingsType>({
+    name: '',
     semester: '',
     classNumber: '',
     major: '',
@@ -29,14 +31,18 @@ export default function Setup() {
 
 
   const handleSettingChange = (field: keyof UserDetailSettingsType, value: string | boolean) => {
-    setSettings(prev => ({
-      ...prev,
-      [field]: value
-    }))
+    setSettings(prev => {
+      const newSettings = { ...prev, [field]: value };
+      // 전공 구분이 변경되면 전공 트랙 선택을 초기화
+      if (field === 'isMajor') {
+        newSettings.major = '';
+      }
+      return newSettings;
+    });
   }
 
   const handleComplete = async () => {
-    if (!settings.semester || !settings.classNumber || !settings.major) {
+    if (!settings.name || !settings.semester || !settings.classNumber || !settings.major) {
       return
     }
 
@@ -64,7 +70,7 @@ export default function Setup() {
     }
   }
 
-  const isFormComplete = settings.semester && settings.classNumber && settings.major
+  const isFormComplete = settings.name && settings.semester && settings.classNumber && settings.major
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
@@ -97,6 +103,21 @@ export default function Setup() {
           </CardHeader>
           
           <CardContent className="space-y-8">
+            {/* 이름 입력 */}
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2">
+                <User className="w-5 h-5 text-gray-600" />
+                <label className="text-sm font-semibold text-gray-700">이름</label>
+                {settings.name && <CheckCircle2 className="w-4 h-4 text-green-500" />}
+              </div>
+              <Input
+                type="text"
+                placeholder="이름을 입력하세요"
+                value={settings.name}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleSettingChange('name', e.target.value)}
+                className="w-full h-12 text-base"
+              />
+            </div>
             {/* 학기 선택 */}
             <div className="space-y-3">
               <div className="flex items-center space-x-2">
@@ -150,7 +171,7 @@ export default function Setup() {
               </div>
             )}
 
-            {/* 전공/비전공 선택 */}
+            {/* 전공 구분 선택 */}
             <div className="space-y-3">
               <div className="flex items-center space-x-2">
                 <BookOpen className="w-5 h-5 text-purple-600" />
@@ -185,7 +206,7 @@ export default function Setup() {
                   <SelectValue placeholder="전공 트랙을 선택하세요" />
                 </SelectTrigger>
                 <SelectContent>
-                  {MAJOR_OPTIONS.map((option) => (
+                  {(settings.isMajor ? MAJOR_TRACK_OPTIONS : NON_MAJOR_TRACK_OPTIONS).map((option: { value: string; label: string }) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
                     </SelectItem>
