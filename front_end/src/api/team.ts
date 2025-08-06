@@ -16,8 +16,14 @@ export const teamAPI = {
    * 팀 생성
    * POST /team
    */
-  createTeam: (teamData: TeamCreateRequest): Promise<ApiResponse<TeamResponse>> =>
-    apiClient.post('/team', teamData),
+  createTeam: (teamData: TeamCreateRequest): Promise<ApiResponse<TeamResponse>> => {
+    const token = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkbmxlbTU0MTVAZ21haWwuY29tIiwibmFtZSI6Iuyepe2aqOu5iFvshJzsmrhfM-uwmF9BMzA3Xe2MgOybkCIsInJvbGUiOiJzdHVkZW50IiwiaWF0IjoxNzU0Mjk0ODM2LCJleHAiOjE3NTQyOTg0MzZ9.7pK2m5ZQiHop8RQ9vIfyNb6po02Kw5N_lRbmpdpf0gI'
+    return apiClient.post('/team', teamData, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+  },
 
   /**
    * 전체 팀 목록 조회

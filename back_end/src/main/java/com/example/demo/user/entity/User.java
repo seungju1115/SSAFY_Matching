@@ -33,41 +33,43 @@ public class User {
     @Column(name = "user_id")
     private Long id;
 
-    @Column(name="user_name", length = 10, nullable = false)
-    @NotBlank
-    @Size(max = 10)
-    private String userName;
-
+    // 학생인지 프로인지 구분, 기본값 학생
     @Column(name="role", length = 10, nullable = false)
     @NotBlank
     @Size(max = 10)
-    private String role;
+    private String role = "student";
 
     @ManyToOne
     @JoinColumn(name = "team_id")
     private Team team;
 
+    // 기초정보
+    @Column(name="user_name", length = 10, nullable = false)
+    @NotBlank
+    @Size(max = 10)
+    private String userName;
+
+    // 기초정보
     @Column(name= "user_email",unique = true, nullable = false, length = 50)
     @NotBlank
     @Size(max = 50)
     private String email;
 
-    @Column(name="user_profile", length = 550)
-    @Size(max = 550)
-    private String userProfile;
-
-    //private String projectStep;
-
+    // 기초정보
     @Column(name = "major",  nullable = false)
     private boolean major=false;
 
+    // 기초정보
     @Column(name = "last_class", nullable = false)
     @NotNull
     private Integer lastClass;
 
+    @Column(name="user_profile", length = 550)
+    @Size(max = 550)
+    private String userProfile;
+
     @Enumerated(EnumType.STRING)
-    @Column(name = "wanted_position",  nullable = false)
-    @NotNull
+    @Column(name = "wanted_position")
     private PositionEnum wantedPosition;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
@@ -87,21 +89,18 @@ public class User {
     @ElementCollection(targetClass = TechEnum.class, fetch = FetchType.LAZY)
     @Enumerated(EnumType.STRING)
     @Column(name="tech_stack",  nullable = true, length = 100)
-    @NotEmpty
     @Size(max = 100)
     private Set<TechEnum> techStack;
 
     @ElementCollection(targetClass = ProjectGoalEnum.class, fetch = FetchType.LAZY)
     @Enumerated(EnumType.STRING)
-    @Column(name = "project_preference", nullable = false, length = 50)
-    @NotEmpty
+    @Column(name = "project_preference", nullable = true, length = 50)
     @Size(max = 50)
     private Set<ProjectGoalEnum> projectGoal;
 
     @ElementCollection(targetClass = ProjectViveEnum.class, fetch = FetchType.LAZY)
     @Enumerated(EnumType.STRING)
-    @Column(name = "personal_preference", nullable = false, length = 50)
-    @NotEmpty
+    @Column(name = "personal_preference", nullable = true, length = 50)
     @Size(max = 50)
     private Set<ProjectViveEnum> ProjectVive;
 

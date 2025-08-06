@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Schema(description = "팀 생성/수정/검색 요청")
+@Schema(description = "팀 수정/검색 요청")
 public class TeamRequest {
 
     @Schema(description = "팀 ID (수정/검색 시 사용)", example = "1")

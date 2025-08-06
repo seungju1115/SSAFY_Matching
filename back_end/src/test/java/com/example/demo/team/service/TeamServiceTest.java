@@ -5,6 +5,7 @@ import com.example.demo.chat.entity.ChatRoom;
 import com.example.demo.chat.service.ChatRoomService;
 import com.example.demo.team.dto.TeamMemberResponse;
 import com.example.demo.team.dto.TeamRequest;
+import com.example.demo.team.dto.TeamCreateRequest;
 import com.example.demo.team.dto.TeamResponse;
 import com.example.demo.team.entity.Team;
 import com.example.demo.team.dao.TeamRepository;
@@ -65,9 +66,15 @@ class TeamServiceTest {
 
     @Test
     void createTeam_success() {
-        TeamRequest request = new TeamRequest();
+        TeamCreateRequest request = new TeamCreateRequest();
         request.setLeaderId(1L);
-        request.setTeamName("TeamA");
+        request.setTeamDomain("웹기술");
+        request.setTeamDescription("TeamA");
+        request.setBackendCount(1);
+        request.setFrontendCount(1);
+        request.setAiCount(0);
+        request.setPmCount(0);
+        request.setDesignCount(0);
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(leader));
         when(teamRepository.save(any(Team.class))).thenAnswer(invocation -> {
@@ -85,7 +92,6 @@ class TeamServiceTest {
 
         assertThat(response).isNotNull();
         assertThat(response.getTeamId()).isEqualTo(10L);
-        assertThat(response.getTeamName()).isEqualTo("TeamA");
         assertThat(response.getLeaderId()).isEqualTo(1L);
         assertThat(response.getMemberCount()).isEqualTo(1); // leader 도 멤버에 포함
 
