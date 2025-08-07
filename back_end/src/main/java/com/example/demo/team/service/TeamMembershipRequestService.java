@@ -1,5 +1,7 @@
 package com.example.demo.team.service;
 
+import com.example.demo.common.exception.BusinessException;
+import com.example.demo.common.exception.ErrorCode;
 import com.example.demo.team.dao.TeamMembershipRequestRepository;
 import com.example.demo.team.dao.TeamRepository;
 import com.example.demo.team.dto.*;
@@ -29,14 +31,13 @@ public class TeamMembershipRequestService {
     public final TeamMembershipRequestRepository teamMembershipRequestRepository;
     public final TeamRepository teamRepository;
     public final UserRepository userRepository;
-    private final TeamService teamService;
     private final SimpMessagingTemplate messagingTemplate;
     private final HazelcastInstance hazelcastInstance;
 
     @Transactional
     public void requestTeamToMember(TeamOffer teamOffer){ // 팀원 아무나 초대 가능
-        Team team = teamRepository.findById(teamOffer.getTeamId()).orElseThrow(()-> new RuntimeException("no team"));
-        User user = userRepository.findById(teamOffer.getUserId()).orElseThrow(()-> new RuntimeException("no user"));
+        Team team = teamRepository.findById(teamOffer.getTeamId()).orElseThrow(()-> new BusinessException(ErrorCode.TEAM_NOT_FOUND));
+        User user = userRepository.findById(teamOffer.getUserId()).orElseThrow(()-> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         String key=team.getId() + "+" + user.getId();
         FencedLock lock=hazelcastInstance.getCPSubsystem().getLock(key);
@@ -71,8 +72,8 @@ public class TeamMembershipRequestService {
 
     @Transactional
     public void requestMemberToTeam(TeamOffer teamOffer) {
-        Team team = teamRepository.findById(teamOffer.getTeamId()).orElseThrow(()-> new RuntimeException("no team"));
-        User user = userRepository.findById(teamOffer.getUserId()).orElseThrow(()-> new RuntimeException("no user"));
+        Team team = teamRepository.findById(teamOffer.getTeamId()).orElseThrow(()-> new BusinessException(ErrorCode.TEAM_NOT_FOUND));
+        User user = userRepository.findById(teamOffer.getUserId()).orElseThrow(()-> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         String key=team.getId() + "+" + user.getId();
         FencedLock lock=hazelcastInstance.getCPSubsystem().getLock(key);
@@ -101,8 +102,8 @@ public class TeamMembershipRequestService {
             throw new RuntimeException("요청이 중단되었습니다.", e);
         }
 
-        for (TeamMemberResponse teamMemberResponse : teamService.getTeamMembers(teamOffer.getTeamId())) {
-            messagingTemplate.convertAndSend("/queue/team/offer/" + teamMemberResponse.getMemberId(), teamOffer.getMessage());
+        for (User member : team.getMembers()) {
+            messagingTemplate.convertAndSend("/queue/team/offer/" + member.getId(), teamOffer.getMessage());
         }
     }
 

@@ -18,8 +18,6 @@ import CertificationInput from '@/components/features/profile/CertificationInput
 interface Certification {
   id: string
   name: string
-  issuer: string
-  date: string
 }
 
 interface ProfileSetupData {

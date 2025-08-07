@@ -2,6 +2,7 @@ package com.example.demo.chat.dto;
 
 import com.example.demo.chat.entity.RoomType;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,6 +11,7 @@ import lombok.Setter;
 @Schema(description = "채팅방 생성 요청")
 public class ChatRoomRequest {
 
+    @NotNull(message = "roomType은 필수입니다.")
     @Schema(
             description = "채팅방 타입",
             example = "PRIVATE",
