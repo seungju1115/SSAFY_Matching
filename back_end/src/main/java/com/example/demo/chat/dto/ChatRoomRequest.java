@@ -10,6 +10,7 @@ import lombok.Setter;
 @Schema(description = "채팅방 생성 요청")
 public class ChatRoomRequest {
 
+    @NotNull(message = "roomType은 필수입니다.")
     @Schema(
             description = "채팅방 타입",
             example = "PRIVATE",

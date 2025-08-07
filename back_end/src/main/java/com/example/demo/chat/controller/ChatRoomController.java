@@ -116,8 +116,7 @@ public class ChatRoomController {
             )
             @PathVariable Long chatRoomId
     ) {
-        List<ChatMessageResponse> messages = chatMessageService.getAllMessagesByChatRoom(chatRoomId);
-        return ResponseEntity.ok(ApiResponse.ok(messages));
+        return ResponseEntity.ok(ApiResponse.ok(chatMessageService.getAllMessagesByChatRoom(chatRoomId)));
     }
 
     @Operation(
@@ -207,7 +206,9 @@ public class ChatRoomController {
             )
             @Valid @RequestBody ChatRoomRequest chatRoomRequest
     ) {
-        ChatRoomResponse chatRoom = chatRoomService.createPrivateChatRoom(chatRoomRequest);
-        return ResponseEntity.ok(ApiResponse.created(chatRoom));
+        if (chatRoomRequest.getUser1Id() == null || chatRoomRequest.getUser2Id() == null) {
+            throw new BusinessException(ErrorCode.INVALID_PRIVATEROOM_REQUEST);
+        }
+        return ResponseEntity.ok(ApiResponse.created(chatRoomService.createPrivateChatRoom(chatRoomRequest)));
     }
 }
