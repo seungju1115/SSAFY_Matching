@@ -1,9 +1,5 @@
-import { useState } from 'react'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { X, Plus } from 'lucide-react'
-
+import { X } from 'lucide-react'
 
 interface PreferenceSelectorProps {
   title: string
@@ -14,7 +10,6 @@ interface PreferenceSelectorProps {
   color: 'blue' | 'green' | 'purple' | 'orange' | 'pink'
 }
 
-// 색상 설정
 const colorStyles = {
   blue: {
     badge: 'bg-blue-100 text-blue-800 hover:bg-blue-200',
@@ -71,32 +66,26 @@ export default function PreferenceSelector({
   suggestions,
   color = 'blue'
 }: PreferenceSelectorProps) {
-  const [inputValue, setInputValue] = useState('')
+
   const styles = colorStyles[color]
 
-  // 선호도 추가
   const addPreference = (preference: string) => {
     if (!preference.trim()) return
     if (!selectedPreferences.includes(preference)) {
       onChange([...selectedPreferences, preference])
     }
-    setInputValue('')
   }
 
-  // 선호도 제거
   const removePreference = (preference: string) => {
     onChange(selectedPreferences.filter(p => p !== preference))
   }
 
-  // 추천 항목 필터링 (이미 선택된 항목 제외)
   const filteredSuggestions = suggestions.filter(
-    preference => !selectedPreferences.includes(preference) && 
-    preference.toLowerCase().includes(inputValue.toLowerCase())
+    preference => !selectedPreferences.includes(preference)
   )
 
   return (
     <div className="space-y-6">
-      {/* 선택된 선호도 표시 */}
       <div className="flex flex-wrap gap-2 min-h-12">
         {selectedPreferences.map(preference => (
           <Badge 
@@ -113,35 +102,10 @@ export default function PreferenceSelector({
           </Badge>
         ))}
         {selectedPreferences.length === 0 && (
-          <p className="text-sm text-gray-500">선택된 {title}이 없습니다. 아래에서 선택하거나 직접 입력해주세요.</p>
+          <p className="text-sm text-gray-500">선택된 {title}이 없습니다. 아래에서 선택해주세요.</p>
         )}
       </div>
 
-      {/* 입력 */}
-      <div className="flex gap-2">
-        <Input
-          placeholder={`${title} 입력`}
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          className="flex-1"
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault()
-              addPreference(inputValue)
-            }
-          }}
-        />
-        <Button 
-          onClick={() => addPreference(inputValue)}
-          disabled={!inputValue.trim()}
-          className={styles.actionButton}
-        >
-          <Plus className="h-4 w-4" />
-          추가
-        </Button>
-      </div>
-
-      {/* 추천 항목 */}
       <div>
         <h3 className="text-sm font-medium text-gray-700 mb-2">추천 {title}</h3>
         <div className="flex flex-wrap gap-2">
