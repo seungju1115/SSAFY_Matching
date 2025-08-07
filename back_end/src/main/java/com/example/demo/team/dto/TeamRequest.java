@@ -1,6 +1,9 @@
 package com.example.demo.team.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,6 +22,7 @@ public class TeamRequest {
             minLength = 2,
             maxLength = 20
     )
+    @NotBlank(message = "팀 이름은 필수입니다.")
     private String teamName;
 
     @Schema(
@@ -26,5 +30,16 @@ public class TeamRequest {
             example = "5",
             required = true
     )
+    @NotNull(message = "팀장 ID는 필수입니다.")
     private Long leaderId;
+
+    @Schema(
+            description = "팀 도메인",
+            example = "domainTest11",
+            required = true
+    )
+    @NotNull(message = "도메인은 필수입니다.")
+    @Size(min=10)
+    private String teamDomain;
+
 }
