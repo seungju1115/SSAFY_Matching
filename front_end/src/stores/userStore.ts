@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { persist, createJSONStorage } from 'zustand/middleware'
 
 interface User {
   id: number | null
@@ -45,7 +45,8 @@ const useUserStore = create<UserState>()(
       }),
     }),
     {
-      name: 'user-storage',
+            name: 'user-storage',
+      storage: createJSONStorage(() => sessionStorage),
     }
   )
 )
