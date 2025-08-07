@@ -1,14 +1,19 @@
 // Axios 인스턴스 및 설정
 import axios from 'axios'
 
+// 현재 브라우저 도메인을 기반으로 baseURL 생성
+const getBaseURL = () => {
+  return import.meta.env.VITE_API_URL || `${window.location.protocol}//${window.location.host}/api`
+}
+
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api',
+  baseURL: getBaseURL(),
   timeout: 10000,
 })
 
 // 인증이 필요 없는 API용 별도 인스턴스
 export const publicApiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api',
+  baseURL: getBaseURL(),
   timeout: 10000,
 })
 
