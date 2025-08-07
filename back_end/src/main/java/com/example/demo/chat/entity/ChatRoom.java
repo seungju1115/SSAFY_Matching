@@ -40,5 +40,14 @@ public class ChatRoom {
         }
     }
 
+    public void addMember(ChatRoomMember member) {
+        members.add(member);
+        member.setChatRoom(this);
+    }
+
+    public void removeMember(ChatRoomMember member) {
+        members.remove(member);
+        member.setChatRoom(null);
+    }
 }
 

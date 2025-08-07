@@ -5,8 +5,7 @@ import Signup from './pages/Signup'
 import Setup from './pages/Setup'
 import ProfileSetup from './pages/ProfileSetup'
 import MakeTeam from './pages/MakeTeam/make'
-import AuthCallback from './pages/Auth/Callback'
-import Team from './pages/Team'
+import OAuthCallback from './pages/OAuthCallback'
 
 function App() {
   return (
@@ -18,8 +17,7 @@ function App() {
         <Route path="/setup" element={<Setup />} />
         <Route path="/profile-setup" element={<ProfileSetup />} />
         <Route path="/make-team" element={<MakeTeam />} />
-        <Route path="/oauth/callback" element={<AuthCallback />} />
-        <Route path="/team/:teamId" element={<Team />} />
+        <Route path="/oauth/callback" element={<OAuthCallback />} />
       </Routes>
     </BrowserRouter>
   )

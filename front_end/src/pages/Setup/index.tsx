@@ -12,15 +12,14 @@ import {
 } from '@/components/ui/select'
 import type { UserDetailSettings as UserDetailSettingsType } from '@/types/user'
 import { CLASS_OPTIONS } from '@/types/user'
+import { authAPI } from '@/api/auth'
 import { CheckCircle2, User, BookOpen, Users } from 'lucide-react'
-import { publicApiClient } from '@/api/axios'
-import useUserStore from '@/stores/userStore'
+import apiClient from '@/api/axios'
 
 export default function Setup() {
   const navigate = useNavigate()
   const location = useLocation()
   const email = location.state?.email || ''
-  const { setUser } = useUserStore()
   
   const [settings, setSettings] = useState<UserDetailSettingsType>({
     name: '',
@@ -28,6 +27,7 @@ export default function Setup() {
     isMajor: true
   })
   const [isLoading, setIsLoading] = useState(false)
+
 
   const handleSettingChange = (field: keyof UserDetailSettingsType, value: string | boolean) => {
     setSettings((prev: UserDetailSettingsType) => ({
@@ -43,6 +43,7 @@ export default function Setup() {
 
     setIsLoading(true)
     try {
+      // 사용자 프로필 API 호출을 위한 데이터 준비
       const userProfileData = {
         email: email || '',
         userName: settings.name,
@@ -50,23 +51,31 @@ export default function Setup() {
         major: settings.isMajor
       }
       
-      const response = await publicApiClient.post('/users/profile', userProfileData)
+      // 프로필 API 호출
+      await apiClient.post('/users/profile', userProfileData)
+      console.log('User profile created successfully:', userProfileData)
       
-      if (response.data && response.data.status === 200) {
-        const userData = response.data.data
-        setUser({
-          id: userData.id,
-          userName: userData.userName,
-          role: userData.role,
-          email: userData.email,
-          major: userData.major,
-          lastClass: userData.lastClass,
+      // 기존 인증 로직도 유지 (필요에 따라)
+      if (email) {
+        await authAPI.register({
+          email,
+          ...settings,
+          semester: '',  // 빈 값으로 설정
+          major: ''      // 빈 값으로 설정
         })
-        console.log('User profile created and state updated:', userData)
-        navigate('/')
+        console.log('User registered successfully:', { email, ...settings })
       } else {
-        console.error('Failed to create user profile:', response.data.message)
+        // 기존 사용자인 경우 설정 업데이트
+        await authAPI.updateUserDetails({
+          ...settings,
+          semester: '',  // 빈 값으로 설정
+          major: ''      // 빈 값으로 설정
+        })
+        console.log('User detail settings saved successfully:', settings)
       }
+      
+      localStorage.setItem('userDetailSettings', JSON.stringify(settings))
+      navigate('/')
     } catch (error) {
       console.error('Failed to save settings:', error)
     } finally {

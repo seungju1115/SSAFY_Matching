@@ -6,11 +6,10 @@ import com.example.demo.chat.dto.ChatRoomRequest;
 import com.example.demo.chat.dto.ChatRoomResponse;
 import com.example.demo.chat.service.ChatMessageService;
 import com.example.demo.chat.service.ChatRoomService;
-import com.example.demo.common.exception.BusinessException;
-import com.example.demo.common.exception.ErrorCode;
-import com.example.demo.common.response.ApiResponse;
+import com.example.demo.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -117,7 +116,8 @@ public class ChatRoomController {
             )
             @PathVariable Long chatRoomId
     ) {
-        return ResponseEntity.ok(ApiResponse.ok(chatMessageService.getAllMessagesByChatRoom(chatRoomId)));
+        List<ChatMessageResponse> messages = chatMessageService.getAllMessagesByChatRoom(chatRoomId);
+        return ResponseEntity.ok(ApiResponse.ok(messages));
     }
 
     @Operation(
@@ -207,9 +207,7 @@ public class ChatRoomController {
             )
             @Valid @RequestBody ChatRoomRequest chatRoomRequest
     ) {
-        if (chatRoomRequest.getUser1Id() == null || chatRoomRequest.getUser2Id() == null) {
-            throw new BusinessException(ErrorCode.INVALID_PRIVATEROOM_REQUEST);
-        }
-        return ResponseEntity.ok(ApiResponse.created(chatRoomService.createPrivateChatRoom(chatRoomRequest)));
+        ChatRoomResponse chatRoom = chatRoomService.createPrivateChatRoom(chatRoomRequest);
+        return ResponseEntity.ok(ApiResponse.created(chatRoom));
     }
 }

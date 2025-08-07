@@ -4,276 +4,221 @@ import com.example.demo.chat.dao.ChatRoomRepository;
 import com.example.demo.chat.dto.ChatRoomRequest;
 import com.example.demo.chat.dto.ChatRoomResponse;
 import com.example.demo.chat.entity.*;
-import com.example.demo.common.exception.BusinessException;
-import com.example.demo.common.exception.ErrorCode;
 import com.example.demo.team.dao.TeamRepository;
 import com.example.demo.team.entity.Team;
 import com.example.demo.user.dao.UserRepository;
 import com.example.demo.user.entity.User;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-@ExtendWith(MockitoExtension.class)
+
 class ChatRoomServiceTest {
-
-    @Mock
-    private ChatRoomRepository chatRoomRepository;
-
-    @Mock
-    private UserRepository userRepository;
-
-    @Mock
-    private TeamRepository teamRepository;
-
-    @Mock
-    private ChatMemberService chatMemberService;
 
     @InjectMocks
     private ChatRoomService chatRoomService;
 
-    private User user1,user2;
-    private ChatRoomMember chatRoomMember1,chatRoomMember2;
-    private ChatRoom chatRoom;
-    private ChatRoomRequest chatRoomRequest;
+    @Mock
+    private ChatRoomRepository chatRoomRepository;
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private TeamRepository teamRepository;
+    @Mock
+    private ChatMemberService chatMemberService;
+
+    private User user1;
+    private User user2;
     private Team team;
+
     @BeforeEach
-    void setUp(){
-        chatRoom = new ChatRoom();
-        chatRoom.setId(100L);
-        chatRoom.setRoomType(RoomType.PRIVATE);
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
 
         user1 = new User();
         user1.setId(1L);
-        chatRoomMember1 = new ChatRoomMember();
-        chatRoomMember1.setUser(user1);
-        chatRoomMember1.setChatRoom(chatRoom);
+        user1.setChatRoomMembers(new ArrayList<>());
 
         user2 = new User();
         user2.setId(2L);
-        chatRoomMember2 = new ChatRoomMember();
-        chatRoomMember2.setUser(user2);
-        chatRoomMember2.setChatRoom(chatRoom);
+        user2.setChatRoomMembers(new ArrayList<>());
 
         team = new Team();
-        team.setId(1L);
-
-        chatRoomRequest = new ChatRoomRequest();
-        chatRoomRequest.setRoomId(chatRoom.getId());
-        chatRoomRequest.setTeamId(team.getId());
-        chatRoomRequest.setUserId(team.getId());
-        chatRoomRequest.setUser1Id(user1.getId());
-        chatRoomRequest.setUser2Id(user2.getId());
+        team.setId(10L);
     }
 
     @Test
-    @DisplayName("1:1 채팅방 생성 - 이미 존재하는 채팅 방")
-    void createPrivateChatRoom_existingRoom_returnsExistingRoom() {
-        when(userRepository.findByIdWithChatRoomMembers(chatRoomRequest.getUser1Id())).thenReturn(Optional.of(user1));
-        when(userRepository.findByIdWithChatRoomMembers(chatRoomRequest.getUser2Id())).thenReturn(Optional.of(user2));
+    void createPrivateChatRoom_newRoomCreated() {
+        ChatRoomRequest request = new ChatRoomRequest();
+        request.setUser1Id(1L);
+        request.setUser2Id(2L);
 
-        ChatRoomResponse response = chatRoomService.createPrivateChatRoom(chatRoomRequest);
+        when(userRepository.findByIdWithChatRoomMembers(1L)).thenReturn(Optional.of(user1));
+        when(userRepository.findByIdWithChatRoomMembers(2L)).thenReturn(Optional.of(user2));
 
-        // Assert
-        assertNotNull(response);
-        assertEquals(chatRoom.getId(), response.getRoomId());
-        assertEquals(RoomType.PRIVATE, response.getRoomType());
-
-        verify(chatRoomRepository, never()).save(any());
-        verify(chatMemberService, never()).createChatRoomMember(any(), any());
-    }
-
-    @Test
-    @DisplayName("1:1 채팅방 생성 성공")
-    void createPrivateChatRoom_noExistingRoom_createsNewRoom() {
-        chatRoomMember1.setUser(null);
-        chatRoomMember1.setChatRoom(null);
-        chatRoomMember2.setUser(null);
-        chatRoomMember2.setChatRoom(null);
-        when(userRepository.findByIdWithChatRoomMembers(chatRoomRequest.getUser1Id())).thenReturn(Optional.of(user1));
-        when(userRepository.findByIdWithChatRoomMembers(chatRoomRequest.getUser2Id())).thenReturn(Optional.of(user2));
-
-        when(chatMemberService.createChatRoomMember(eq(user1), any(ChatRoom.class)))
+        when(chatMemberService.createChatRoomMember(any(User.class), any(ChatRoom.class)))
                 .thenAnswer(invocation -> {
-                    ChatRoom chatRoom = invocation.getArgument(1);
+                    User user = invocation.getArgument(0);
+                    ChatRoom room = invocation.getArgument(1);
                     ChatRoomMember member = new ChatRoomMember();
-                    member.setUser(user1);
-                    member.setChatRoom(chatRoom);
+                    member.setUser(user);
+                    member.setChatRoom(room);
                     return member;
                 });
 
-        ChatRoom savedRoom = new ChatRoom();
-        savedRoom.setId(101L);
-        savedRoom.setRoomType(RoomType.PRIVATE);
+        when(chatRoomRepository.save(any(ChatRoom.class))).thenAnswer(invocation -> {
+            ChatRoom room = invocation.getArgument(0);
+            room.setId(100L);
+            return room;
+        });
 
-        when(chatRoomRepository.save(any(ChatRoom.class))).thenReturn(savedRoom);
+        ChatRoomResponse response = chatRoomService.createPrivateChatRoom(request);
 
-        // Act
-        ChatRoomResponse response = chatRoomService.createPrivateChatRoom(chatRoomRequest);
-
-        // Assert
         assertNotNull(response);
-        assertEquals(101L, response.getRoomId());
+        assertEquals(100L, response.getRoomId());
         assertEquals(RoomType.PRIVATE, response.getRoomType());
 
-        verify(chatRoomRepository).save(any(ChatRoom.class));
+        // 멤버가 user1, user2인지 확인
         verify(chatMemberService, times(2)).createChatRoomMember(any(User.class), any(ChatRoom.class));
+        verify(chatRoomRepository, times(1)).save(any(ChatRoom.class));
     }
 
     @Test
-    @DisplayName("1:1 채팅방 생성 실패 - 유저 id 없음")
-    void createPrivateChatRoom_failWithUserNotFound() {
-        when(userRepository.findByIdWithChatRoomMembers(chatRoomRequest.getUser1Id())).thenReturn(Optional.empty());
-        BusinessException exception = assertThrows(BusinessException.class,
-                () -> chatRoomService.createPrivateChatRoom(chatRoomRequest));
+    void createPrivateChatRoom_existingRoomReturned() {
+        ChatRoomRequest request = new ChatRoomRequest();
+        request.setUser1Id(1L);
+        request.setUser2Id(2L);
 
-        assertEquals(ErrorCode.USER_NOT_FOUND, exception.getErrorCode());
-        verify(chatRoomRepository, never()).save(any());
+        ChatRoom existingRoom = new ChatRoom();
+        existingRoom.setId(200L);
+        existingRoom.setRoomType(RoomType.PRIVATE);
+
+        // user1이 속한 방 세팅
+        ChatRoomMember member1 = new ChatRoomMember();
+        member1.setChatRoom(existingRoom);
+        member1.setUser(user1);
+        user1.getChatRoomMembers().add(member1);
+
+        // user2가 속한 방 세팅 (동일 방)
+        ChatRoomMember member2 = new ChatRoomMember();
+        member2.setChatRoom(existingRoom);
+        member2.setUser(user2);
+        user2.getChatRoomMembers().add(member2);
+
+        when(userRepository.findByIdWithChatRoomMembers(1L)).thenReturn(Optional.of(user1));
+        when(userRepository.findByIdWithChatRoomMembers(2L)).thenReturn(Optional.of(user2));
+
+        ChatRoomResponse response = chatRoomService.createPrivateChatRoom(request);
+
+        assertNotNull(response);
+        assertEquals(200L, response.getRoomId());
+        assertEquals(RoomType.PRIVATE, response.getRoomType());
+
+        // 새로 생성하지 않음
+        verify(chatRoomRepository, never()).save(any(ChatRoom.class));
+        verify(chatMemberService, never()).createChatRoomMember(any(User.class), any(ChatRoom.class));
     }
 
     @Test
-    @DisplayName("팀 채팅방 생성 성공")
-    void createTeamChatRoom_success() {
-        when(teamRepository.findById(chatRoomRequest.getTeamId())).thenReturn(Optional.of(team));
-        when(userRepository.findById(chatRoomRequest.getUserId())).thenReturn(Optional.of(user1));
+    void createPrivateChatRoom_user1NotFound_throwsException() {
+        ChatRoomRequest request = new ChatRoomRequest();
+        request.setUser1Id(1L);
+        request.setUser2Id(2L);
 
-        when(chatMemberService.createChatRoomMember(eq(user1), any(ChatRoom.class)))
+        when(userRepository.findByIdWithChatRoomMembers(1L)).thenReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                chatRoomService.createPrivateChatRoom(request)
+        );
+        assertEquals("User not found", exception.getMessage());
+    }
+
+    @Test
+    void createPrivateChatRoom_user2NotFound_throwsException() {
+        ChatRoomRequest request = new ChatRoomRequest();
+        request.setUser1Id(1L);
+        request.setUser2Id(2L);
+
+        when(userRepository.findByIdWithChatRoomMembers(1L)).thenReturn(Optional.of(user1));
+        when(userRepository.findByIdWithChatRoomMembers(2L)).thenReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                chatRoomService.createPrivateChatRoom(request)
+        );
+        assertEquals("User not found", exception.getMessage());
+    }
+
+
+    @Test
+    void testCreateTeamChatRoom() {
+        ChatRoomRequest request = new ChatRoomRequest();
+        request.setTeamId(10L);
+        request.setUserId(1L);
+
+        when(teamRepository.findById(10L)).thenReturn(Optional.of(team));
+        when(userRepository.getReferenceById(1L)).thenReturn(user1);
+        when(chatMemberService.createChatRoomMember(any(User.class), any(ChatRoom.class)))
                 .thenAnswer(invocation -> {
+                    User user = invocation.getArgument(0);
                     ChatRoom chatRoom = invocation.getArgument(1);
                     ChatRoomMember member = new ChatRoomMember();
-                    member.setUser(user1);
+                    member.setUser(user);
                     member.setChatRoom(chatRoom);
                     return member;
                 });
+        when(chatRoomRepository.save(any(ChatRoom.class))).thenAnswer(invocation -> {
+            ChatRoom room = invocation.getArgument(0);
+            room.setId(200L);
+            return room;
+        });
 
-        ChatRoom savedRoom = new ChatRoom();
-        savedRoom.setId(101L);
-        savedRoom.setRoomType(RoomType.PRIVATE);
+        ChatRoomResponse response = chatRoomService.createTeamChatRoom(request);
 
-        when(chatRoomRepository.save(any(ChatRoom.class))).thenReturn(savedRoom);
-
-        ChatRoomResponse response = chatRoomService.createTeamChatRoom(chatRoomRequest);
-
-        // Assert
         assertNotNull(response);
-        assertEquals(101L, response.getRoomId());
-        assertEquals(RoomType.PRIVATE, response.getRoomType());
-
-        verify(chatRoomRepository).save(any(ChatRoom.class));
-        verify(chatMemberService, times(1)).createChatRoomMember(any(User.class), any(ChatRoom.class));
+        assertEquals(RoomType.TEAM, response.getRoomType());
+        assertEquals(200L, response.getRoomId());
+        assertEquals(10L, response.getTeamId());
     }
 
     @Test
-    @DisplayName("팀 채팅방 생성 실패 - 유저 id 없음")
-    void createTeamChatRoom_failWithUserNotFound() {
-        when(teamRepository.findById(chatRoomRequest.getTeamId())).thenReturn(Optional.of(team));
-        when(userRepository.findById(chatRoomRequest.getUserId())).thenReturn(Optional.empty());
-
-        BusinessException exception = assertThrows(BusinessException.class,
-                () -> chatRoomService.createTeamChatRoom(chatRoomRequest));
-
-        assertEquals(ErrorCode.USER_NOT_FOUND, exception.getErrorCode());
-        verify(chatRoomRepository, never()).save(any());
-    }
-
-    @Test
-    @DisplayName("팀 채팅방 생성 실패 - 팀 id 없음")
-    void createTeamChatRoom_failWithTeamNotFound() {
-        when(teamRepository.findById(chatRoomRequest.getTeamId())).thenReturn(Optional.empty());
-
-        BusinessException exception = assertThrows(BusinessException.class,
-                () -> chatRoomService.createTeamChatRoom(chatRoomRequest));
-
-        assertEquals(ErrorCode.TEAM_NOT_FOUND, exception.getErrorCode());
-        verify(chatRoomRepository, never()).save(any());
-    }
-
-    @Test
-    @DisplayName("팀 채팅에 멤버 추가 성공")
-    void addMemberToTeamChatRoom_success() {
-        chatRoom.setRoomType(RoomType.TEAM);
-        chatRoom.setTeam(team);
-        chatRoomMember1.setUser(null);
-        chatRoomMember1.setChatRoom(null);
-        when(chatRoomRepository.findById(chatRoomRequest.getRoomId())).thenReturn(Optional.of(chatRoom));
-        when(userRepository.findById(chatRoomRequest.getUserId())).thenReturn(Optional.of(user1));
-
-        ChatRoomMember newMember = new ChatRoomMember();
-        when(chatMemberService.createChatRoomMember(eq(user1), eq(chatRoom))).thenReturn(newMember);
-
-        // Act
-        chatRoomService.addMemberToTeamChatRoom(new ChatRoomRequest() {{
-            setRoomId(chatRoom.getId());
-            setUserId(user1.getId());
-        }});
-
-        // Assert
-        verify(chatRoomRepository).save(chatRoom);
-        verify(chatMemberService).createChatRoomMember(eq(user1), eq(chatRoom));
-    }
-
-    @Test
-    @DisplayName("팀 멤버 추가 실패 - 팀채팅방이 아님")
-    void addMemberToTeamChatRoom_throwsIfNotTeamRoom() {
-        chatRoom.setRoomType(RoomType.PRIVATE);
-        when(chatRoomRepository.findById(chatRoomRequest.getRoomId())).thenReturn(Optional.of(chatRoom));
-        // Act & Assert
-        BusinessException ex = assertThrows(BusinessException.class,
-                () -> chatRoomService.addMemberToTeamChatRoom(chatRoomRequest));
-        assertEquals(ErrorCode.INVALID_CHAT_ROOM_TYPE, ex.getErrorCode());
-    }
-
-    @Test
-    @DisplayName("채팅방에 이미 존재하는 유저")
-    void addMemberToTeamChatRoom_throwsIfMemberAlreadyExists() {
+    void testAddMemberToTeamChatRoom_duplicate() {
+        ChatRoom chatRoom = new ChatRoom();
+        chatRoom.setId(1L);
         chatRoom.setRoomType(RoomType.TEAM);
 
-        when(chatRoomRepository.findById(chatRoomRequest.getRoomId())).thenReturn(Optional.of(chatRoom));
-        when(userRepository.findById(chatRoomRequest.getUserId())).thenReturn(Optional.of(user1));  // 반드시 필요
+        ChatRoomMember existingMember = new ChatRoomMember();
+        existingMember.setUser(user1);
+        chatRoom.addMember(existingMember);
 
-        // Act & Assert
-        BusinessException ex = assertThrows(BusinessException.class,
-                () -> chatRoomService.addMemberToTeamChatRoom(chatRoomRequest));
-        assertEquals(ErrorCode.CHATROOM_MEMBER_ALREADY_EXISTS, ex.getErrorCode());
-    }
+        ChatRoomRequest request = new ChatRoomRequest();
+        request.setRoomId(1L);
+        request.setUserId(1L);
 
-    @Test
-    @DisplayName("채팅방 삭제 성공")
-    void deleteChatRoom_success() {
-        // given
-        when(chatRoomRepository.findById(chatRoom.getId())).thenReturn(Optional.of(chatRoom));
+        when(chatRoomRepository.findById(1L)).thenReturn(Optional.of(chatRoom));
 
-        // when
-        chatRoomService.deleteChatRoom(chatRoom.getId());
-
-        // then
-        verify(chatRoomRepository).findById(chatRoom.getId());
-        verify(chatRoomRepository).delete(chatRoom);
-    }
-
-    @Test
-    @DisplayName("채팅방 삭제 실패 - 채팅방 없음")
-    void deleteChatRoom_fail_chatRoomNotFound() {
-        // given
-        when(chatRoomRepository.findById(999L)).thenReturn(Optional.empty());
-
-        // when
-        BusinessException exception = assertThrows(
-                BusinessException.class,
-                () -> chatRoomService.deleteChatRoom(999L)
+        RuntimeException e = assertThrows(RuntimeException.class, () ->
+                chatRoomService.addMemberToTeamChatRoom(request)
         );
+        assertEquals("User is already a member of this chat room.", e.getMessage());
+    }
 
-        // then
-        assertEquals(ErrorCode.CHAT_ROOM_NOT_FOUND, exception.getErrorCode());
-        verify(chatRoomRepository).findById(999L);
-        verify(chatRoomRepository, never()).delete(any());
+    @Test
+    void testDeleteChatRoom() {
+        ChatRoom chatRoom = new ChatRoom();
+        chatRoom.setId(1L);
+
+        when(chatRoomRepository.findById(1L)).thenReturn(Optional.of(chatRoom));
+
+        chatRoomService.deleteChatRoom(1L);
+
+        verify(chatRoomRepository, times(1)).delete(chatRoom);
     }
 }
-

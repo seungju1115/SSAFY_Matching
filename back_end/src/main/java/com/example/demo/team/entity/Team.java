@@ -51,9 +51,9 @@ public class Team {
     @NotBlank
     private String teamDomain;
 
-//    @Column(name = "member_wanted",  nullable = true, length = 50)
-//    @Size(max = 50)
-//    private String memberWanted;
+    @Column(name = "member_wanted",  nullable = true, length = 50)
+    @Size(max = 50)
+    private String memberWanted;
 
     @Column(name = "team_description", nullable = true, length = 300)
     @Size(max = 300)

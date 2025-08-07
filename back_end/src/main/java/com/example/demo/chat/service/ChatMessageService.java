@@ -6,11 +6,8 @@ import com.example.demo.chat.dto.ChatMessageRequest;
 import com.example.demo.chat.dto.ChatMessageResponse;
 import com.example.demo.chat.entity.ChatMessage;
 import com.example.demo.chat.entity.ChatRoom;
-import com.example.demo.common.exception.BusinessException;
-import com.example.demo.common.exception.ErrorCode;
 import com.example.demo.user.dao.UserRepository;
 import com.example.demo.user.entity.User;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,12 +25,12 @@ public class ChatMessageService {
     private final UserRepository userRepository;
 
     @Transactional
-    public ChatMessageResponse saveMessage(@Valid ChatMessageRequest dto) {
+    public ChatMessageResponse saveMessage(ChatMessageRequest dto) {
         ChatRoom chatRoom = chatRoomRepository.findById(dto.getRoomId())
-                .orElseThrow(() -> new BusinessException(ErrorCode.CHAT_ROOM_NOT_FOUND));
+                .orElseThrow(() -> new RuntimeException("ChatRoom not found"));
 
         User sender = userRepository.findById(dto.getSenderId())
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         ChatMessage message = new ChatMessage();
         message.setChatRoom(chatRoom);
@@ -64,4 +61,3 @@ public class ChatMessageService {
                 .collect(Collectors.toList());
     }
 }
-
