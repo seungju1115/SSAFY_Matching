@@ -37,7 +37,7 @@ public class ProdSecurityConfig {
                 c ->
                         c.requestMatchers("/error", "/users/login",
                                         "/login/oauth2/code/**", "/h2-console/**").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/team", "/team/search", "/users/profile").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/team", "/team/search", "/users/profile", "/hello").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/users/profile").permitAll()
                                 .anyRequest().authenticated());
 
