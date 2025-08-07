@@ -2,8 +2,11 @@ package com.example.demo.dashboard.dto;
 
 import com.example.demo.team.entity.Team;
 import com.example.demo.user.Enum.PositionEnum;
+import com.example.demo.user.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -20,5 +23,13 @@ public class UserCountDto {
     private boolean major;
 
     @Schema(description = "희망 포지션", example = "BACKEND")
-    private PositionEnum position;
+    private List<PositionEnum> position;
+
+    public static UserCountDto from(User user) {
+        UserCountDto dto = new UserCountDto();
+        dto.team = user.getTeam();
+        dto.major = user.isMajor();
+        dto.position=user.getWantedPosition();
+        return dto;
+    }
 }

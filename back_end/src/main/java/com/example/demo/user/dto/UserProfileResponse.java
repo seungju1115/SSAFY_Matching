@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -41,7 +42,7 @@ public class UserProfileResponse implements Serializable {
     private Integer lastClass;
 
     @Schema(description = "희망 포지션", example = "BACKEND")
-    private PositionEnum wantedPosition;
+    private List<PositionEnum> wantedPosition;
 
     @Schema(description = "프로젝트 선호도")
     private Set<ProjectGoalEnum> projectGoal;

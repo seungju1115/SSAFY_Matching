@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.Set;
 
 @Setter
@@ -29,7 +30,7 @@ public class UserProfileUpdateRequest {
     private Integer lastClass;
 
     @Schema(description = "희망 포지션", example = "FULLSTACK")
-    private PositionEnum wantedPosition;
+    private List<PositionEnum> wantedPosition;
 
     @Schema(description = "프로젝트 선호도", example = "[\"도전적인 성향\", \"새로운 기술 적극 사용\"]")
     private Set<ProjectGoalEnum> projectGoal;
