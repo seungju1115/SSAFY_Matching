@@ -1,8 +1,5 @@
-import { useState } from 'react'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { X, Plus } from 'lucide-react'
+import { X } from 'lucide-react'
 
 interface PositionSelectorProps {
   selectedPositions: string[]
@@ -11,33 +8,21 @@ interface PositionSelectorProps {
 
 // 추천 포지션 목록
 const SUGGESTED_POSITIONS = [
-  '프론트엔드',
   '백엔드',
-  '풀스택',
-  'DevOps',
-  '모바일',
-  'AI/ML',
-  '데이터 사이언티스트',
-  'UI/UX 디자이너',
-  '게임 개발자',
-  '블록체인',
-  'IoT',
-  '임베디드',
-  '시스템 아키텍트',
-  'QA 엔지니어',
-  '보안 전문가'
+  '프론트엔드',
+  'AI',
+  '디자인',
+  'PM',
 ]
 
 export default function PositionSelector({ selectedPositions, onChange }: PositionSelectorProps) {
-  const [inputValue, setInputValue] = useState('')
 
   // 포지션 추가
   const addPosition = (position: string) => {
     if (!position.trim()) return
-    if (!selectedPositions.includes(position)) {
+    if (!selectedPositions.includes(position) && selectedPositions.length < 5) {
       onChange([...selectedPositions, position])
     }
-    setInputValue('')
   }
 
   // 포지션 제거
@@ -47,8 +32,7 @@ export default function PositionSelector({ selectedPositions, onChange }: Positi
 
   // 추천 포지션 필터링 (이미 선택된 항목 제외)
   const filteredSuggestions = SUGGESTED_POSITIONS.filter(
-    position => !selectedPositions.includes(position) && 
-    position.toLowerCase().includes(inputValue.toLowerCase())
+    position => !selectedPositions.includes(position)
   )
 
   return (
@@ -71,39 +55,15 @@ export default function PositionSelector({ selectedPositions, onChange }: Positi
           </Badge>
         ))}
         {selectedPositions.length === 0 && (
-          <p className="text-xs sm:text-sm text-gray-500">선택된 포지션이 없습니다. 아래에서 선택하거나 직접 입력해주세요.</p>
+          <p className="text-xs sm:text-sm text-gray-500">선택된 포지션이 없습니다. 아래에서 선택해주세요.</p>
         )}
-      </div>
-
-      {/* 포지션 입력 */}
-      <div className="flex gap-1.5 sm:gap-2">
-        <Input
-          placeholder="포지션 입력 (예: 백엔드)"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          className="flex-1 h-10 sm:h-10 text-sm"
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault()
-              addPosition(inputValue)
-            }
-          }}
-        />
-        <Button 
-          onClick={() => addPosition(inputValue)}
-          disabled={!inputValue.trim()}
-          className="bg-green-500 hover:bg-green-600 h-10 sm:h-10 px-3 sm:px-4"
-        >
-          <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-          <span className="text-sm">추가</span>
-        </Button>
       </div>
 
       {/* 추천 포지션 */}
       <div>
         <h3 className="text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">추천 포지션</h3>
         <div className="flex flex-wrap gap-1.5 sm:gap-2">
-          {filteredSuggestions.slice(0, 10).map(position => (
+          {filteredSuggestions.map(position => (
             <Badge 
               key={position}
               variant="outline" 

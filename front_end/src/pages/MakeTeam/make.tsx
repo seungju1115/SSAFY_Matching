@@ -61,47 +61,37 @@ export default function MakeTeam() {
 
   // 프로젝트 성향 선택지
   const projectPreferenceSuggestions = [
-    '취업우선', '수상목표', '개발경험우선', '포트폴리오중심',
-    '학습중심', '혁신추구', '실무경험', '창업지향',
-    '오픈소스', '사회공헌', '빠른개발', '완성도추구'
+    '취업우선', '수상목표', '포트폴리오중심', '학습중심', '아이디어실현', '실무경험', '빠른개발', '완성도추구'
   ]
 
   // 팀 분위기 선택지
   const atmosphereSuggestions = [
-    '반말 지향', '존대 지향', '편한 분위기', '체계적 분위기',
-    '자유로운', '규칙적인', '소통 활발', '집중 중시',
-    '유연한 시간', '정해진 시간', '온라인 중심', '오프라인 중심'
+    '반말 지향', '존대 지향', '편한 분위기', '규칙적인 분위기', '리더 중심', '합의 중심', '새로운 주제', '안정적인 주제', '애자일 방식', '워터폴 방식'
   ]
 
   // UI 텍스트를 백엔드 enum으로 매핑
   const projectPreferenceToEnumMapping: Record<string, ProjectGoalEnum> = {
     '취업우선': 'JOB',
-    '수상목표': 'AWARD', 
-    '개발경험우선': 'PROFESSIONAL',
+    '수상목표': 'AWARD',
     '포트폴리오중심': 'PORTFOLIO',
     '학습중심': 'STUDY',
-    '혁신추구': 'IDEA',
+    '아이디어실현': 'IDEA',
     '실무경험': 'PROFESSIONAL',
-    '창업지향': 'IDEA',
-    '오픈소스': 'STUDY',
-    '사회공헌': 'IDEA',
     '빠른개발': 'QUICK',
-    '완성도추구': 'QUALITY'
+    '완성도추구': 'QUALITY',
   }
 
   const atmosphereToEnumMapping: Record<string, ProjectViveEnum> = {
     '반말 지향': 'CASUAL',
     '존대 지향': 'FORMAL',
     '편한 분위기': 'COMFY',
-    '체계적 분위기': 'RULE',
-    '자유로운': 'DEMOCRACY',
-    '규칙적인': 'RULE',
-    '소통 활발': 'DEMOCRACY',
-    '집중 중시': 'LEADER',
-    '유연한 시간': 'AGILE',
-    '정해진 시간': 'WATERFALL',
-    '온라인 중심': 'AGILE',
-    '오프라인 중심': 'DEMOCRACY'
+    '규칙적인 분위기': 'RULE',
+    '리더 중심': 'LEADER',
+    '합의 중심': 'DEMOCRACY',
+    '새로운 주제': 'BRANDNEW',
+    '안정적인 주제': 'STABLE',
+    '애자일 방식': 'AGILE',
+    '워터폴 방식': 'WATERFALL',
   }
 
   // 태그 추가/제거 함수
