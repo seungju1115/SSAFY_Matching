@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Match SSAFY** - A full-stack team matching platform specifically designed for SSAFY (Samsung Software Academy For Youth) trainees. This monorepo application helps developers find teammates based on skills, positions, project preferences, and SSAFY-specific information (major/non-major tracks, class numbers, etc.).
+**Match SSAFY** - A full-stack team matching platform specifically designed for SSAFY (Samsung Software Academy For Youth) trainees. This monorepo consists of three main services: Spring Boot backend, React frontend, and FastAPI recommendation system.
 
 ### SSAFY-Specific Context
 - Users are categorized by major/non-major tracks (전공자/비전공자)
@@ -19,7 +19,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Comprehensive user profiling with enum-based categorization
 - Dashboard analytics for team and user metrics
 - Multi-environment setup: H2 (local), PostgreSQL (production)
-- Swagger/OpenAPI 3 documentation
+- Swagger/OpenAPI 3 documentation at `/swagger-ui.html`
 - Docker containerization
 
 **Frontend (React 19 + TypeScript + Vite)**:
@@ -31,6 +31,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Axios with interceptors for API communication
 - Multi-step profile setup with progress tracking
 - Mock data integration for development
+
+**RecSys (FastAPI + Python)**:
+- AI-powered team-person recommendation system
+- Machine learning algorithms for skill and preference matching
+- RESTful API for integration with Spring Boot backend
+- Scikit-learn, Pandas, NumPy for data processing and ML models
 
 ## Architecture
 
@@ -77,6 +83,16 @@ Feature-based organization with modern React patterns:
 - `services/`: Business logic and external service integrations
 - `utils/`: Helper functions, constants, validation schemas
 
+### RecSys Architecture (RecSys/)
+FastAPI-based recommendation service with machine learning:
+
+- **`main.py`**: FastAPI application entry point with CORS and logging setup
+- **`app/api/routes.py`**: REST API endpoints for recommendation services
+- **`app/core/config.py`**: Configuration management, CORS setup, logging
+- **`app/schemas/models.py`**: Pydantic models for request/response validation
+- **`app/services/recommender.py`**: Machine learning algorithms and recommendation logic
+- **`requirements.txt`**: Python dependencies (FastAPI, scikit-learn, pandas, numpy)
+
 ## Development Commands
 
 ### Backend Development
@@ -121,10 +137,27 @@ npm run lint
 npm run preview
 ```
 
+### RecSys Development (AI/ML Service)
+```bash
+# Navigate to RecSys directory
+cd RecSys
+
+# Install Python dependencies
+pip install -r requirements.txt
+
+# Run FastAPI development server
+python main.py
+# or
+uvicorn main:app --reload
+```
+
 ### Full-Stack Development
 ```bash
 # Run both services with Docker (backend: :8081, frontend: :8080)
 docker-compose up --build
+
+# Production deployment with optimized images
+docker-compose -f docker-compose.release.yml up --build
 
 # Development mode with hot reload
 cd front_end && docker-compose -f docker-compose.dev.yml up
@@ -170,6 +203,13 @@ OAuth2 flow: Frontend redirects to `/users/login/google` → Google OAuth → JW
 - React Hook Form 7.61 + Zod 4.0 for forms
 - Axios 1.11 for API calls
 - React Router 7.7 for routing
+
+**RecSys (AI/ML)**:
+- FastAPI 0.116.1 for REST API framework
+- Pydantic 2.11.7 for data validation and serialization
+- Scikit-learn 1.7.1 for machine learning algorithms
+- Pandas 2.3.1 + NumPy 2.3.2 for data processing
+- Uvicorn 0.35.0 ASGI server for production deployment
 
 ## Core Features & Workflows
 
