@@ -1,8 +1,13 @@
 package com.example.demo.team.dto;
 
+import com.example.demo.user.Enum.ProjectGoalEnum;
+import com.example.demo.user.Enum.ProjectViveEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.Set;
 
 @Getter
 @Setter
@@ -19,6 +24,7 @@ public class TeamRequest {
             minLength = 2,
             maxLength = 20
     )
+    @NotBlank(message = "팀 이름은 필수입니다.")
     private String teamName;
 
     @Schema(
@@ -26,5 +32,55 @@ public class TeamRequest {
             example = "5",
             required = true
     )
+    @NotNull(message = "팀장 ID는 필수입니다.")
     private Long leaderId;
+
+    @Schema(
+            description = "팀 도메인",
+            example = "domainTest11",
+            required = true
+    )
+    @NotNull(message = "도메인은 필수입니다.")
+    @Size(min=10)
+    private String teamDomain;
+
+    @Schema(
+            description = "팀 분위기/성향 (Enum Set)",
+            example = "[\"ENTHUSIASTIC\", \"CHALLENGING\"]"
+    )
+    private Set<ProjectViveEnum> teamVive;
+
+    @Schema(
+            description = "팀 목표/선호사항 (Enum Set)",
+            example = "[\"PORTFOLIO\", \"COMMERCIALIZATION\"]",
+            requiredMode = Schema.RequiredMode.REQUIRED
+    )
+    private Set<ProjectGoalEnum> teamPreference;
+
+    @Schema(description = "백엔드 개발자 인원", example = "2")
+    @Min(value = 0, message = "인원수는 0 이상이어야 합니다.")
+    private int backendCount;
+
+    @Schema(description = "프론트엔드 개발자 인원", example = "2")
+    @Min(value = 0, message = "인원수는 0 이상이어야 합니다.")
+    private int frontendCount;
+
+    @Schema(description = "AI 개발자 인원", example = "1")
+    @Min(value = 0, message = "인원수는 0 이상이어야 합니다.")
+    private int aiCount;
+
+    @Schema(description = "기획자(PM) 인원", example = "1")
+    @Min(value = 0, message = "인원수는 0 이상이어야 합니다.")
+    private int pmCount;
+
+    @Schema(description = "디자이너 인원", example = "0")
+    @Min(value = 0, message = "인원수는 0 이상이어야 합니다.")
+    private int designCount;
+
+    @Schema(
+            description = "팀 상세 설명",
+            example = "저희는 사이드 프로젝트를 통해 함께 성장하고 싶은 주니어 개발자 그룹입니다."
+    )
+    @Size(max = 300, message = "팀 설명은 최대 300자까지 입력 가능합니다.")
+    private String teamDescription;
 }
