@@ -7,22 +7,12 @@ import {
   Trash2, 
   Plus, 
   Award, 
-  Calendar, 
   AlertCircle 
 } from 'lucide-react'
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 
 interface Certification {
   id: string
   name: string
-  issuer: string
-  date: string // YYYY-MM 형식
 }
 
 interface CertificationInputProps {
@@ -37,24 +27,15 @@ export default function CertificationInput({
   maxCertifications = 3 
 }: CertificationInputProps) {
   const [name, setName] = useState('')
-  const [issuer, setIssuer] = useState('')
-  const [date, setDate] = useState('')
-
-  // 현재 년도와 월 계산
-  const currentYear = new Date().getFullYear()
-  const years = Array.from({ length: 30 }, (_, i) => currentYear - i)
-  const months = Array.from({ length: 12 }, (_, i) => i + 1)
 
   // 자격증 추가
   const addCertification = () => {
-    if (!name.trim() || !issuer.trim() || !date) return
+    if (!name.trim()) return
     if (certifications.length >= maxCertifications) return
 
     const newCertification: Certification = {
       id: Date.now().toString(),
       name: name.trim(),
-      issuer: issuer.trim(),
-      date
     }
 
     onChange([...certifications, newCertification])
@@ -69,15 +50,13 @@ export default function CertificationInput({
   // 폼 초기화
   const resetForm = () => {
     setName('')
-    setIssuer('')
-    setDate('')
   }
 
   // 자격증 추가 가능 여부
   const canAddMore = certifications.length < maxCertifications
   
   // 폼 유효성 검사
-  const isFormValid = name.trim() && issuer.trim() && date
+  const isFormValid = name.trim()
 
   return (
     <div className="space-y-6">
@@ -91,13 +70,6 @@ export default function CertificationInput({
                   <div className="flex items-center gap-2">
                     <Award className="h-5 w-5 text-orange-500" />
                     <h3 className="font-medium">{cert.name}</h3>
-                  </div>
-                  <div className="text-sm text-gray-600 space-y-1">
-                    <p>발급기관: {cert.issuer}</p>
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-4 w-4" />
-                      <span>취득일: {cert.date}</span>
-                    </div>
                   </div>
                 </div>
                 <Button
@@ -131,75 +103,15 @@ export default function CertificationInput({
           </h3>
           
           <div className="space-y-3">
-            <div>
-              <label htmlFor="cert-name" className="block text-sm font-medium text-gray-700 mb-1">
-                자격증명
-              </label>
-              <Input
-                id="cert-name"
-                placeholder="자격증명을 입력하세요"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="cert-issuer" className="block text-sm font-medium text-gray-700 mb-1">
-                발급기관
-              </label>
-              <Input
-                id="cert-issuer"
-                placeholder="발급기관을 입력하세요"
-                value={issuer}
-                onChange={(e) => setIssuer(e.target.value)}
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="cert-date" className="block text-sm font-medium text-gray-700 mb-1">
-                취득일
-              </label>
-              <div className="flex gap-2">
-                <Select
-                  value={date.split('-')[0] || ''}
-                  onValueChange={(year) => {
-                    const month = date.split('-')[1] || ''
-                    setDate(month ? `${year}-${month}` : year)
-                  }}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="연도" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {years.map((year) => (
-                      <SelectItem key={year} value={year.toString()}>
-                        {year}년
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                
-                <Select
-                  value={date.split('-')[1] || ''}
-                  onValueChange={(month) => {
-                    const year = date.split('-')[0] || ''
-                    setDate(year ? `${year}-${month.padStart(2, '0')}` : '')
-                  }}
-                  disabled={!date.split('-')[0]}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="월" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {months.map((month) => (
-                      <SelectItem key={month} value={month.toString().padStart(2, '0')}>
-                        {month}월
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+            <Card>
+              <CardContent className="p-4 space-y-4">
+                <Input 
+                  placeholder="자격증명 (예: 정보처리기사)"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </CardContent>
+            </Card>
           </div>
           
           <div className="pt-2">
