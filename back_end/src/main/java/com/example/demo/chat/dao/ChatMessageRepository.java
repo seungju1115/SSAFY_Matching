@@ -9,6 +9,9 @@ import java.util.List;
 @Repository
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
 
+    // ✅ 특정 채팅방의 메시지 조회
+    List<ChatMessage> findByChatRoomId(Long chatRoomId);
+
     // ✅ 특정 채팅방의 메시지를 생성일 순으로 조회 (추가 예시)
     List<ChatMessage> findByChatRoomIdOrderByCreatedAtAsc(Long chatRoomId);
 }
