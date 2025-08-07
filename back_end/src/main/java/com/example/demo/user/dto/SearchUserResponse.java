@@ -35,7 +35,7 @@ public class SearchUserResponse {
     private Integer lastClass;
 
     @Schema(description = "희망 포지션", example = "FRONTEND")
-    private PositionEnum wantedPosition;
+    private List<PositionEnum> wantedPosition;
 
     @Schema(description = "보유 기술 스택")
     private Set<TechEnum> techStack;

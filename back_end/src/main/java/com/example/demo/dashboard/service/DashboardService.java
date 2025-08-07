@@ -3,7 +3,9 @@ package com.example.demo.dashboard.service;
 import com.example.demo.dashboard.dto.DashboardResponseDto;
 import com.example.demo.dashboard.dto.UserCountDto;
 import com.example.demo.team.dao.TeamRepository;
+import com.example.demo.user.Enum.PositionEnum;
 import com.example.demo.user.dao.UserRepository;
+import com.example.demo.user.entity.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
@@ -12,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,12 +26,17 @@ public class DashboardService {
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
 
+
     @Cacheable(value = "shortTermCache")
     public DashboardResponseDto getDashboard() {
 
         DashboardResponseDto dashboardResponseDto = new DashboardResponseDto();
 
-        List<UserCountDto> users=userRepository.CountUsers();
+        List<UserCountDto> users=new ArrayList<>();
+        List<User> list= userRepository.CountUsers();
+        for(User user:list){
+            users.add(UserCountDto.from(user));
+        }
         int whole= users.size();
         int matched_major=0; int matched_unmajor=0; int unmatched_major=0; int unmatched_unmajor=0;
 
@@ -49,27 +57,29 @@ public class DashboardService {
 
         for (UserCountDto user : users) {
             boolean hasTeam = user.getTeam() != null;
-            switch (user.getPosition()) {
-                case BACKEND:
-                    if (hasTeam) matched_back++;
-                    else unmatched_back++;
-                    break;
-                case FRONTEND:
-                    if (hasTeam) matched_front++;
-                    else unmatched_front++;
-                    break;
-                case AI:
-                    if (hasTeam) matched_ai++;
-                    else unmatched_ai++;
-                    break;
-                case DESIGN:
-                    if (hasTeam) matched_design++;
-                    else unmatched_design++;
-                    break;
-                case PM:
-                    if (hasTeam) matched_pm++;
-                    else unmatched_pm++;
-                    break;
+            for(PositionEnum position : user.getPosition()) {
+                switch (position) {
+                    case BACKEND:
+                        if (hasTeam) matched_back++;
+                        else unmatched_back++;
+                        break;
+                    case FRONTEND:
+                        if (hasTeam) matched_front++;
+                        else unmatched_front++;
+                        break;
+                    case AI:
+                        if (hasTeam) matched_ai++;
+                        else unmatched_ai++;
+                        break;
+                    case DESIGN:
+                        if (hasTeam) matched_design++;
+                        else unmatched_design++;
+                        break;
+                    case PM:
+                        if (hasTeam) matched_pm++;
+                        else unmatched_pm++;
+                        break;
+                }
             }
         }
 
@@ -104,7 +114,11 @@ public class DashboardService {
 
         DashboardResponseDto dashboardResponseDto = new DashboardResponseDto();
 
-        List<UserCountDto> users=userRepository.CountUsers();
+        List<UserCountDto> users=new ArrayList<>();
+        List<User> list= userRepository.CountUsers();
+        for(User user:list){
+            users.add(UserCountDto.from(user));
+        }
         int whole= users.size();
         int matched_major=0; int matched_unmajor=0; int unmatched_major=0; int unmatched_unmajor=0;
 
@@ -125,27 +139,29 @@ public class DashboardService {
 
         for (UserCountDto user : users) {
             boolean hasTeam = user.getTeam() != null;
-            switch (user.getPosition()) {
-                case BACKEND:
-                    if (hasTeam) matched_back++;
-                    else unmatched_back++;
-                    break;
-                case FRONTEND:
-                    if (hasTeam) matched_front++;
-                    else unmatched_front++;
-                    break;
-                case AI:
-                    if (hasTeam) matched_ai++;
-                    else unmatched_ai++;
-                    break;
-                case DESIGN:
-                    if (hasTeam) matched_design++;
-                    else unmatched_design++;
-                    break;
-                case PM:
-                    if (hasTeam) matched_pm++;
-                    else unmatched_pm++;
-                    break;
+            for(PositionEnum position : user.getPosition()) {
+                switch (position) {
+                    case BACKEND:
+                        if (hasTeam) matched_back++;
+                        else unmatched_back++;
+                        break;
+                    case FRONTEND:
+                        if (hasTeam) matched_front++;
+                        else unmatched_front++;
+                        break;
+                    case AI:
+                        if (hasTeam) matched_ai++;
+                        else unmatched_ai++;
+                        break;
+                    case DESIGN:
+                        if (hasTeam) matched_design++;
+                        else unmatched_design++;
+                        break;
+                    case PM:
+                        if (hasTeam) matched_pm++;
+                        else unmatched_pm++;
+                        break;
+                }
             }
         }
 

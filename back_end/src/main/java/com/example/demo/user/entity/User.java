@@ -68,9 +68,10 @@ public class User {
     @Size(max = 550)
     private String userProfile;
 
+    @ElementCollection(targetClass = PositionEnum.class, fetch = FetchType.LAZY)
     @Enumerated(EnumType.STRING)
     @Column(name = "wanted_position")
-    private PositionEnum wantedPosition;
+    private List<PositionEnum> wantedPosition;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<ChatRoomMember> chatRoomMembers = new ArrayList<>();
