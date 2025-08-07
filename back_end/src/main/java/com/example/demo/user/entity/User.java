@@ -21,7 +21,7 @@ import java.util.Set;
 @Table(name = "USERS"
         , indexes= {
         @Index(name = "user_major_idx", columnList = "major"),
-        @Index(name = "user_position_idx", columnList = "wanted_position"),
+//        @Index(name = "user_position_idx", columnList = "wanted_position"),
         @Index(name = "user_team_idx", columnList = "team_id")
         }
         )
