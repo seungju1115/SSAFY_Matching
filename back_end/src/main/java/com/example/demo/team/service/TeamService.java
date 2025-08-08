@@ -188,29 +188,52 @@ public class TeamService {
     public TeamDetailResponse teamToResponse(Team team) {
         TeamDetailResponse response = new TeamDetailResponse();
 
-        response.setTeamId(team.getId());
-        response.setChatRoomId(team.getChatRoom().getId());
-        response.setTeamName(team.getTeamName());
-        response.setTeamDomain(team.getTeamDomain());
-        response.setTeamVive(team.getTeamVive());
-        response.setTeamPreference(team.getTeamPreference());
-        response.setBackendCount(team.getBackendCount());
-        response.setFrontendCount(team.getFrontendCount());
-        response.setAiCount(team.getAiCount());
-        response.setPmCount(team.getPmCount());
-        response.setDesignCount(team.getDesignCount());
-        response.setTeamDescription(team.getTeamDescription());
+        response.setTeamId(team != null ? team.getId() : null);
 
-        // UserProfileResponse 대신 UserDetailResponse 사용
-        response.setLeader(UserDetailResponse.fromEntity(team.getLeader()));
+        if (team != null && team.getChatRoom() != null) {
+            response.setChatRoomId(team.getChatRoom().getId());
+        } else {
+            response.setChatRoomId(null);
+        }
+
+        response.setTeamName(team != null ? team.getTeamName() : null);
+        response.setTeamDomain(team != null ? team.getTeamDomain() : null);
+
+        if (team != null && team.getTeamVive() != null) {
+            response.setTeamVive(team.getTeamVive());
+        } else {
+            response.setTeamVive(null);
+        }
+
+        if (team != null && team.getTeamPreference() != null) {
+            response.setTeamPreference(team.getTeamPreference());
+        } else {
+            response.setTeamPreference(null);
+        }
+
+        response.setBackendCount(team != null ? team.getBackendCount() : 0);
+        response.setFrontendCount(team != null ? team.getFrontendCount() : 0);
+        response.setAiCount(team != null ? team.getAiCount() : 0);
+        response.setPmCount(team != null ? team.getPmCount() : 0);
+        response.setDesignCount(team != null ? team.getDesignCount() : 0);
+
+        response.setTeamDescription(team != null ? team.getTeamDescription() : null);
+
+        if (team != null && team.getLeader() != null) {
+            response.setLeader(UserDetailResponse.fromEntity(team.getLeader()));
+        } else {
+            response.setLeader(null);
+        }
 
         List<UserDetailResponse> members = new ArrayList<>();
-        for(User user : team.getMembers()){
-            members.add(UserDetailResponse.fromEntity(user));
+        if (team != null && team.getMembers() != null) {
+            for (User user : team.getMembers()) {
+                if (user != null) {
+                    members.add(UserDetailResponse.fromEntity(user));
+                }
+            }
         }
-        // TeamDetailResponse 의 members 타입도 List<UserDetailResponse> 로 바뀌어야 합니다.
-        // 만약 아직 List<UserProfileResponse>면 타입 수정 필요합니다.
-        response.setMembers((List)members);
+        response.setMembers(members);
 
         return response;
     }

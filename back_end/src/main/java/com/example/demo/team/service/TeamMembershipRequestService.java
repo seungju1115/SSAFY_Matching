@@ -39,14 +39,14 @@ public class TeamMembershipRequestService {
         Team team = teamRepository.findById(teamOffer.getTeamId()).orElseThrow(() -> new BusinessException(ErrorCode.TEAM_NOT_FOUND));
         User user = userRepository.findById(teamOffer.getUserId()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        String key = team.getId() + "+" + user.getId();
-        FencedLock lock = hazelcastInstance.getCPSubsystem().getLock(key);
-
-        if (!lock.tryLock()) {
-            throw new LockAcquireLimitReachedException("요청이 처리 중입니다. 잠시 후 다시 시도해주세요.");
-        }
-
-        try {
+//        String key = team.getId() + "+" + user.getId();
+//        FencedLock lock = hazelcastInstance.getCPSubsystem().getLock(key);
+//
+//        if (!lock.tryLock()) {
+//            throw new LockAcquireLimitReachedException("요청이 처리 중입니다. 잠시 후 다시 시도해주세요.");
+//        }
+//
+//        try {
             boolean exists = team.getMembershipRequests().stream()
                     .anyMatch(req -> req.getUser().equals(user) && req.getStatus() != RequestStatus.REJECTED);
 
@@ -55,10 +55,10 @@ public class TeamMembershipRequestService {
             }
 
             saveTeamOffer(teamOffer, team, user);
-
-        } finally {
-            lock.unlock();
-        }
+//
+//        } finally {
+//            lock.unlock();
+//        }
 
         messagingTemplate.convertAndSend("/queue/team/offer/" + teamOffer.getUserId(), teamOffer.getMessage());
     }
@@ -67,14 +67,14 @@ public class TeamMembershipRequestService {
         Team team = teamRepository.findById(teamOffer.getTeamId()).orElseThrow(()-> new BusinessException(ErrorCode.TEAM_NOT_FOUND));
         User user = userRepository.findById(teamOffer.getUserId()).orElseThrow(()-> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        String key=team.getId() + "+" + user.getId();
-        FencedLock lock=hazelcastInstance.getCPSubsystem().getLock(key);
-
-        if (!lock.tryLock()) {
-            throw new LockAcquireLimitReachedException("요청이 처리 중입니다. 잠시 후 다시 시도해주세요.");
-        }
-
-        try {
+//        String key=team.getId() + "+" + user.getId();
+//        FencedLock lock=hazelcastInstance.getCPSubsystem().getLock(key);
+//
+//        if (!lock.tryLock()) {
+//            throw new LockAcquireLimitReachedException("요청이 처리 중입니다. 잠시 후 다시 시도해주세요.");
+//        }
+//
+//        try {
             boolean exists = team.getMembershipRequests().stream()
                     .anyMatch(req -> req.getTeam().equals(team) && req.getStatus() != RequestStatus.REJECTED);
 
@@ -83,10 +83,10 @@ public class TeamMembershipRequestService {
             }
 
             saveTeamOffer(teamOffer, team, user);
-
-        } finally {
-            lock.unlock();
-        }
+//
+//        } finally {
+//            lock.unlock();
+//        }
 
         for (User member : team.getMembers()) {
             messagingTemplate.convertAndSend("/queue/team/offer/" + member.getId(), teamOffer.getMessage());
