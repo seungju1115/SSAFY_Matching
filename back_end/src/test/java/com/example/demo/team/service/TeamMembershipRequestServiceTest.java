@@ -4,6 +4,7 @@ import com.example.demo.common.exception.BusinessException;
 import com.example.demo.common.exception.ErrorCode;
 import com.example.demo.team.dao.TeamMembershipRequestRepository;
 import com.example.demo.team.dao.TeamRepository;
+import com.example.demo.team.dto.TeamMembershipResponse;
 import com.example.demo.team.dto.TeamOffer;
 import com.example.demo.team.entity.RequestStatus;
 import com.example.demo.team.entity.RequestType;
@@ -117,14 +118,14 @@ class TeamMembershipRequestServiceTest {
     @Test
     @DisplayName("팀 -> 멤버 요청 성공")
     void requestTeamToMember_success() {
-        // 1. hazelcastInstance.getCPSubsystem()이 호출되면, 우리가 만든 cpSubsystem Mock을 반환하도록 설정
-        when(hazelcastInstance.getCPSubsystem()).thenReturn(cpSubsystem);
-
-        // 2. cpSubsystem.getLock(...)이 호출되면, 우리가 만든 fencedLock Mock을 반환하도록 설정
-        when(cpSubsystem.getLock(anyString())).thenReturn(fencedLock);
-
-        // 3. fencedLock.tryLock(...)이 호출되면, true를 반환하여 락 획득에 성공한 것처럼 설정
-        when(fencedLock.tryLock()).thenReturn(true);
+//        // 1. hazelcastInstance.getCPSubsystem()이 호출되면, 우리가 만든 cpSubsystem Mock을 반환하도록 설정
+//        when(hazelcastInstance.getCPSubsystem()).thenReturn(cpSubsystem);
+//
+//        // 2. cpSubsystem.getLock(...)이 호출되면, 우리가 만든 fencedLock Mock을 반환하도록 설정
+//        when(cpSubsystem.getLock(anyString())).thenReturn(fencedLock);
+//
+//        // 3. fencedLock.tryLock(...)이 호출되면, true를 반환하여 락 획득에 성공한 것처럼 설정
+//        when(fencedLock.tryLock()).thenReturn(true);
 
         // given
         when(teamRepository.findById(teamOffer.getTeamId())).thenReturn(Optional.of(team));
@@ -165,14 +166,14 @@ class TeamMembershipRequestServiceTest {
     void requestTeamToMember_duplicateRequest() {
         team.setMembershipRequests(List.of(existingRequest));
 
-        // 1. hazelcastInstance.getCPSubsystem()이 호출되면, 우리가 만든 cpSubsystem Mock을 반환하도록 설정
-        when(hazelcastInstance.getCPSubsystem()).thenReturn(cpSubsystem);
-
-        // 2. cpSubsystem.getLock(...)이 호출되면, 우리가 만든 fencedLock Mock을 반환하도록 설정
-        when(cpSubsystem.getLock(anyString())).thenReturn(fencedLock);
-
-        // 3. fencedLock.tryLock(...)이 호출되면, true를 반환하여 락 획득에 성공한 것처럼 설정
-        when(fencedLock.tryLock()).thenReturn(true);
+//        // 1. hazelcastInstance.getCPSubsystem()이 호출되면, 우리가 만든 cpSubsystem Mock을 반환하도록 설정
+//        when(hazelcastInstance.getCPSubsystem()).thenReturn(cpSubsystem);
+//
+//        // 2. cpSubsystem.getLock(...)이 호출되면, 우리가 만든 fencedLock Mock을 반환하도록 설정
+//        when(cpSubsystem.getLock(anyString())).thenReturn(fencedLock);
+//
+//        // 3. fencedLock.tryLock(...)이 호출되면, true를 반환하여 락 획득에 성공한 것처럼 설정
+//        when(fencedLock.tryLock()).thenReturn(true);
 
         when(teamRepository.findById(teamOffer.getTeamId())).thenReturn(Optional.of(team));
         when(userRepository.findById(teamOffer.getUserId())).thenReturn(Optional.of(user));
@@ -188,14 +189,14 @@ class TeamMembershipRequestServiceTest {
         teamOffer.setRequestType(RequestType.JOIN_REQUEST);
 
         user.setMembershipRequests(new ArrayList<>());
-        // 1. hazelcastInstance.getCPSubsystem()이 호출되면, 우리가 만든 cpSubsystem Mock을 반환하도록 설정
-        when(hazelcastInstance.getCPSubsystem()).thenReturn(cpSubsystem);
-
-        // 2. cpSubsystem.getLock(...)이 호출되면, 우리가 만든 fencedLock Mock을 반환하도록 설정
-        when(cpSubsystem.getLock(anyString())).thenReturn(fencedLock);
-
-        // 3. fencedLock.tryLock(...)이 호출되면, true를 반환하여 락 획득에 성공한 것처럼 설정
-        when(fencedLock.tryLock()).thenReturn(true);
+//        // 1. hazelcastInstance.getCPSubsystem()이 호출되면, 우리가 만든 cpSubsystem Mock을 반환하도록 설정
+//        when(hazelcastInstance.getCPSubsystem()).thenReturn(cpSubsystem);
+//
+//        // 2. cpSubsystem.getLock(...)이 호출되면, 우리가 만든 fencedLock Mock을 반환하도록 설정
+//        when(cpSubsystem.getLock(anyString())).thenReturn(fencedLock);
+//
+//        // 3. fencedLock.tryLock(...)이 호출되면, true를 반환하여 락 획득에 성공한 것처럼 설정
+//        when(fencedLock.tryLock()).thenReturn(true);
 
         when(teamRepository.findById(teamOffer.getTeamId())).thenReturn(Optional.of(team));
         when(userRepository.findById(teamOffer.getUserId())).thenReturn(Optional.of(user));
@@ -234,14 +235,14 @@ class TeamMembershipRequestServiceTest {
     void requestMemberToTeam_duplicateRequest() {
         team.setMembershipRequests(List.of(existingRequest));
 
-        // 1. hazelcastInstance.getCPSubsystem()이 호출되면, 우리가 만든 cpSubsystem Mock을 반환하도록 설정
-        when(hazelcastInstance.getCPSubsystem()).thenReturn(cpSubsystem);
-
-        // 2. cpSubsystem.getLock(...)이 호출되면, 우리가 만든 fencedLock Mock을 반환하도록 설정
-        when(cpSubsystem.getLock(anyString())).thenReturn(fencedLock);
-
-        // 3. fencedLock.tryLock(...)이 호출되면, true를 반환하여 락 획득에 성공한 것처럼 설정
-        when(fencedLock.tryLock()).thenReturn(true);
+//        // 1. hazelcastInstance.getCPSubsystem()이 호출되면, 우리가 만든 cpSubsystem Mock을 반환하도록 설정
+//        when(hazelcastInstance.getCPSubsystem()).thenReturn(cpSubsystem);
+//
+//        // 2. cpSubsystem.getLock(...)이 호출되면, 우리가 만든 fencedLock Mock을 반환하도록 설정
+//        when(cpSubsystem.getLock(anyString())).thenReturn(fencedLock);
+//
+//        // 3. fencedLock.tryLock(...)이 호출되면, true를 반환하여 락 획득에 성공한 것처럼 설정
+//        when(fencedLock.tryLock()).thenReturn(true);
 
         when(teamRepository.findById(teamOffer.getTeamId())).thenReturn(Optional.of(team));
         when(userRepository.findById(teamOffer.getUserId())).thenReturn(Optional.of(user));
@@ -272,4 +273,5 @@ class TeamMembershipRequestServiceTest {
         assertThat(capturedRequest.getStatus()).isEqualTo(RequestStatus.PENDING);
         assertThat(capturedRequest.getMessage()).isEqualTo(teamOffer.getMessage());
     }
+
 }

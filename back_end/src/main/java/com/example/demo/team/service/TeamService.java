@@ -2,9 +2,10 @@ package com.example.demo.team.service;
 
 import com.example.demo.common.exception.BusinessException;
 import com.example.demo.common.exception.ErrorCode;
+import com.example.demo.team.dao.TeamMembershipRequestRepository;
+import com.example.demo.team.entity.TeamMembershipRequest;
 import com.example.demo.user.dao.UserRepository;
 import com.example.demo.user.dto.UserDetailResponse;
-import com.example.demo.user.dto.UserProfileResponse;
 import com.example.demo.user.entity.User;
 import com.example.demo.chat.dto.ChatRoomRequest;
 import com.example.demo.chat.entity.RoomType;
@@ -12,7 +13,6 @@ import com.example.demo.chat.service.ChatRoomService;
 import com.example.demo.team.dao.TeamRepository;
 import com.example.demo.team.dto.*;
 import com.example.demo.team.entity.Team;
-import com.example.demo.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -32,7 +32,6 @@ public class TeamService {
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
     private final ChatRoomService chatRoomService;
-    private final UserService userService;
     // 1. 팀 생성
     @Transactional
     public TeamDetailResponse createTeam(TeamRequest dto) { // 팀장만 생성 가능
@@ -158,18 +157,6 @@ public class TeamService {
 
         return teamToResponse(team);
     }
-
-    // n. 팀 멤버 조회
-//    public List<TeamMemberResponse> getTeamMembers(Long teamId) {
-//        Team team = teamRepository.findById(teamId)
-//                .orElseThrow(() -> new BusinessException(ErrorCode.TEAM_NOT_FOUND));
-//
-//        List<User> members = team.getMembers();
-//
-//        return members.stream()
-//                .map(user -> new TeamMemberResponse(user.getId(), user.getUserName()))
-//                .collect(Collectors.toList());
-//    }
 
     public Team toTeam(TeamRequest teamRequest,Team team) {
         team.setTeamName(teamRequest.getTeamName());

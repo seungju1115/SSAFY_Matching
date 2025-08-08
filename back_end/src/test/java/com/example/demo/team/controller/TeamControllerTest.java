@@ -5,6 +5,7 @@ import com.example.demo.auth.util.JwtUtil;
 import com.example.demo.common.exception.ErrorCode;
 import com.example.demo.common.response.ApiResponse;
 import com.example.demo.team.dto.*;
+import com.example.demo.team.entity.RequestStatus;
 import com.example.demo.team.entity.RequestType;
 import com.example.demo.team.service.TeamMembershipRequestService;
 import com.example.demo.team.service.TeamService;
@@ -367,26 +368,37 @@ class TeamControllerTest {
                 .andExpect(jsonPath("$.message").exists());
     }
 
-//    @Test
-//    @DisplayName("특정 팀의 팀원 조회 성공")
-//    void getTeamMembers_shouldReturnTeamMemberList() throws Exception {
-//        Long teamId = 1L;
-//
-//        List<tea> members = List.of(
-//                new TeamMemberResponse(1L, "홍길동"),
-//                new TeamMemberResponse(2L, "김철수")
-//        );
-//
-//        when(teamService.getTeamMembers(teamId)).thenReturn(members);
-//
-//        mockMvc.perform(get("/team/{teamId}/members", teamId)
-//                        .contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.data[0].memberId").value(1))
-//                .andExpect(jsonPath("$.data[0].userName").value("홍길동"))
-//                .andExpect(jsonPath("$.data[1].memberId").value(2))
-//                .andExpect(jsonPath("$.data[1].userName").value("김철수"));
-//    }
+    @Test
+    @DisplayName("팀 멤버 초대 요청 목록 조회 성공 - 단위 테스트")
+    void getAllRequest_shouldReturn200AndList() throws Exception {
+        // given
+        Long teamId = 1L;
 
+        // TeamMembershipResponse DTO 리스트를 만들어서 반환하도록 설정
+        List<TeamMembershipResponse> mockResponseList = List.of(
+                TeamMembershipResponse.builder()
+                        .userId(1L)
+                        .userName("홍길동")
+                        .requestType(RequestType.INVITE)
+                        .status(RequestStatus.PENDING)
+                        .message("초대 메시지")
+                        .build()
+        );
+
+        // service가 teamId로 호출되면 위 리스트 반환하도록 mock 설정
+        when(teamMembershipRequestService.getAllRequest(teamId)).thenReturn(mockResponseList);
+
+        // when & then
+        mockMvc.perform(get("/team/{teamId}/request", teamId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(ApiResponse.ok().getStatus()))
+                .andExpect(jsonPath("$.data").isArray())
+                .andExpect(jsonPath("$.data[0].userId").value(1L))
+                .andExpect(jsonPath("$.data[0].userName").value("홍길동"))
+                .andExpect(jsonPath("$.data[0].requestType").value(RequestType.INVITE.toString()))
+                .andExpect(jsonPath("$.data[0].status").value(RequestStatus.PENDING.toString()))
+                .andExpect(jsonPath("$.data[0].message").value("초대 메시지"));
+    }
 }
 

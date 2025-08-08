@@ -21,7 +21,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -104,5 +106,14 @@ public class TeamMembershipRequestService {
         request.setMessage(teamOffer.getMessage()); // 메시지가 있다면
 
         teamMembershipRequestRepository.save(request);
+    }
+
+    public List<TeamMembershipResponse> getAllRequest(Long teamId) {
+
+        List<TeamMembershipRequest> requests = teamMembershipRequestRepository.findAllByTeamId(teamId);
+
+        return requests.stream()
+                .map(TeamMembershipResponse::fromEntity)
+                .collect(Collectors.toList());
     }
 }

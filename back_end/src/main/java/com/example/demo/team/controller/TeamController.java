@@ -3,6 +3,7 @@ package com.example.demo.team.controller;
 import com.example.demo.common.response.ApiResponse;
 import com.example.demo.team.dto.*;
 import com.example.demo.team.entity.RequestType;
+import com.example.demo.team.entity.TeamMembershipRequest;
 import com.example.demo.team.service.TeamMembershipRequestService;
 import com.example.demo.team.service.TeamService;
 import jakarta.validation.Valid;
@@ -77,9 +78,9 @@ public class TeamController {
         return ResponseEntity.ok(ApiResponse.created(null));
     }
 
-    // n. 특정 팀의 팀원 조회
-//    @GetMapping("/{teamId}/members")
-//    public ResponseEntity<ApiResponse<List<TeamMemberResponse>>> getTeamMembers(@PathVariable Long teamId) {
-//        return ResponseEntity.ok(ApiResponse.ok(teamService.getTeamMembers(teamId)));
-//    }
+    @GetMapping("/{teamId}/request")
+    public ResponseEntity<ApiResponse<List<TeamMembershipResponse>>> getAllRequest(@PathVariable Long teamId) {
+        return ResponseEntity.ok(ApiResponse.ok(teamMembershipRequestService.getAllRequest(teamId)));
+    }
+
 }

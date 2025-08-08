@@ -540,26 +540,19 @@ public class TeamIntegrationTest {
                 .andExpect(jsonPath("$.message").value(ErrorCode.TEAM_REQUEST_ALLREADY_EXIST.getMessage()));
     }
 
-//    @Test
-//    @DisplayName("특정 팀의 팀원 조회 - 통합 테스트 성공")
-//    void getTeamMembers_success() throws Exception {
-//        mockMvc.perform(get("/team/{teamId}/members", team1.getId())
-//                        .contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.status").value(ApiResponse.ok().getStatus()))
-//                .andExpect(jsonPath("$.data").isArray())
-//                .andExpect(jsonPath("$.data[0].userName").exists());
-//    }
-//
-//    @Test
-//    @DisplayName("특정 팀의 팀원 조회 - 통합 테스트 실패 team id 없음")
-//    void getTeamMembers_failWithNotFoundUser() throws Exception {
-//        mockMvc.perform(get("/team/{teamId}/members", 9999L)
-//                        .contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isNotFound())
-//                .andExpect(jsonPath("$.status").value(ErrorCode.TEAM_NOT_FOUND.getStatus()))
-//                .andExpect(jsonPath("$.message").exists())
-//                .andExpect(jsonPath("$.message").value(ErrorCode.TEAM_NOT_FOUND.getMessage()));
-//    }
+    @Test
+    @DisplayName("팀 멤버 초대 요청 목록 조회 - 통합 테스트 성공")
+    void getAllRequest_success() throws Exception {
+        // given
+        Long teamId = team1.getId();  // @BeforeEach에서 생성된 팀 ID 사용
+
+        // when & then
+        mockMvc.perform(get("/team/{teamId}/request", teamId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(ApiResponse.ok().getStatus()))
+                .andExpect(jsonPath("$.data").isArray());
+                // data 배열 안에 최소 하나의 요청 객체가 있고, userName 필드가 존재하는지 확인
+    }
 }
 

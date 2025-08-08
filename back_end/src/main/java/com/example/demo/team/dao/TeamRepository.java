@@ -35,4 +35,7 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
             "LEFT JOIN FETCH t.members " +
             "WHERE t.id=:id")
     Team findTeamAIDtoById(Long id);
+
+    @Query("select t from Team t left join fetch t.membershipRequests where t.id = :teamId")
+    Optional<Team> findByIdWithRequests(Long teamId);
 }
