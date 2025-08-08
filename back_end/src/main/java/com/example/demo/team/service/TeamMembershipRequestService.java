@@ -14,8 +14,6 @@ import com.example.demo.user.entity.User;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.cp.lock.FencedLock;
 import com.hazelcast.cp.lock.exception.LockAcquireLimitReachedException;
-import com.hazelcast.map.IMap;
-import jakarta.transaction.SystemException;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.exception.LockAcquisitionException;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -43,29 +41,26 @@ public class TeamMembershipRequestService {
         Team team = teamRepository.findById(teamOffer.getTeamId()).orElseThrow(() -> new BusinessException(ErrorCode.TEAM_NOT_FOUND));
         User user = userRepository.findById(teamOffer.getUserId()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        String key = team.getId() + "+" + user.getId();
-        IMap<String,String> lock = hazelcastInstance.getMap("teamMembershipRequestLock");
-        boolean lockAcquired = false;
-        try {
-            lockAcquired=lock.tryLock(key,5,TimeUnit.SECONDS);
-            if (!lockAcquired) {
-                throw new LockAcquireLimitReachedException("요청이 처리 중입니다. 잠시 후 다시 시도해주세요.");
-            }
+//        String key = team.getId() + "+" + user.getId();
+//        FencedLock lock = hazelcastInstance.getCPSubsystem().getLock(key);
+//
+//        if (!lock.tryLock()) {
+//            throw new LockAcquireLimitReachedException("요청이 처리 중입니다. 잠시 후 다시 시도해주세요.");
+//        }
+//
+//        try {
             boolean exists = team.getMembershipRequests().stream()
                     .anyMatch(req -> req.getUser().equals(user) && req.getStatus() != RequestStatus.REJECTED);
 
             if (exists) {
                 throw new BusinessException(ErrorCode.TEAM_REQUEST_ALLREADY_EXIST);
             }
-            saveTeamOffer(teamOffer, team, user);
-        } catch (InterruptedException | LockAcquisitionException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("요청 처리가 중단되었습니다.", e);
-        }
-        finally {
-            if (lockAcquired) lock.unlock(key);
-        }
 
+            saveTeamOffer(teamOffer, team, user);
+//
+//        } finally {
+//            lock.unlock();
+//        }
 
         messagingTemplate.convertAndSend("/queue/team/offer/" + teamOffer.getUserId(), teamOffer.getMessage());
     }
@@ -73,15 +68,15 @@ public class TeamMembershipRequestService {
     public void requestMemberToTeam(TeamOffer teamOffer) {
         Team team = teamRepository.findById(teamOffer.getTeamId()).orElseThrow(()-> new BusinessException(ErrorCode.TEAM_NOT_FOUND));
         User user = userRepository.findById(teamOffer.getUserId()).orElseThrow(()-> new BusinessException(ErrorCode.USER_NOT_FOUND));
-        String key = team.getId() + "+" + user.getId();
-        IMap<String,String> lock = hazelcastInstance.getMap("teamMembershipRequestLock");
-        boolean lockAcquired = false;
-        try {
-            lockAcquired=lock.tryLock(key,5,TimeUnit.SECONDS);
-            if (!lockAcquired) {
-                throw new LockAcquireLimitReachedException("요청이 처리 중입니다. 잠시 후 다시 시도해주세요.");
-            }
 
+//        String key=team.getId() + "+" + user.getId();
+//        FencedLock lock=hazelcastInstance.getCPSubsystem().getLock(key);
+//
+//        if (!lock.tryLock()) {
+//            throw new LockAcquireLimitReachedException("요청이 처리 중입니다. 잠시 후 다시 시도해주세요.");
+//        }
+//
+//        try {
             boolean exists = team.getMembershipRequests().stream()
                     .anyMatch(req -> req.getTeam().equals(team) && req.getStatus() != RequestStatus.REJECTED);
 
@@ -90,13 +85,10 @@ public class TeamMembershipRequestService {
             }
 
             saveTeamOffer(teamOffer, team, user);
-        } catch (InterruptedException | LockAcquisitionException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("요청 처리가 중단되었습니다.", e);
-        }
-        finally {
-            if (lockAcquired) lock.unlock(key);
-        }
+//
+//        } finally {
+//            lock.unlock();
+//        }
 
         for (User member : team.getMembers()) {
             messagingTemplate.convertAndSend("/queue/team/offer/" + member.getId(), teamOffer.getMessage());
