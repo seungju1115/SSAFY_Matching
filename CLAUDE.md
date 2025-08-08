@@ -385,3 +385,39 @@ const atmosphereToEnumMapping: Record<string, ProjectViveEnum> = {
 - ✅ GoogleSignInButton unused parameter warning fixed  
 - ✅ Backend Enum mapping aligned with frontend types
 - ✅ Complete API flow from UI to database
+
+## Important Development Notes
+
+### Windows-Specific Configuration
+- Docker polling enabled for file change detection: `CHOKIDAR_USEPOLLING=true` and `WATCHPACK_POLLING=true`  
+- Vite development server configured with `usePolling: true` for Windows Docker compatibility
+- Backend runs on `:8081`, frontend on `:8080` in Docker setup
+
+### Type System & Code Quality  
+- TypeScript strict mode enabled with `verbatimModuleSyntax`
+- Use `import type { ... }` for type-only imports to avoid compilation errors
+- Enum integration: Backend Java enums (ProjectGoalEnum, ProjectViveEnum, etc.) mapped to TypeScript union types
+- Zod validation schemas integrated with React Hook Form for form validation
+
+### Testing & Coverage
+- Backend: JUnit 5 with Jacoco coverage reports (`./gradlew test jacocoTestReport`)  
+- Coverage reports available at `build/reports/jacoco/test/html/`
+- All tests use H2 database regardless of Spring profile
+- Test isolation ensured with `@Transactional` and cleanup scripts
+
+### Database Schema & Initialization
+- Schema definition: `src/main/resources/schema-mysql.sql`
+- Test data: `src/main/resources/data.sql` (loaded in local profile)
+- H2 console: `http://localhost:8080/h2-console` (local profile only)
+- Database URL: `jdbc:h2:~/test` (local) | `jdbc:postgresql://postgres:5432/team_search` (prod)
+
+### API Documentation & Debugging
+- Swagger UI: `http://localhost:8080/swagger-ui.html` 
+- API Docs: `http://localhost:8080/api-docs`
+- Actuator endpoints: `http://localhost:8080/actuator` (health, metrics, prometheus)
+- Debug logging enabled for Spring Security OAuth2 in local profile
+
+### Git Workflow & Branch Management
+- Main branch: `master` (use for PRs)
+- Current feature branch: `feature/S13P11A307-118-api/팀-api-매핑`
+- Clean working directory policy - commit frequently with descriptive messages
