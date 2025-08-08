@@ -44,11 +44,12 @@ public class TeamService {
 
         // 팀 객체 생성
         Team team = new Team();
-        team = toTeam(dto,team);
         team.setLeader(leader);
+        leader.setTeam(team);
+        team = toTeam(dto,team);
 
         // 팀장도 팀의 멤버로 설정 (양방향 메서드 이용)
-        leader.setTeam(team); // 내부적으로 team.getMembers().add(this) 포함됨
+//        leader.setTeam(team); // 내부적으로 team.getMembers().add(this) 포함됨
 
         // 저장
         Team saved = teamRepository.save(team);
@@ -198,10 +199,12 @@ public class TeamService {
         response.setPmCount(team.getPmCount());
         response.setDesignCount(team.getDesignCount());
         response.setTeamDescription(team.getTeamDescription());
-        response.setLeader(userService.getProfile(team.getLeader().getId()));
+        response.setLeader(UserProfileResponse.toUserProfileResponse(team.getLeader()));
+//        response.setLeader(userService.getProfile(team.getLeader().getId()));
         List<UserProfileResponse> members = new ArrayList<>();
         for(User user : team.getMembers()){
-            members.add(userService.getProfile(user.getId()));
+            members.add(UserProfileResponse.toUserProfileResponse(user));
+//            members.add(UserProfileResponse.toUserProfileResponse(user.get));
         }
         response.setMembers(members);
         return response;

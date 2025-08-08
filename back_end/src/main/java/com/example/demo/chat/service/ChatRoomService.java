@@ -75,7 +75,6 @@ public class ChatRoomService {
         User creator = userRepository.findById(chatRoomRequest.getUserId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-
         ChatRoom chatRoom = new ChatRoom();
         chatRoom.setRoomType(RoomType.TEAM);
         chatRoom.setTeam(team);
