@@ -36,7 +36,7 @@ public class UserProfileResponse implements Serializable {
     private String userProfile;
 
     @Schema(description = "전공 여부", example = "true")
-    private boolean major;
+    private Boolean major;
 
     @Schema(description = "이전 반", example = "7")
     private Integer lastClass;
@@ -69,13 +69,13 @@ public class UserProfileResponse implements Serializable {
         Team team = user.getTeam();
 
         UserProfileResponse response = new UserProfileResponse();
-        response.setId(user.getId());
-        response.setUserName(user.getUserName());
-        response.setRole(user.getRole());
-        response.setEmail(user.getEmail());
-        response.setMajor(user.isMajor());
-        response.setLastClass(user.getLastClass());
 
+        if (user.getId() != null) response.setId(user.getId());
+        if (user.getUserName() != null)  response.setUserName(user.getUserName());
+        if (user.getRole() != null) response.setRole(user.getRole());
+        if (user.getEmail() != null) response.setEmail(user.getEmail());
+        if (user.getMajor() != null) response.setMajor(user.getMajor());
+        if (user.getLastClass() != null) response.setLastClass(user.getLastClass());
         if (user.getUserProfile() != null) response.setUserProfile(user.getUserProfile());
         if (user.getWantedPosition() != null) response.setWantedPosition(user.getWantedPosition());
         if (user.getProjectGoal() != null) response.setProjectGoal(user.getProjectGoal());
@@ -98,7 +98,7 @@ public class UserProfileResponse implements Serializable {
         response.setUserName(user.getUserName());
         response.setRole(user.getRole());
         response.setEmail(user.getEmail());
-        response.setMajor(user.isMajor());
+        response.setMajor(user.getMajor());
         response.setLastClass(user.getLastClass());
 
         if (user.getUserProfile() != null) response.setUserProfile(user.getUserProfile());

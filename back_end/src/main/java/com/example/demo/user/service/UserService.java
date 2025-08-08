@@ -11,6 +11,8 @@ import com.example.demo.user.dto.UserProfileUpdateRequest;
 import com.example.demo.user.entity.User;
 import com.example.demo.team.dao.TeamRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -22,6 +24,8 @@ import java.util.List;
 
 @Service
 public class UserService {
+
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private UserRepository userRepository;
@@ -62,13 +66,16 @@ public class UserService {
     @CacheEvict(value = "longTermCache", key = "'user:'+ #id")
     @Transactional
     public UserProfileResponse updateUserProfile(UserProfileUpdateRequest request, Long id) {
+        System.out.println("유저 찾기 전");
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("유저를 찾을 수 없습니다."));
 
         // 전체 및 부분 업데이트
-        if (request.getUserName() != null) user.setUserName(request.getUserName());
+        if (request.getUserName() != null) {
+            user.setUserName(request.getUserName());
+        }
         if (request.getUserProfile() != null) user.setUserProfile(request.getUserProfile());
-        if (request.isMajor()) user.setMajor(true);
+        if (request.getMajor() != null) user.setMajor(request.getMajor());
         if (request.getLastClass() != null) user.setLastClass(request.getLastClass());
         if (request.getWantedPosition() != null) user.setWantedPosition(request.getWantedPosition());
         if (request.getProjectGoal() != null) user.setProjectGoal(request.getProjectGoal());
