@@ -18,7 +18,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "사용자 프로필 응답")
-public class UserProfileResponse implements Serializable {
+public class UserProfileResponse {
 
     @Schema(description = "사용자 ID", example = "1")
     private Long id;
