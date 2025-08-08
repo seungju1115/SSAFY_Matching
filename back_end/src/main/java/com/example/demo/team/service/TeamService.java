@@ -3,6 +3,7 @@ package com.example.demo.team.service;
 import com.example.demo.common.exception.BusinessException;
 import com.example.demo.common.exception.ErrorCode;
 import com.example.demo.user.dao.UserRepository;
+import com.example.demo.user.dto.UserDetailResponse;
 import com.example.demo.user.dto.UserProfileResponse;
 import com.example.demo.user.entity.User;
 import com.example.demo.chat.dto.ChatRoomRequest;
@@ -199,14 +200,18 @@ public class TeamService {
         response.setPmCount(team.getPmCount());
         response.setDesignCount(team.getDesignCount());
         response.setTeamDescription(team.getTeamDescription());
-        response.setLeader(UserProfileResponse.toUserProfileResponse(team.getLeader()));
-//        response.setLeader(userService.getProfile(team.getLeader().getId()));
-        List<UserProfileResponse> members = new ArrayList<>();
+
+        // UserProfileResponse 대신 UserDetailResponse 사용
+        response.setLeader(UserDetailResponse.fromEntity(team.getLeader()));
+
+        List<UserDetailResponse> members = new ArrayList<>();
         for(User user : team.getMembers()){
-            members.add(UserProfileResponse.toUserProfileResponse(user));
-//            members.add(UserProfileResponse.toUserProfileResponse(user.get));
+            members.add(UserDetailResponse.fromEntity(user));
         }
-        response.setMembers(members);
+        // TeamDetailResponse 의 members 타입도 List<UserDetailResponse> 로 바뀌어야 합니다.
+        // 만약 아직 List<UserProfileResponse>면 타입 수정 필요합니다.
+        response.setMembers((List)members);
+
         return response;
     }
 

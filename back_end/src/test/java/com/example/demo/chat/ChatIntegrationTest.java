@@ -128,7 +128,7 @@ public class ChatIntegrationTest {
         teamRequest.setDesignCount(0);
         teamRequest.setTeamDescription("함께 성장하며 멋진 포트폴리오를 만들고 싶습니다.");
 
-        TeamDetailResponse teamDetailResponse = teamService.createTeam(teamRequest);
+        teamDetailResponse = teamService.createTeam(teamRequest);
         teamDetailResponse = teamService.getTeam(teamDetailResponse.getTeamId());
 
         chatMessageRequest = new ChatMessageRequest();

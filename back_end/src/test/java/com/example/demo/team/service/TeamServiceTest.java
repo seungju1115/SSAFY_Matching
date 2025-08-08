@@ -134,7 +134,6 @@ class TeamServiceTest {
             savedTeam.setChatRoom(chatRoom);
             return savedTeam;
         });
-        when(userService.getProfile(user.getId())).thenReturn(userProfileResponse1);
 
         // When (실행)
         TeamDetailResponse response = teamService.createTeam(teamRequest);
@@ -151,8 +150,6 @@ class TeamServiceTest {
         verify(userRepository, times(1)).findById(user.getId());
         verify(teamRepository, times(1)).save(any(Team.class));
         verify(chatRoomService, times(1)).createTeamChatRoom(any(ChatRoomRequest.class));
-        // leader 정보 조회 1번, members 리스트 순회하며 조회 1번 -> 총 2번 호출
-        verify(userService, times(2)).getProfile(user.getId());
     }
 
     @Test

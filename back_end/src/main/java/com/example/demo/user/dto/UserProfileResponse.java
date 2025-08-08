@@ -91,4 +91,24 @@ public class UserProfileResponse implements Serializable {
 
         return response;
     }
+
+    public static UserProfileResponse makeToUserProfileResponse(User user) {
+        UserProfileResponse response = new UserProfileResponse();
+        response.setId(user.getId());
+        response.setUserName(user.getUserName());
+        response.setRole(user.getRole());
+        response.setEmail(user.getEmail());
+        response.setMajor(user.isMajor());
+        response.setLastClass(user.getLastClass());
+
+        if (user.getUserProfile() != null) response.setUserProfile(user.getUserProfile());
+        if (user.getWantedPosition() != null) response.setWantedPosition(user.getWantedPosition());
+        if (user.getProjectGoal() != null) response.setProjectGoal(user.getProjectGoal());
+        if (user.getProjectVive() != null) response.setProjectVive(user.getProjectVive());
+        if (user.getProjectExp() != null) response.setProjectExp(user.getProjectExp());
+        if (user.getQualification() != null) response.setQualification(user.getQualification());
+        if (user.getTechStack() != null) response.setTechStack(user.getTechStack());
+
+        return response;
+    }
 }

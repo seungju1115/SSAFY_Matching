@@ -2,19 +2,13 @@ package com.example.demo.team.dto;
 
 import com.example.demo.user.Enum.ProjectGoalEnum;
 import com.example.demo.user.Enum.ProjectViveEnum;
-import com.example.demo.user.dto.SearchUserResponse;
-import com.example.demo.user.dto.UserProfileResponse;
+import com.example.demo.user.dto.UserDetailResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
@@ -23,7 +17,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Schema(description = "팀 상세 정보 응답")
-public class TeamDetailResponse implements Serializable {
+public class TeamDetailResponse{
 
     @Schema(description = "팀 ID", example = "1")
     private Long teamId;
@@ -35,13 +29,13 @@ public class TeamDetailResponse implements Serializable {
     private String teamName;
 
     @Schema(description = "팀장 정보", example = "leader")
-    private UserProfileResponse leader;
+    private UserDetailResponse leader;
 
     @Schema(
             description = "팀원 정보 목록",
             example = "[member1, member2]"
     )
-    private List<UserProfileResponse> members;
+    private List<UserDetailResponse> members;
 
     @Schema(
             description = "팀 도메인",

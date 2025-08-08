@@ -12,6 +12,7 @@ import com.example.demo.user.Enum.PositionEnum;
 import com.example.demo.user.Enum.ProjectGoalEnum;
 import com.example.demo.user.Enum.ProjectViveEnum;
 import com.example.demo.user.Enum.TechEnum;
+import com.example.demo.user.dto.UserDetailResponse;
 import com.example.demo.user.dto.UserProfileResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
@@ -93,48 +94,45 @@ class TeamControllerTest {
     }
 
     static private TeamDetailResponse teamDetailResponse1,teamDetailResponse2;
-    static private UserProfileResponse userProfileResponse1;
-    static private UserProfileResponse userProfileResponse2;
+    static private UserDetailResponse userDetailResponse1,userDetailResponse2;
     static private List<TeamDetailResponse> teamList;
     @BeforeAll
     static void globalSetUp() {
         // --- 사용자 1: 백엔드 개발자 지망생 ---
-        userProfileResponse1 = new UserProfileResponse();
-        userProfileResponse1.setId(100L);
-        userProfileResponse1.setUserName("김백엔");
-        userProfileResponse1.setRole("USER");
-        userProfileResponse1.setEmail("backend.kim@example.com");
-        userProfileResponse1.setUserProfile("Spring Boot와 JPA에 자신 있는 백엔드 개발자입니다.");
-        userProfileResponse1.setMajor(true);
-        userProfileResponse1.setLastClass(8);
-        userProfileResponse1.setWantedPosition(new ArrayList<>(Arrays.asList(PositionEnum.DESIGN)));
-        userProfileResponse1.setProjectGoal(Set.of(ProjectGoalEnum.AWARD, ProjectGoalEnum.PORTFOLIO));
-        userProfileResponse1.setProjectVive(Set.of(ProjectViveEnum.RULE, ProjectViveEnum.AGILE));
-        userProfileResponse1.setProjectExp("실시간 채팅 기능이 포함된 소셜 미디어 플랫폼 개발 경험");
-        userProfileResponse1.setQualification("SQLD");
-        userProfileResponse1.setTechStack(Set.of(TechEnum.JAVA, TechEnum.SPRING, TechEnum.JPA, TechEnum.MYSQL));
-        userProfileResponse1.setTeamId(10L); // 소속된 팀 정보
-        userProfileResponse1.setTeamName("알파 프로젝트팀");
+        userDetailResponse1 = UserDetailResponse.builder()
+                .id(100L)
+                .userName("김백엔")
+                .role("USER")
+                .email("backend.kim@example.com")
+                .userProfile("Spring Boot와 JPA에 자신 있는 백엔드 개발자입니다.")
+                .major(true)
+                .lastClass(8)
+                .wantedPosition(new ArrayList<>(Arrays.asList(PositionEnum.DESIGN)))
+                .projectGoal(Set.of(ProjectGoalEnum.AWARD, ProjectGoalEnum.PORTFOLIO))
+                .projectVive(Set.of(ProjectViveEnum.RULE, ProjectViveEnum.AGILE))
+                .projectExp("실시간 채팅 기능이 포함된 소셜 미디어 플랫폼 개발 경험")
+                .qualification("SQLD")
+                .techStack(Set.of(TechEnum.JAVA, TechEnum.SPRING, TechEnum.JPA, TechEnum.MYSQL))
+                .build();
 
-        // --- 사용자 2: UI/UX 디자이너 ---
-        userProfileResponse2 = new UserProfileResponse();
-        userProfileResponse2.setId(200L);
-        userProfileResponse2.setUserName("이디자인");
-        userProfileResponse2.setRole("USER");
-        userProfileResponse2.setEmail("design.lee@example.com");
-        userProfileResponse2.setUserProfile("사용자 중심의 직관적인 UI/UX를 설계합니다.");
-        userProfileResponse2.setMajor(true);
-        userProfileResponse2.setLastClass(7);
-        userProfileResponse2.setWantedPosition(new ArrayList<>(Arrays.asList(PositionEnum.DESIGN)));
-        userProfileResponse2.setProjectGoal(Set.of(ProjectGoalEnum.PORTFOLIO));
-        userProfileResponse2.setProjectVive(Set.of(ProjectViveEnum.STABLE, ProjectViveEnum.CASUAL));
-        userProfileResponse2.setProjectExp("모바일 앱 디자인 및 프로토타이핑 다수 경험");
-        userProfileResponse2.setQualification("GTQ 포토샵 1급");
-        userProfileResponse2.setTechStack(Set.of(TechEnum.JAVA, TechEnum.ANSIBLE));
-        userProfileResponse2.setTeamId(null); // 소속된 팀이 없는 경우
-        userProfileResponse2.setTeamName(null);
+// --- 사용자 2: UI/UX 디자이너 ---
+        userDetailResponse2 = UserDetailResponse.builder()
+                .id(200L)
+                .userName("이디자인")
+                .role("USER")
+                .email("design.lee@example.com")
+                .userProfile("사용자 중심의 직관적인 UI/UX를 설계합니다.")
+                .major(true)
+                .lastClass(7)
+                .wantedPosition(new ArrayList<>(Arrays.asList(PositionEnum.DESIGN)))
+                .projectGoal(Set.of(ProjectGoalEnum.PORTFOLIO))
+                .projectVive(Set.of(ProjectViveEnum.STABLE, ProjectViveEnum.CASUAL))
+                .projectExp("모바일 앱 디자인 및 프로토타이핑 다수 경험")
+                .qualification("GTQ 포토샵 1급")
+                .techStack(Set.of(TechEnum.JAVA, TechEnum.ANSIBLE))
+                .build();
 
-        // --- 첫 번째 팀 상세 정보 예제 ---
+// --- 첫 번째 팀 상세 정보 예제 ---
         teamDetailResponse1 = new TeamDetailResponse();
         teamDetailResponse1.setTeamId(1L);
         teamDetailResponse1.setChatRoomId(10L);
@@ -148,8 +146,8 @@ class TeamControllerTest {
         teamDetailResponse1.setAiCount(1);
         teamDetailResponse1.setPmCount(1);
         teamDetailResponse1.setDesignCount(0);
-        teamDetailResponse1.setLeader(userProfileResponse1);
-        teamDetailResponse1.setMembers(List.of(userProfileResponse1, userProfileResponse2));
+        teamDetailResponse1.setLeader(userDetailResponse1);
+        teamDetailResponse1.setMembers(List.of(userDetailResponse1, userDetailResponse2));
 
 
         // --- 두 번째 팀 상세 정보 예제 ---
@@ -166,8 +164,8 @@ class TeamControllerTest {
         teamDetailResponse2.setAiCount(1);
         teamDetailResponse2.setPmCount(0);
         teamDetailResponse2.setDesignCount(0);
-        teamDetailResponse2.setLeader(userProfileResponse1);
-        teamDetailResponse2.setMembers(List.of(userProfileResponse1)); // 다른 멤버 구성
+        teamDetailResponse2.setLeader(userDetailResponse1);
+        teamDetailResponse2.setMembers(List.of(userDetailResponse1)); // 다른 멤버 구성
 
         teamList = List.of(teamDetailResponse1, teamDetailResponse2);
     }
@@ -266,9 +264,9 @@ class TeamControllerTest {
                 .andExpect(jsonPath("$.status").value(ApiResponse.ok().getStatus()))
                 .andExpect(jsonPath("$.data.teamId").value(1L))
                 .andExpect(jsonPath("$.data.teamName").value("성장하는 A팀"))
-                .andExpect(jsonPath("$.data.leader.id").value(userProfileResponse1.getId()))
-                .andExpect(jsonPath("$.data.members[0].id").value(userProfileResponse1.getId()))
-                .andExpect(jsonPath("$.data.members[1].id").value(userProfileResponse2.getId()));
+                .andExpect(jsonPath("$.data.leader.id").value(userDetailResponse1.getId()))
+                .andExpect(jsonPath("$.data.members[0].id").value(userDetailResponse1.getId()))
+                .andExpect(jsonPath("$.data.members[1].id").value(userDetailResponse2.getId()));
     }
 
     @Test
