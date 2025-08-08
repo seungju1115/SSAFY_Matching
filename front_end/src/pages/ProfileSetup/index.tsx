@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import { ChevronRight, ChevronLeft, User, Sparkles, Target, Heart, Award, Code, Briefcase } from 'lucide-react'
+import { ChevronRight, ChevronLeft, User, Sparkles, Target, Heart, Award, Code, Briefcase, Loader2 } from 'lucide-react'
+import { useToast } from '@/hooks/use-toast'
 
 // 컴포넌트 import
 import PositionSelector from '@/components/features/profile/PositionSelector'
@@ -13,6 +14,10 @@ import SkillSelector from '@/components/features/profile/SkillSelector'
 import IntroductionEditor from '@/components/features/profile/IntroductionEditor'
 import PreferenceSelector from '@/components/features/profile/PreferenceSelector'
 import CertificationInput from '@/components/features/profile/CertificationInput'
+
+// API import
+import { userHelpers } from '@/api/user'
+import useUserStore from '@/stores/userStore'
 
 // 프로필 설정 데이터 타입
 interface Certification {
@@ -31,7 +36,10 @@ interface ProfileSetupData {
 
 export default function ProfileSetup() {
   const navigate = useNavigate()
+  const { toast } = useToast()
+  const { user, setUser } = useUserStore()
   const [step, setStep] = useState(1)
+  const [isLoading, setIsLoading] = useState(false)
   const [profileData, setProfileData] = useState<ProfileSetupData>({
     positions: [],
     skills: [],
@@ -63,9 +71,75 @@ export default function ProfileSetup() {
     }
   }
 
-  const handleComplete = () => {
-    console.log('Profile setup completed:', profileData)
-    navigate('/')
+  const handleComplete = async () => {
+    if (!user?.id) {
+      toast({
+        title: "오류",
+        description: "사용자 정보를 찾을 수 없습니다.",
+        variant: "destructive"
+      })
+      return
+    }
+
+    setIsLoading(true)
+    
+    try {
+      const response = await userHelpers.completeProfileSetup(user.id, profileData)
+
+      // API 응답에서 실제 데이터 추출
+      const userData = response.data.data
+
+
+      // 사용자 상태 업데이트 - 백엔드 Enum을 프론트엔드 문자열로 역매핑
+      const updatedUser = {
+        // 기존 필수 정보 보존
+        id: user.id,
+        userName: user.userName,
+        role: user.role,
+        email: user.email,
+        major: user.major,
+        lastClass: user.lastClass,
+        // 기존 선택적 정보 보존 (있다면)
+        teamId: user.teamId || null,
+        teamName: user.teamName || null,
+        projectExp: user.projectExp || null,
+        isSigned: user.isSigned || false,
+        // 새로 업데이트되는 프로필 정보
+        userProfile: userData.userProfile || null,
+        wantedPosition: userData.wantedPosition?.map((pos: string) => 
+          userHelpers.mapEnumToDisplayValue(pos, 'position')
+        ) || null,
+        techStack: userData.techStack?.map((tech: string) => 
+          userHelpers.mapEnumToDisplayValue(tech, 'techStack')
+        ) || null,
+        projectGoal: userData.projectGoal?.map((goal: string) => 
+          userHelpers.mapEnumToDisplayValue(goal, 'projectGoal')
+        ) || null,
+        projectVive: userData.projectVive?.map((vibe: string) => 
+          userHelpers.mapEnumToDisplayValue(vibe, 'projectVive')
+        ) || null,
+        qualification: userData.qualification || null,
+        isProfileComplete: true
+      }
+      
+      setUser(updatedUser)
+
+      toast({
+        title: "프로필 설정 완료!",
+        description: "프로필이 성공적으로 설정되었습니다.",
+      })
+
+      navigate('/')
+    } catch (error) {
+      console.error('Profile setup failed:', error)
+      toast({
+        title: "프로필 설정 실패",
+        description: "프로필 설정 중 오류가 발생했습니다. 다시 시도해주세요.",
+        variant: "destructive"
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const progress = (step / 2) * 100
@@ -342,12 +416,17 @@ export default function ProfileSetup() {
             
             <Button
               onClick={handleNext}
-              className="group w-44 h-16 text-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+              disabled={isLoading}
+              className="group w-44 h-16 text-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
               {step === 2 ? (
                 <>
-                  <Sparkles className="h-6 w-6 mr-2" />
-                  완료
+                  {isLoading ? (
+                    <Loader2 className="h-6 w-6 mr-2 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-6 w-6 mr-2" />
+                  )}
+                  {isLoading ? '저장 중...' : '완료'}
                 </>
               ) : (
                 <>
