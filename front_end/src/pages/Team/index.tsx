@@ -2,8 +2,6 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTeamStore } from '@/store/teamStore'
 import useUserStore from '@/stores/userStore'
-import { ProfileRecommendModal } from '@/components/features/team/recommendation'
-import type { ProfileData } from '@/components/features/team/recommendation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -62,9 +60,6 @@ const TeamPage: React.FC = () => {
   const { isLoading } = useTeamStore()
   const { user } = useUserStore()
   
-  // 추천 모달 상태
-  const [showRecommendModal, setShowRecommendModal] = useState(false)
-  
   const [chatMessage, setChatMessage] = useState('')
   const [chatMessages, setChatMessages] = useState([
     { id: 1, sender: '김개발', message: '안녕하세요! 팀에 합류하게 되어 기쁩니다', time: '14:30' },
@@ -116,58 +111,8 @@ const TeamPage: React.FC = () => {
     }
   }
 
-    // 모의 추천 프로필 데이터
-  const mockProfiles: ProfileData[] = [
-    { 
-      id: 101, 
-      name: '강우석', 
-      role: 'backend', 
-      position: '백엔드 개발자', 
-      skills: ['Java', 'Spring', 'MySQL'], 
-      description: '서버 개발 3년차, 대규모 트래픽 처리 경험이 있으며, 안정적이고 확장 가능한 시스템 구축에 관심이 많습니다.', 
-      avatar: '', 
-      matching: 92, 
-      domain: '웹/앱 서비스',
-      projectPreferences: ['취업우선', '실무경험', '완성도추구'],
-      personalPreferences: ['존대 지향', '규칙적인 분위기', '합의 중심']
-    },
-    { 
-      id: 102, 
-      name: '박지은', 
-      role: 'frontend', 
-      position: '프론트엔드 개발자', 
-      skills: ['React', 'TypeScript', 'Next.js'], 
-      description: 'UI/UX에 관심이 많고 사용자 경험을 최우선으로 생각하는 프론트엔드 개발자입니다. 모던한 기술 스택을 선호합니다.', 
-      avatar: '', 
-      matching: 89, 
-      domain: '웹 서비스',
-      projectPreferences: ['포트폴리오중심', '빠른개발', '아이디어실현'],
-      personalPreferences: ['반말 지향', '편한 분위기', '애자일 방식']
-    },
-    { 
-      id: 103, 
-      name: '이민호', 
-      role: 'ai', 
-      position: 'AI 엔지니어', 
-      skills: ['Python', 'TensorFlow', 'PyTorch'], 
-      description: '컴퓨터 비전과 딥러닝 전문가로, AI 모델 최적화와 실제 서비스 적용에 경험이 풍부합니다.', 
-      avatar: '', 
-      matching: 87, 
-      domain: 'AI/머신러닝',
-      projectPreferences: ['학습중심', '새로운 주제', '실무경험'],
-      personalPreferences: ['편한 분위기', '리더 중심', '새로운 주제']
-    }
-  ]
-
-  // 추천 멤버 핸들러 함수
   const handleRecommendMember = () => {
-    setShowRecommendModal(true)
-  }
-  
-  // 프로필 초대 핸들러
-  const handleInviteProfile = (profile: ProfileData) => {
-    // 실제로는 API 호출로 초대 처리
-    alert(`${profile.name}님을 팀에 초대했습니다.`)
+    navigate('/matching?recommend=true')
   }
 
 
@@ -352,14 +297,6 @@ const TeamPage: React.FC = () => {
           </div>
         </div>
       </div>
-      
-      {/* 추천 프로필 모달 */}
-      <ProfileRecommendModal
-        isOpen={showRecommendModal}
-        onClose={() => setShowRecommendModal(false)}
-        onInvite={handleInviteProfile}
-        profiles={mockProfiles} // 3명 표시
-      />
     </div>
   )
 }
