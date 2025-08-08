@@ -20,7 +20,7 @@ public class UserCountDto {
     private Team team;
 
     @Schema(description = "전공 여부", example = "true")
-    private boolean major;
+    private Boolean major;
 
     @Schema(description = "희망 포지션", example = "BACKEND")
     private List<PositionEnum> position;
@@ -28,7 +28,7 @@ public class UserCountDto {
     public static UserCountDto from(User user) {
         UserCountDto dto = new UserCountDto();
         dto.team = user.getTeam();
-        dto.major = user.isMajor();
+        dto.major = user.getMajor();
         dto.position=user.getWantedPosition();
         return dto;
     }

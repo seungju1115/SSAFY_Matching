@@ -57,7 +57,7 @@ public class User {
 
     // 기초정보
     @Column(name = "major",  nullable = false)
-    private boolean major=false;
+    private Boolean major;
 
     // 기초정보
     @Column(name = "last_class", nullable = false)
