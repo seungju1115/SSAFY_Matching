@@ -6,6 +6,7 @@ import com.example.demo.user.Enum.ProjectViveEnum;
 import com.example.demo.user.entity.User;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -31,6 +32,7 @@ public class TeamAIDto {
         this.memberWanted= Arrays.stream(memberWanted.split(",")).toList();
         this.goals = goals;
         this.vives = vives;
+        this.members = new ArrayList<>();
         for(User user : users){
             this.members.add(CandidateDto.from(user));
         }
@@ -43,6 +45,7 @@ public class TeamAIDto {
         teamAIDto.memberWanted = Arrays.stream(team.getMemberWanted().split(",")).toList();
         teamAIDto.goals = team.getTeamPreference();
         teamAIDto.vives = team.getTeamVive();
+        teamAIDto.members = new ArrayList<>();
         for (User user : team.getMembers()) {
             teamAIDto.members.add(CandidateDto.from(user));
         }
