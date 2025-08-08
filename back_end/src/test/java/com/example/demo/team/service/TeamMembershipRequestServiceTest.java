@@ -80,7 +80,7 @@ class TeamMembershipRequestServiceTest {
         user = new User();
         user.setUserName("test");
         user.setRole("ROLE_USER");
-        user.setWantedPosition(PositionEnum.BACKEND);
+        user.setWantedPosition(new ArrayList<>(Arrays.asList(PositionEnum.DESIGN)));
         user.setTechStack(new HashSet<>(Arrays.asList(TechEnum.JPA, TechEnum.JPA)));
         user.setProjectGoal(new HashSet<>(Arrays.asList(ProjectGoalEnum.AWARD)));
         user.setProjectVive(new HashSet<>(Arrays.asList(ProjectViveEnum.AGILE)));
@@ -91,7 +91,7 @@ class TeamMembershipRequestServiceTest {
         user2 = new User();
         user2.setUserName("test");
         user2.setRole("ROLE_USER");
-        user2.setWantedPosition(PositionEnum.BACKEND);
+        user2.setWantedPosition(new ArrayList<>(Arrays.asList(PositionEnum.DESIGN)));
         user2.setTechStack(new HashSet<>(Arrays.asList(TechEnum.JPA, TechEnum.JPA)));
         user2.setProjectGoal(new HashSet<>(Arrays.asList(ProjectGoalEnum.AWARD)));
         user2.setProjectVive(new HashSet<>(Arrays.asList(ProjectViveEnum.AGILE)));

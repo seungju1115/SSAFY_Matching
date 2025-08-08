@@ -21,7 +21,7 @@ import java.util.Set;
 @Table(name = "USERS"
         , indexes= {
         @Index(name = "user_major_idx", columnList = "major"),
-        @Index(name = "user_position_idx", columnList = "wanted_position"),
+//        @Index(name = "user_position_idx", columnList = "wanted_position"),
         @Index(name = "user_team_idx", columnList = "team_id")
         }
         )
@@ -68,9 +68,10 @@ public class User {
     @Size(max = 550)
     private String userProfile;
 
+    @ElementCollection(targetClass = PositionEnum.class, fetch = FetchType.LAZY)
     @Enumerated(EnumType.STRING)
     @Column(name = "wanted_position")
-    private PositionEnum wantedPosition;
+    private List<PositionEnum> wantedPosition;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<ChatRoomMember> chatRoomMembers = new ArrayList<>();

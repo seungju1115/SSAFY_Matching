@@ -70,7 +70,7 @@ class TeamServiceTest {
         user = new User();
         user.setUserName("test");
         user.setRole("ROLE_USER");
-        user.setWantedPosition(PositionEnum.BACKEND);
+        user.setWantedPosition(new ArrayList<>(Arrays.asList(PositionEnum.DESIGN)));
         user.setTechStack(new HashSet<>(Arrays.asList(TechEnum.JPA, TechEnum.JPA)));
         user.setProjectGoal(new HashSet<>(Arrays.asList(ProjectGoalEnum.AWARD)));
         user.setProjectVive(new HashSet<>(Arrays.asList(ProjectViveEnum.AGILE)));
@@ -110,7 +110,7 @@ class TeamServiceTest {
         userProfileResponse1.setUserProfile("Spring Boot와 JPA에 자신 있는 백엔드 개발자입니다.");
         userProfileResponse1.setMajor(true);
         userProfileResponse1.setLastClass(8);
-        userProfileResponse1.setWantedPosition(PositionEnum.BACKEND);
+        userProfileResponse1.setWantedPosition(new ArrayList<>(Arrays.asList(PositionEnum.DESIGN)));
         userProfileResponse1.setProjectGoal(Set.of(ProjectGoalEnum.AWARD, ProjectGoalEnum.PORTFOLIO));
         userProfileResponse1.setProjectVive(Set.of(ProjectViveEnum.RULE, ProjectViveEnum.AGILE));
         userProfileResponse1.setProjectExp("실시간 채팅 기능이 포함된 소셜 미디어 플랫폼 개발 경험");

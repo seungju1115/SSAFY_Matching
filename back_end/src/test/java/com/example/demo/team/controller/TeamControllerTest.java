@@ -25,10 +25,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
@@ -110,7 +107,7 @@ class TeamControllerTest {
         userProfileResponse1.setUserProfile("Spring Boot와 JPA에 자신 있는 백엔드 개발자입니다.");
         userProfileResponse1.setMajor(true);
         userProfileResponse1.setLastClass(8);
-        userProfileResponse1.setWantedPosition(PositionEnum.BACKEND);
+        userProfileResponse1.setWantedPosition(new ArrayList<>(Arrays.asList(PositionEnum.DESIGN)));
         userProfileResponse1.setProjectGoal(Set.of(ProjectGoalEnum.AWARD, ProjectGoalEnum.PORTFOLIO));
         userProfileResponse1.setProjectVive(Set.of(ProjectViveEnum.RULE, ProjectViveEnum.AGILE));
         userProfileResponse1.setProjectExp("실시간 채팅 기능이 포함된 소셜 미디어 플랫폼 개발 경험");
@@ -128,7 +125,7 @@ class TeamControllerTest {
         userProfileResponse2.setUserProfile("사용자 중심의 직관적인 UI/UX를 설계합니다.");
         userProfileResponse2.setMajor(true);
         userProfileResponse2.setLastClass(7);
-        userProfileResponse2.setWantedPosition(PositionEnum.DESIGN);
+        userProfileResponse2.setWantedPosition(new ArrayList<>(Arrays.asList(PositionEnum.DESIGN)));
         userProfileResponse2.setProjectGoal(Set.of(ProjectGoalEnum.PORTFOLIO));
         userProfileResponse2.setProjectVive(Set.of(ProjectViveEnum.STABLE, ProjectViveEnum.CASUAL));
         userProfileResponse2.setProjectExp("모바일 앱 디자인 및 프로토타이핑 다수 경험");

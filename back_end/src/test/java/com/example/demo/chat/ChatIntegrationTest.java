@@ -31,6 +31,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -82,7 +83,7 @@ public class ChatIntegrationTest {
         user1.setEmail("hong@example.com");
         user1.setMajor(true);
         user1.setLastClass(1);
-        user1.setWantedPosition(PositionEnum.BACKEND);
+        user1.setWantedPosition(new ArrayList<>(Arrays.asList(PositionEnum.DESIGN)));
         user1.setTechStack(new HashSet<>(Arrays.asList(TechEnum.JPA, TechEnum.JPA)));
         user1.setProjectGoal(new HashSet<>(Arrays.asList(ProjectGoalEnum.AWARD)));
         user1.setProjectVive(new HashSet<>(Arrays.asList(ProjectViveEnum.AGILE)));
@@ -94,7 +95,7 @@ public class ChatIntegrationTest {
         user2.setEmail("kim@example.com");
         user2.setMajor(false);
         user2.setLastClass(2);
-        user2.setWantedPosition(PositionEnum.FRONTEND);
+        user2.setWantedPosition(new ArrayList<>(Arrays.asList(PositionEnum.DESIGN)));
         user2.setTechStack(new HashSet<>(Arrays.asList(TechEnum.JPA, TechEnum.JPA)));
         user2.setProjectGoal(new HashSet<>(Arrays.asList(ProjectGoalEnum.AWARD)));
         user2.setProjectVive(new HashSet<>(Arrays.asList(ProjectViveEnum.AGILE)));
@@ -106,7 +107,7 @@ public class ChatIntegrationTest {
         user3.setEmail("lee@example.com");
         user3.setMajor(true);
         user3.setLastClass(3);
-        user3.setWantedPosition(PositionEnum.FRONTEND);
+        user3.setWantedPosition(new ArrayList<>(Arrays.asList(PositionEnum.DESIGN)));
         user3.setTechStack(new HashSet<>(Arrays.asList(TechEnum.JPA, TechEnum.JPA)));
         user3.setProjectGoal(new HashSet<>(Arrays.asList(ProjectGoalEnum.AWARD)));
         user3.setProjectVive(new HashSet<>(Arrays.asList(ProjectViveEnum.AGILE)));
