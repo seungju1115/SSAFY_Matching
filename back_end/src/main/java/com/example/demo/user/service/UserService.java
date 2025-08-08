@@ -1,5 +1,6 @@
 package com.example.demo.user.service;
 
+import com.example.demo.team.entity.Team;
 import com.example.demo.user.Enum.ProjectGoalEnum;
 import com.example.demo.user.dao.UserRepository;
 import com.example.demo.user.dto.SearchUserRequest;
@@ -76,11 +77,11 @@ public class UserService {
         if (request.getQualification() != null) user.setQualification(request.getQualification());
         if (request.getTechStack() != null) user.setTechStack(request.getTechStack());
 
-        //if (request.getTeamId() != null) {
-        //    Team team = teamRepository.findById(request.getTeamId())
-        //            .orElseThrow(() -> new EntityNotFoundException("해당 팀이 존재하지 않습니다."));
-        //    user.setTeam(team);
-        //}
+        if (request.getTeamId() != null) {
+            Team team = teamRepository.findById(request.getTeamId())
+                    .orElseThrow(() -> new EntityNotFoundException("해당 팀이 존재하지 않습니다."));
+            user.setTeam(team);
+        }
 
         return UserProfileResponse.toUserProfileResponse(user);
     }
