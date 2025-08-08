@@ -115,9 +115,6 @@ const TeamPage: React.FC = () => {
     navigate('/matching?recommend=true')
   }
 
-  const handleGoBack = () => {
-    navigate(-1)
-  }
 
   if (isLoading) {
     return (
