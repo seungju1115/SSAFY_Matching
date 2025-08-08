@@ -2,6 +2,8 @@ package com.example.demo.common.exception;
 
 import com.example.demo.common.response.ApiResponse;
 import com.hazelcast.cp.lock.exception.LockAcquireLimitReachedException;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     // BusinessException 처리
@@ -118,8 +121,28 @@ public class GlobalExceptionHandler {
 
     // 그외 예외 처리
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Void>> handleUnknownException(Exception ex) {
+    public ResponseEntity<ApiResponse<Void>> handleUnknownException(Exception ex, HttpServletRequest request) {
         // 공통 서버 내부 오류 코드 사용
+        String requestURI = request.getRequestURI();
+        if (requestURI.startsWith("/v3/api-docs") ||
+                requestURI.startsWith("/swagger-ui") ||
+                requestURI.startsWith("/swagger-resources")) {
+
+            log.error("=== Swagger 예외 상세 정보 ===");
+            log.error("Request URI: {}", requestURI);
+            log.error("Exception Type: {}", ex.getClass().getName());
+            log.error("Exception Message: {}", ex.getMessage());
+            log.error("Full Stack Trace: ", ex);
+
+            // 임시로 원본 예외를 그대로 던지기
+            if (ex instanceof RuntimeException) {
+                throw (RuntimeException) ex;
+            } else {
+                throw new RuntimeException(ex);
+            }
+        }
+
+
         ErrorCode code = ErrorCode.INTERNAL_ERROR;
         return ResponseEntity
                 .status(code.getStatus())
