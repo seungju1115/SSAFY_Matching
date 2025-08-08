@@ -77,13 +77,6 @@ public class Team {
     @JoinColumn(name = "leader_id") // 외래키: team.leader_id → users.id
     private User leader;
 
-    public void setChatRoom(ChatRoom chatRoom) { //양방향 동기화 메서드
-        this.chatRoom = chatRoom;
-        if (chatRoom != null && chatRoom.getTeam() != this) {
-            chatRoom.setTeam(this);
-        }
-    }
-
     // ✅ 팀 멤버들 (1:N 관계)
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<User> members = new ArrayList<>();

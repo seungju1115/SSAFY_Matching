@@ -64,6 +64,13 @@ jwt:
 front:
   url: http://localhost:8080
 
+recsys:
+  base-url: http://localhost:8000
+  timeout:
+    connect: 5s
+    read: 30s
+
+
 springdoc:
   api-docs:
     path: /api-docs

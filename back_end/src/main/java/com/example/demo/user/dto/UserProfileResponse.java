@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -41,7 +42,7 @@ public class UserProfileResponse implements Serializable {
     private Integer lastClass;
 
     @Schema(description = "희망 포지션", example = "BACKEND")
-    private PositionEnum wantedPosition;
+    private List<PositionEnum> wantedPosition;
 
     @Schema(description = "프로젝트 선호도")
     private Set<ProjectGoalEnum> projectGoal;
@@ -87,6 +88,26 @@ public class UserProfileResponse implements Serializable {
             response.setTeamId(team.getId());
             if (team.getTeamName() != null) response.setTeamName(team.getTeamName());
         }
+
+        return response;
+    }
+
+    public static UserProfileResponse makeToUserProfileResponse(User user) {
+        UserProfileResponse response = new UserProfileResponse();
+        response.setId(user.getId());
+        response.setUserName(user.getUserName());
+        response.setRole(user.getRole());
+        response.setEmail(user.getEmail());
+        response.setMajor(user.isMajor());
+        response.setLastClass(user.getLastClass());
+
+        if (user.getUserProfile() != null) response.setUserProfile(user.getUserProfile());
+        if (user.getWantedPosition() != null) response.setWantedPosition(user.getWantedPosition());
+        if (user.getProjectGoal() != null) response.setProjectGoal(user.getProjectGoal());
+        if (user.getProjectVive() != null) response.setProjectVive(user.getProjectVive());
+        if (user.getProjectExp() != null) response.setProjectExp(user.getProjectExp());
+        if (user.getQualification() != null) response.setQualification(user.getQualification());
+        if (user.getTechStack() != null) response.setTechStack(user.getTechStack());
 
         return response;
     }

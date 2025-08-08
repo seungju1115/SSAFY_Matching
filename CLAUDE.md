@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Match SSAFY** - A full-stack team matching platform specifically designed for SSAFY (Samsung Software Academy For Youth) trainees. This monorepo application helps developers find teammates based on skills, positions, project preferences, and SSAFY-specific information (major/non-major tracks, class numbers, etc.).
+**Match SSAFY** - A full-stack team matching platform specifically designed for SSAFY (Samsung Software Academy For Youth) trainees. This monorepo consists of three main services: Spring Boot backend, React frontend, and FastAPI recommendation system.
 
 ### SSAFY-Specific Context
 - Users are categorized by major/non-major tracks (전공자/비전공자)
@@ -19,7 +19,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Comprehensive user profiling with enum-based categorization
 - Dashboard analytics for team and user metrics
 - Multi-environment setup: H2 (local), PostgreSQL (production)
-- Swagger/OpenAPI 3 documentation
+- Swagger/OpenAPI 3 documentation at `/swagger-ui.html`
 - Docker containerization
 
 **Frontend (React 19 + TypeScript + Vite)**:
@@ -31,6 +31,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Axios with interceptors for API communication
 - Multi-step profile setup with progress tracking
 - Mock data integration for development
+
+**RecSys (FastAPI + Python)**:
+- AI-powered team-person recommendation system
+- Machine learning algorithms for skill and preference matching
+- RESTful API for integration with Spring Boot backend
+- Scikit-learn, Pandas, NumPy for data processing and ML models
 
 ## Architecture
 
@@ -77,6 +83,16 @@ Feature-based organization with modern React patterns:
 - `services/`: Business logic and external service integrations
 - `utils/`: Helper functions, constants, validation schemas
 
+### RecSys Architecture (RecSys/)
+FastAPI-based recommendation service with machine learning:
+
+- **`main.py`**: FastAPI application entry point with CORS and logging setup
+- **`app/api/routes.py`**: REST API endpoints for recommendation services
+- **`app/core/config.py`**: Configuration management, CORS setup, logging
+- **`app/schemas/models.py`**: Pydantic models for request/response validation
+- **`app/services/recommender.py`**: Machine learning algorithms and recommendation logic
+- **`requirements.txt`**: Python dependencies (FastAPI, scikit-learn, pandas, numpy)
+
 ## Development Commands
 
 ### Backend Development
@@ -121,10 +137,27 @@ npm run lint
 npm run preview
 ```
 
+### RecSys Development (AI/ML Service)
+```bash
+# Navigate to RecSys directory
+cd RecSys
+
+# Install Python dependencies
+pip install -r requirements.txt
+
+# Run FastAPI development server
+python main.py
+# or
+uvicorn main:app --reload
+```
+
 ### Full-Stack Development
 ```bash
 # Run both services with Docker (backend: :8081, frontend: :8080)
 docker-compose up --build
+
+# Production deployment with optimized images
+docker-compose -f docker-compose.release.yml up --build
 
 # Development mode with hot reload
 cd front_end && docker-compose -f docker-compose.dev.yml up
@@ -170,6 +203,13 @@ OAuth2 flow: Frontend redirects to `/users/login/google` → Google OAuth → JW
 - React Hook Form 7.61 + Zod 4.0 for forms
 - Axios 1.11 for API calls
 - React Router 7.7 for routing
+
+**RecSys (AI/ML)**:
+- FastAPI 0.116.1 for REST API framework
+- Pydantic 2.11.7 for data validation and serialization
+- Scikit-learn 1.7.1 for machine learning algorithms
+- Pandas 2.3.1 + NumPy 2.3.2 for data processing
+- Uvicorn 0.35.0 ASGI server for production deployment
 
 ## Core Features & Workflows
 
@@ -345,3 +385,39 @@ const atmosphereToEnumMapping: Record<string, ProjectViveEnum> = {
 - ✅ GoogleSignInButton unused parameter warning fixed  
 - ✅ Backend Enum mapping aligned with frontend types
 - ✅ Complete API flow from UI to database
+
+## Important Development Notes
+
+### Windows-Specific Configuration
+- Docker polling enabled for file change detection: `CHOKIDAR_USEPOLLING=true` and `WATCHPACK_POLLING=true`  
+- Vite development server configured with `usePolling: true` for Windows Docker compatibility
+- Backend runs on `:8081`, frontend on `:8080` in Docker setup
+
+### Type System & Code Quality  
+- TypeScript strict mode enabled with `verbatimModuleSyntax`
+- Use `import type { ... }` for type-only imports to avoid compilation errors
+- Enum integration: Backend Java enums (ProjectGoalEnum, ProjectViveEnum, etc.) mapped to TypeScript union types
+- Zod validation schemas integrated with React Hook Form for form validation
+
+### Testing & Coverage
+- Backend: JUnit 5 with Jacoco coverage reports (`./gradlew test jacocoTestReport`)  
+- Coverage reports available at `build/reports/jacoco/test/html/`
+- All tests use H2 database regardless of Spring profile
+- Test isolation ensured with `@Transactional` and cleanup scripts
+
+### Database Schema & Initialization
+- Schema definition: `src/main/resources/schema-mysql.sql`
+- Test data: `src/main/resources/data.sql` (loaded in local profile)
+- H2 console: `http://localhost:8080/h2-console` (local profile only)
+- Database URL: `jdbc:h2:~/test` (local) | `jdbc:postgresql://postgres:5432/team_search` (prod)
+
+### API Documentation & Debugging
+- Swagger UI: `http://localhost:8080/swagger-ui.html` 
+- API Docs: `http://localhost:8080/api-docs`
+- Actuator endpoints: `http://localhost:8080/actuator` (health, metrics, prometheus)
+- Debug logging enabled for Spring Security OAuth2 in local profile
+
+### Git Workflow & Branch Management
+- Main branch: `master` (use for PRs)
+- Current feature branch: `feature/S13P11A307-118-api/팀-api-매핑`
+- Clean working directory policy - commit frequently with descriptive messages

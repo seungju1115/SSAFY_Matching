@@ -1,6 +1,7 @@
 package com.example.demo.team.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,6 +15,7 @@ public class TeamInviteRequest {
             example = "12",
             required = true
     )
+    @NotNull(message = "초대할 사용자 ID는 필수입니다.")
     private Long userId;
 
     @Schema(
@@ -21,5 +23,6 @@ public class TeamInviteRequest {
             example = "1",
             required = true
     )
+    @NotNull(message = "팀 ID는 필수입니다.")
     private Long teamId;
 }

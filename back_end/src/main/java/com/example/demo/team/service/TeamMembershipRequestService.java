@@ -1,5 +1,7 @@
 package com.example.demo.team.service;
 
+import com.example.demo.common.exception.BusinessException;
+import com.example.demo.common.exception.ErrorCode;
 import com.example.demo.team.dao.TeamMembershipRequestRepository;
 import com.example.demo.team.dao.TeamRepository;
 import com.example.demo.team.dto.*;
@@ -29,84 +31,70 @@ public class TeamMembershipRequestService {
     public final TeamMembershipRequestRepository teamMembershipRequestRepository;
     public final TeamRepository teamRepository;
     public final UserRepository userRepository;
-    private final TeamService teamService;
     private final SimpMessagingTemplate messagingTemplate;
     private final HazelcastInstance hazelcastInstance;
 
     @Transactional
-    public void requestTeamToMember(TeamOffer teamOffer){ // 팀원 아무나 초대 가능
-        Team team = teamRepository.findById(teamOffer.getTeamId()).orElseThrow(()-> new RuntimeException("no team"));
-        User user = userRepository.findById(teamOffer.getUserId()).orElseThrow(()-> new RuntimeException("no user"));
+    public void requestTeamToMember(TeamOffer teamOffer) {
+        Team team = teamRepository.findById(teamOffer.getTeamId()).orElseThrow(() -> new BusinessException(ErrorCode.TEAM_NOT_FOUND));
+        User user = userRepository.findById(teamOffer.getUserId()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        String key=team.getId() + "+" + user.getId();
-        FencedLock lock=hazelcastInstance.getCPSubsystem().getLock(key);
+        String key = team.getId() + "+" + user.getId();
+        FencedLock lock = hazelcastInstance.getCPSubsystem().getLock(key);
+
+        if (!lock.tryLock()) {
+            throw new LockAcquireLimitReachedException("요청이 처리 중입니다. 잠시 후 다시 시도해주세요.");
+        }
+
         try {
-            if(lock.tryLock(5, TimeUnit.SECONDS)) {
-                try {
-                    boolean exists = team.getMembershipRequests().stream()
-                            .anyMatch(req ->
-                                    req.getUser().equals(user)
-                                            && req.getStatus() != RequestStatus.REJECTED
-                            );
+            boolean exists = team.getMembershipRequests().stream()
+                    .anyMatch(req -> req.getUser().equals(user) && req.getStatus() != RequestStatus.REJECTED);
 
-                    if (exists) {
-                        System.out.println("이미 초대 요청이 존재합니다.");
-                        return;
-                    }
-
-                    saveTeamOffer(teamOffer, team, user);
-                }
-                finally {lock.unlock();}
-            } else {
-                throw new LockAcquireLimitReachedException("요청이 처리 중입니다. 잠시 후 다시 시도해주세요.");
+            if (exists) {
+                throw new BusinessException(ErrorCode.TEAM_REQUEST_ALLREADY_EXIST);
             }
 
-        } catch (Exception e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("요청이 중단되었습니다.", e);
+            saveTeamOffer(teamOffer, team, user);
+
+        } finally {
+            lock.unlock();
         }
 
         messagingTemplate.convertAndSend("/queue/team/offer/" + teamOffer.getUserId(), teamOffer.getMessage());
     }
-
     @Transactional
     public void requestMemberToTeam(TeamOffer teamOffer) {
-        Team team = teamRepository.findById(teamOffer.getTeamId()).orElseThrow(()-> new RuntimeException("no team"));
-        User user = userRepository.findById(teamOffer.getUserId()).orElseThrow(()-> new RuntimeException("no user"));
+        Team team = teamRepository.findById(teamOffer.getTeamId()).orElseThrow(()-> new BusinessException(ErrorCode.TEAM_NOT_FOUND));
+        User user = userRepository.findById(teamOffer.getUserId()).orElseThrow(()-> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         String key=team.getId() + "+" + user.getId();
         FencedLock lock=hazelcastInstance.getCPSubsystem().getLock(key);
-        try {
-            if(lock.tryLock(5, TimeUnit.SECONDS)) {
-                try {
-                    boolean exists = user.getMembershipRequests().stream()
-                            .anyMatch(req ->
-                                    req.getTeam().equals(team)
-                                            && req.getStatus() != RequestStatus.REJECTED
-                            );
 
-                    if (exists) {
-                        System.out.println("이미 초대 요청이 존재합니다.");
-                        return;
-                    }
-                    saveTeamOffer(teamOffer, team, user);
-                }
-                finally {lock.unlock();}
-            } else {
-                throw new LockAcquireLimitReachedException("요청이 처리 중입니다. 잠시 후 다시 시도해주세요.");
-            }
-
-        } catch (Exception e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("요청이 중단되었습니다.", e);
+        if (!lock.tryLock()) {
+            throw new LockAcquireLimitReachedException("요청이 처리 중입니다. 잠시 후 다시 시도해주세요.");
         }
 
-        for (TeamMemberResponse teamMemberResponse : teamService.getTeamMembers(teamOffer.getTeamId())) {
-            messagingTemplate.convertAndSend("/queue/team/offer/" + teamMemberResponse.getMemberId(), teamOffer.getMessage());
+        try {
+            boolean exists = team.getMembershipRequests().stream()
+                    .anyMatch(req -> req.getTeam().equals(team) && req.getStatus() != RequestStatus.REJECTED);
+
+            if (exists) {
+                throw new BusinessException(ErrorCode.TEAM_REQUEST_ALLREADY_EXIST);
+            }
+
+            saveTeamOffer(teamOffer, team, user);
+
+        } finally {
+            lock.unlock();
+        }
+
+        for (User member : team.getMembers()) {
+            messagingTemplate.convertAndSend("/queue/team/offer/" + member.getId(), teamOffer.getMessage());
         }
     }
 
-    private void saveTeamOffer(TeamOffer teamOffer, Team team, User user) {
+    @Transactional
+    public void saveTeamOffer(TeamOffer teamOffer, Team team, User user) {
 
         TeamMembershipRequest request = new TeamMembershipRequest();
         request.setTeam(team);
