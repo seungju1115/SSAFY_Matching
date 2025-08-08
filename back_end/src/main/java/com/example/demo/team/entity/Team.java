@@ -7,10 +7,7 @@ import com.example.demo.user.entity.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +17,8 @@ import java.util.Set;
 @Table(name = "team")
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Team {
 
     @Id
@@ -84,4 +81,13 @@ public class Team {
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL)
     private List<TeamMembershipRequest> membershipRequests = new ArrayList<>();
 
+    // 요청 상태: PENDING, ACCEPTED, REJECTED, CANCELED
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20, nullable = true)
+    @Builder.Default
+    private TeamStatus status = TeamStatus.UNLOCKED;
+
+    public Team() {
+        this.status = TeamStatus.UNLOCKED;
+    }
 }

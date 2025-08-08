@@ -3,6 +3,7 @@ package com.example.demo.team.dto;
 import com.example.demo.team.entity.RequestStatus;
 import com.example.demo.team.entity.RequestType;
 import com.example.demo.team.entity.TeamMembershipRequest;
+import com.example.demo.team.entity.TeamStatus;
 import lombok.*;
 
 import java.time.LocalDateTime;

@@ -83,4 +83,10 @@ public class TeamController {
         return ResponseEntity.ok(ApiResponse.ok(teamMembershipRequestService.getAllRequest(teamId)));
     }
 
+    @PostMapping("/{teamId}/lock")
+    public ResponseEntity<ApiResponse<Void>> lockTeam(@PathVariable Long teamId) {
+        teamService.lockTeam(teamId);
+        return ResponseEntity.ok(ApiResponse.ok());
+    }
+
 }

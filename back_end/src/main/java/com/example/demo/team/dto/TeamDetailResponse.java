@@ -8,6 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import com.example.demo.team.entity.TeamStatus;
+
 
 import java.util.List;
 import java.util.Set;
@@ -77,4 +79,10 @@ public class TeamDetailResponse{
             example = "저희는 사이드 프로젝트를 통해 함께 성장하고 싶은 주니어 개발자 그룹입니다."
     )
     private String teamDescription;
+
+    @Schema(
+            description = "팀 멤버 상태",
+            example = "FULL"
+    )
+    private TeamStatus teamStatus;
 }

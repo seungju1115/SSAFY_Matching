@@ -15,6 +15,7 @@ import com.example.demo.team.dto.TeamRequest;
 import com.example.demo.team.dto.TeamSearchRequest;
 import com.example.demo.team.entity.RequestType;
 import com.example.demo.team.entity.Team;
+import com.example.demo.team.entity.TeamStatus;
 import com.example.demo.user.Enum.PositionEnum;
 import com.example.demo.user.Enum.ProjectGoalEnum;
 import com.example.demo.user.Enum.ProjectViveEnum;
@@ -553,6 +554,29 @@ public class TeamIntegrationTest {
                 .andExpect(jsonPath("$.status").value(ApiResponse.ok().getStatus()))
                 .andExpect(jsonPath("$.data").isArray());
                 // data 배열 안에 최소 하나의 요청 객체가 있고, userName 필드가 존재하는지 확인
+    }
+
+    @Test
+    @DisplayName("팀 LOCK 요청 통합 테스트 - 성공")
+    void lockTeam_success() throws Exception {
+        // when
+        mockMvc.perform(post("/team/{teamId}/lock", team1.getId())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(ApiResponse.ok().getStatus()));
+
+    }
+
+    @Test
+    @DisplayName("팀 LOCK 요청 통합 테스트 - 실패 이미 락된 팀")
+    void lockTeam_failWithAllReadyLocked() throws Exception {
+        team1.setStatus(TeamStatus.LOCKED);
+        // when
+        mockMvc.perform(post("/team/{teamId}/lock", team1.getId())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(ErrorCode.TEAM_ALLREADY_LOCKED.getStatus()));
+
     }
 }
 

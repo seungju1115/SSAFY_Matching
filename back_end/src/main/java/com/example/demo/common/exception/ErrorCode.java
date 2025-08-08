@@ -16,6 +16,7 @@ public enum ErrorCode {
 
     // ==================== Team 관련 에러 ====================
     TEAM_NOT_FOUND(404, "해당 팀을 찾을 수 없습니다."),
+    TEAM_ALLREADY_LOCKED(400, "이미 고정된 팀입니다."),
     TEAM_INVALID_REQUEST(400, "팀 요청이 유효하지 않습니다."),
     TEAM_NAME_ALREADY_EXISTS(400, "이미 존재하는 팀 이름입니다."),
     TEAM_MEMBER_LIMIT_EXCEEDED(400, "팀 인원 제한을 초과했습니다."),

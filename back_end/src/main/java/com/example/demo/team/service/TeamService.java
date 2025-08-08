@@ -4,6 +4,7 @@ import com.example.demo.common.exception.BusinessException;
 import com.example.demo.common.exception.ErrorCode;
 import com.example.demo.team.dao.TeamMembershipRequestRepository;
 import com.example.demo.team.entity.TeamMembershipRequest;
+import com.example.demo.team.entity.TeamStatus;
 import com.example.demo.user.dao.UserRepository;
 import com.example.demo.user.dto.UserDetailResponse;
 import com.example.demo.user.entity.User;
@@ -158,6 +159,17 @@ public class TeamService {
         return teamToResponse(team);
     }
 
+    // 6. 팀 정보 수정
+    @Transactional
+    @CacheEvict(value = "longTermCache", key = "'team:' + #teamId")
+    public void lockTeam(Long teamId) {
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.TEAM_NOT_FOUND));
+
+        if(team.getStatus() != TeamStatus.LOCKED)team.setStatus(TeamStatus.LOCKED);
+        else throw new BusinessException(ErrorCode.TEAM_ALLREADY_LOCKED);
+    }
+
     public Team toTeam(TeamRequest teamRequest,Team team) {
         team.setTeamName(teamRequest.getTeamName());
         team.setTeamDomain(teamRequest.getTeamDomain());
@@ -221,7 +233,7 @@ public class TeamService {
             }
         }
         response.setMembers(members);
-
+        response.setTeamStatus(team.getStatus());
         return response;
     }
 
