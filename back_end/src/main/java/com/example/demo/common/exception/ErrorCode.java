@@ -42,6 +42,7 @@ public enum ErrorCode {
     NETWORK_TIMEOUT(504, "네트워크 연결 시간 초과입니다."),
     NETWORK_CONNECT_FAIL(503, "네트워크 연결에 실패했습니다."),
     NETWORK_ERROR(500, "네트워크 오류가 발생했습니다."),
+    LOCK_ACQUIRE_FAILED(409, "현재 다른 요청을 처리 중입니다. 잠시 후 다시 시도해주세요."),
 
     // ==================== 구글 에러 =====================
     OAUTH2_INVALID_TOKEN(401, "유효하지 않은 액세스 토큰입니다."),

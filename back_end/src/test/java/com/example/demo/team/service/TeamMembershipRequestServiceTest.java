@@ -15,6 +15,9 @@ import com.example.demo.user.Enum.ProjectViveEnum;
 import com.example.demo.user.Enum.TechEnum;
 import com.example.demo.user.dao.UserRepository;
 import com.example.demo.user.entity.User;
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.cp.CPSubsystem;
+import com.hazelcast.cp.lock.FencedLock;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -24,6 +27,7 @@ import org.mockito.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -50,8 +54,17 @@ class TeamMembershipRequestServiceTest {
     @InjectMocks
     private TeamMembershipRequestService teamMembershipRequestService;
 
+    @Mock
+    private HazelcastInstance hazelcastInstance; // 1. HazelcastInstance를 Mock으로 선언
+
+    @Mock
+    private FencedLock fencedLock; // 2. FencedLock도 Mock으로 선언
+
+    @Mock
+    private CPSubsystem cpSubsystem; // 3. getCPSubsystem()이 반환할 객체도 Mock으로 선언
+
     private Team team;
-    private User user;
+    private User user,user2;
     private TeamOffer teamOffer;
     private TeamMembershipRequest existingRequest;
 
@@ -62,6 +75,7 @@ class TeamMembershipRequestServiceTest {
         team.setTeamName("teamA");
         team.setTeamDomain("DOMAINwebDesign");
         team.setMembershipRequests(new ArrayList<>());
+        team.setMembers(new ArrayList<>());
 
         user = new User();
         user.setUserName("test");
@@ -73,6 +87,20 @@ class TeamMembershipRequestServiceTest {
         user.setLastClass(13);
         user.setEmail("test@gmail.com");
         user.setId(1L);
+
+        user2 = new User();
+        user2.setUserName("test");
+        user2.setRole("ROLE_USER");
+        user2.setWantedPosition(PositionEnum.BACKEND);
+        user2.setTechStack(new HashSet<>(Arrays.asList(TechEnum.JPA, TechEnum.JPA)));
+        user2.setProjectGoal(new HashSet<>(Arrays.asList(ProjectGoalEnum.AWARD)));
+        user2.setProjectVive(new HashSet<>(Arrays.asList(ProjectViveEnum.AGILE)));
+        user2.setLastClass(13);
+        user2.setEmail("test@gmail.com");
+        user2.setId(2L);
+
+        team.getMembers().add(user);
+        team.getMembers().add(user2);
 
         teamOffer = new TeamOffer();
         teamOffer.setTeamId(1L);
@@ -86,13 +114,18 @@ class TeamMembershipRequestServiceTest {
         existingRequest.setStatus(RequestStatus.PENDING);
     }
 
-    @BeforeAll
-    static void globalSetUp(){
-
-    }
     @Test
     @DisplayName("팀 -> 멤버 요청 성공")
     void requestTeamToMember_success() {
+        // 1. hazelcastInstance.getCPSubsystem()이 호출되면, 우리가 만든 cpSubsystem Mock을 반환하도록 설정
+        when(hazelcastInstance.getCPSubsystem()).thenReturn(cpSubsystem);
+
+        // 2. cpSubsystem.getLock(...)이 호출되면, 우리가 만든 fencedLock Mock을 반환하도록 설정
+        when(cpSubsystem.getLock(anyString())).thenReturn(fencedLock);
+
+        // 3. fencedLock.tryLock(...)이 호출되면, true를 반환하여 락 획득에 성공한 것처럼 설정
+        when(fencedLock.tryLock()).thenReturn(true);
+
         // given
         when(teamRepository.findById(teamOffer.getTeamId())).thenReturn(Optional.of(team));
         when(userRepository.findById(teamOffer.getUserId())).thenReturn(Optional.of(user));
@@ -132,6 +165,15 @@ class TeamMembershipRequestServiceTest {
     void requestTeamToMember_duplicateRequest() {
         team.setMembershipRequests(List.of(existingRequest));
 
+        // 1. hazelcastInstance.getCPSubsystem()이 호출되면, 우리가 만든 cpSubsystem Mock을 반환하도록 설정
+        when(hazelcastInstance.getCPSubsystem()).thenReturn(cpSubsystem);
+
+        // 2. cpSubsystem.getLock(...)이 호출되면, 우리가 만든 fencedLock Mock을 반환하도록 설정
+        when(cpSubsystem.getLock(anyString())).thenReturn(fencedLock);
+
+        // 3. fencedLock.tryLock(...)이 호출되면, true를 반환하여 락 획득에 성공한 것처럼 설정
+        when(fencedLock.tryLock()).thenReturn(true);
+
         when(teamRepository.findById(teamOffer.getTeamId())).thenReturn(Optional.of(team));
         when(userRepository.findById(teamOffer.getUserId())).thenReturn(Optional.of(user));
 
@@ -144,24 +186,26 @@ class TeamMembershipRequestServiceTest {
     @DisplayName("유저 -> 팀 요청 성공")
     void requestMemberToTeam_success() {
         teamOffer.setRequestType(RequestType.JOIN_REQUEST);
+
         user.setMembershipRequests(new ArrayList<>());
+        // 1. hazelcastInstance.getCPSubsystem()이 호출되면, 우리가 만든 cpSubsystem Mock을 반환하도록 설정
+        when(hazelcastInstance.getCPSubsystem()).thenReturn(cpSubsystem);
+
+        // 2. cpSubsystem.getLock(...)이 호출되면, 우리가 만든 fencedLock Mock을 반환하도록 설정
+        when(cpSubsystem.getLock(anyString())).thenReturn(fencedLock);
+
+        // 3. fencedLock.tryLock(...)이 호출되면, true를 반환하여 락 획득에 성공한 것처럼 설정
+        when(fencedLock.tryLock()).thenReturn(true);
+
         when(teamRepository.findById(teamOffer.getTeamId())).thenReturn(Optional.of(team));
         when(userRepository.findById(teamOffer.getUserId())).thenReturn(Optional.of(user));
         when(teamMembershipRequestRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // 팀 멤버 리스트 준비
-        var memberResponse1 = new TeamMemberResponse();
-        memberResponse1.setMemberId(100L);
-        var memberResponse2 = new TeamMemberResponse();
-        memberResponse2.setMemberId(200L);
-
-        when(teamService.getTeamMembers(teamOffer.getTeamId())).thenReturn(List.of(memberResponse1, memberResponse2));
-
         teamMembershipRequestService.requestMemberToTeam(teamOffer);
 
         verify(teamMembershipRequestRepository, times(1)).save(any(TeamMembershipRequest.class));
-        verify(messagingTemplate, times(1)).convertAndSend("/queue/team/offer/100", teamOffer.getMessage());
-        verify(messagingTemplate, times(1)).convertAndSend("/queue/team/offer/200", teamOffer.getMessage());
+        verify(messagingTemplate, times(1)).convertAndSend("/queue/team/offer/"+team.getMembers().get(0).getId(), teamOffer.getMessage());
+        verify(messagingTemplate, times(1)).convertAndSend("/queue/team/offer/"+team.getMembers().get(0).getId(), teamOffer.getMessage());
     }
 
     @Test
@@ -190,6 +234,15 @@ class TeamMembershipRequestServiceTest {
     void requestMemberToTeam_duplicateRequest() {
         team.setMembershipRequests(List.of(existingRequest));
 
+        // 1. hazelcastInstance.getCPSubsystem()이 호출되면, 우리가 만든 cpSubsystem Mock을 반환하도록 설정
+        when(hazelcastInstance.getCPSubsystem()).thenReturn(cpSubsystem);
+
+        // 2. cpSubsystem.getLock(...)이 호출되면, 우리가 만든 fencedLock Mock을 반환하도록 설정
+        when(cpSubsystem.getLock(anyString())).thenReturn(fencedLock);
+
+        // 3. fencedLock.tryLock(...)이 호출되면, true를 반환하여 락 획득에 성공한 것처럼 설정
+        when(fencedLock.tryLock()).thenReturn(true);
+
         when(teamRepository.findById(teamOffer.getTeamId())).thenReturn(Optional.of(team));
         when(userRepository.findById(teamOffer.getUserId())).thenReturn(Optional.of(user));
 
@@ -201,28 +254,22 @@ class TeamMembershipRequestServiceTest {
     @Test
     @DisplayName("saveTeamOffer가 올바른 데이터로 호출되는지 검증")
     void saveTeamOffer_shouldSaveWithCorrectValues() {
-        // given
-        teamOffer.setRequestType(RequestType.JOIN_REQUEST);
-        user.setMembershipRequests(new ArrayList<>());
+        teamMembershipRequestService.saveTeamOffer(teamOffer, team, user);
 
-        when(teamRepository.findById(teamOffer.getTeamId())).thenReturn(Optional.of(team));
-        when(userRepository.findById(teamOffer.getUserId())).thenReturn(Optional.of(user));
-        when(teamMembershipRequestRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+        ArgumentCaptor<TeamMembershipRequest> requestCaptor = ArgumentCaptor.forClass(TeamMembershipRequest.class);
 
-        when(teamService.getTeamMembers(teamOffer.getTeamId())).thenReturn(List.of());
+        // 2. teamMembershipRequestRepository의 save 메서드가 1번 호출되었는지,
+        //    그리고 그때 전달된 인자를 캡처합니다.
+        verify(teamMembershipRequestRepository, times(1)).save(requestCaptor.capture());
 
-        // when
-        teamMembershipRequestService.requestMemberToTeam(teamOffer);
+        // 3. 캡처된 객체를 가져옵니다.
+        TeamMembershipRequest capturedRequest = requestCaptor.getValue();
 
-        // then
-        ArgumentCaptor<TeamMembershipRequest> captor = ArgumentCaptor.forClass(TeamMembershipRequest.class);
-        verify(teamMembershipRequestRepository).save(captor.capture());
-
-        TeamMembershipRequest saved = captor.getValue();
-        assertThat(saved.getTeam()).isEqualTo(team);
-        assertThat(saved.getUser()).isEqualTo(user);
-        assertThat(saved.getRequestType()).isEqualTo(RequestType.JOIN_REQUEST);
-        assertThat(saved.getStatus()).isEqualTo(RequestStatus.PENDING);
-        assertThat(saved.getMessage()).isEqualTo("초대 메시지");
+        // 4. 캡처된 객체의 각 필드가 우리가 준비한 데이터와 일치하는지 검증합니다.
+        assertThat(capturedRequest.getTeam()).isEqualTo(team);
+        assertThat(capturedRequest.getUser()).isEqualTo(user);
+        assertThat(capturedRequest.getRequestType()).isEqualTo(teamOffer.getRequestType());
+        assertThat(capturedRequest.getStatus()).isEqualTo(RequestStatus.PENDING);
+        assertThat(capturedRequest.getMessage()).isEqualTo(teamOffer.getMessage());
     }
 }

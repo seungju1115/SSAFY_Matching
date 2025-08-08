@@ -117,9 +117,18 @@ public class ChatIntegrationTest {
         teamRequest.setTeamName("test team");
         teamRequest.setTeamDomain("testDomainTestTime");
         teamRequest.setLeaderId(user1.getId());
+        teamRequest.setTeamId(1L);
+        teamRequest.setTeamVive(new HashSet<>(Arrays.asList(ProjectViveEnum.AGILE)));
+        teamRequest.setTeamPreference(new HashSet<>(Arrays.asList(ProjectGoalEnum.IDEA)));
+        teamRequest.setBackendCount(2);
+        teamRequest.setFrontendCount(2);
+        teamRequest.setAiCount(1);
+        teamRequest.setPmCount(1);
+        teamRequest.setDesignCount(0);
+        teamRequest.setTeamDescription("함께 성장하며 멋진 포트폴리오를 만들고 싶습니다.");
 
-        TeamResponse teamResponse = teamService.createTeam(teamRequest);
-        teamDetailResponse = teamService.getTeam(teamResponse.getTeamId());
+        TeamDetailResponse teamDetailResponse = teamService.createTeam(teamRequest);
+        teamDetailResponse = teamService.getTeam(teamDetailResponse.getTeamId());
 
         chatMessageRequest = new ChatMessageRequest();
         chatMessageRequest.setRoomId(teamDetailResponse.getChatRoomId());

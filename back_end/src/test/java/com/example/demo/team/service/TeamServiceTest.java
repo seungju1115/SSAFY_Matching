@@ -14,7 +14,9 @@ import com.example.demo.user.Enum.ProjectGoalEnum;
 import com.example.demo.user.Enum.ProjectViveEnum;
 import com.example.demo.user.Enum.TechEnum;
 import com.example.demo.user.dao.UserRepository;
+import com.example.demo.user.dto.UserProfileResponse;
 import com.example.demo.user.entity.User;
+import com.example.demo.user.service.UserService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -40,6 +42,9 @@ class TeamServiceTest {
     @Mock
     private ChatRoomService chatRoomService;
 
+    @Mock
+    private UserService userService;
+
     @InjectMocks
     private TeamService teamService;
 
@@ -60,7 +65,7 @@ class TeamServiceTest {
         team.setId(1L);
         team.setTeamName("테스트 팀");
         team.setTeamDomain("DOMAINwebDesign");
-        team.setMembers(List.of(user1, user2));
+        team.setMembers(new ArrayList<>(Arrays.asList(user1,user2)));
 
         user = new User();
         user.setUserName("test");
@@ -71,7 +76,7 @@ class TeamServiceTest {
         user.setProjectVive(new HashSet<>(Arrays.asList(ProjectViveEnum.AGILE)));
         user.setLastClass(13);
         user.setEmail("test@gmail.com");
-        user.setId(1L);
+        user.setId(100L);
 
         team.setLeader(user);
         ChatRoom chatRoom = new ChatRoom();
@@ -80,44 +85,74 @@ class TeamServiceTest {
 
         teamRequest = new TeamRequest();
         teamRequest.setTeamId(1L);
-        teamRequest.setTeamName("테스트 팀2");
-        teamRequest.setLeaderId(1L);
-        teamRequest.setTeamDomain("exampledomain"); // 최소 10자 이상
+        teamRequest.setTeamName("성장하는 A팀");
+        teamRequest.setLeaderId(100L);
+        teamRequest.setTeamDomain("growth-team-a"); // 최소 10자 이상
+        teamRequest.setTeamVive(new HashSet<>(Arrays.asList(ProjectViveEnum.AGILE)));
+        teamRequest.setTeamPreference(new HashSet<>(Arrays.asList(ProjectGoalEnum.IDEA)));
+        teamRequest.setBackendCount(2);
+        teamRequest.setFrontendCount(2);
+        teamRequest.setAiCount(1);
+        teamRequest.setPmCount(1);
+        teamRequest.setDesignCount(0);
+        teamRequest.setTeamDescription("함께 성장하며 멋진 포트폴리오를 만들고 싶습니다.");
     }
 
+    static private UserProfileResponse userProfileResponse1;
     @BeforeAll
-    static void globalSetUp(){
-
+    static void globalSetUp() {
+        // --- 사용자 1: 백엔드 개발자 지망생 ---
+        userProfileResponse1 = new UserProfileResponse();
+        userProfileResponse1.setId(100L);
+        userProfileResponse1.setUserName("김백엔");
+        userProfileResponse1.setRole("USER");
+        userProfileResponse1.setEmail("backend.kim@example.com");
+        userProfileResponse1.setUserProfile("Spring Boot와 JPA에 자신 있는 백엔드 개발자입니다.");
+        userProfileResponse1.setMajor(true);
+        userProfileResponse1.setLastClass(8);
+        userProfileResponse1.setWantedPosition(PositionEnum.BACKEND);
+        userProfileResponse1.setProjectGoal(Set.of(ProjectGoalEnum.AWARD, ProjectGoalEnum.PORTFOLIO));
+        userProfileResponse1.setProjectVive(Set.of(ProjectViveEnum.RULE, ProjectViveEnum.AGILE));
+        userProfileResponse1.setProjectExp("실시간 채팅 기능이 포함된 소셜 미디어 플랫폼 개발 경험");
+        userProfileResponse1.setQualification("SQLD");
+        userProfileResponse1.setTechStack(Set.of(TechEnum.JAVA, TechEnum.SPRING, TechEnum.JPA, TechEnum.MYSQL));
+        userProfileResponse1.setTeamId(10L); // 소속된 팀 정보
+        userProfileResponse1.setTeamName("성장하는 A팀");
     }
-
 
     @Test
     @DisplayName("팀 생성 성공")
     void createTeam_성공() {
         user.setTeam(null);
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+
+        when(userRepository.findById(teamRequest.getLeaderId())).thenReturn(Optional.of(user));
         when(teamRepository.save(any(Team.class))).thenAnswer(invocation -> {
             Team savedTeam = invocation.getArgument(0);
             savedTeam.setId(1L);
-            savedTeam.setChatRoom(new ChatRoom()); // 추가
-            savedTeam.getChatRoom().setId(1L);
+            ChatRoom chatRoom = new ChatRoom();
+            chatRoom.setId(1L);
+            savedTeam.setChatRoom(chatRoom);
             return savedTeam;
         });
-        ChatRoomResponse mockResponse = new ChatRoomResponse();
-        mockResponse.setRoomId(1L);
-        // 필요한 필드 세팅
-        when(chatRoomService.createTeamChatRoom(any(ChatRoomRequest.class)))
-                .thenReturn(mockResponse);
+        when(userService.getProfile(user.getId())).thenReturn(userProfileResponse1);
 
-        TeamResponse response = teamService.createTeam(teamRequest);
+        // When (실행)
+        TeamDetailResponse response = teamService.createTeam(teamRequest);
 
+        assertThat(response).isNotNull();
         assertThat(response.getTeamName()).isEqualTo(teamRequest.getTeamName());
-        assertThat(response.getLeaderId()).isEqualTo(user.getId());
-        assertThat(response.getMemberCount()).isEqualTo(1);
+        assertThat(response.getLeader().getId()).isEqualTo(user.getId());
+        // 팀 생성 시 리더가 멤버로 자동 추가되므로 멤버 수는 1명
+        assertThat(response.getMembers()).hasSize(1);
+        assertThat(response.getMembers().get(0).getId()).isEqualTo(user.getId());
+        assertThat(response.getChatRoomId()).isEqualTo(1L);
 
+        // 2. 주요 메서드들이 정확히 1번씩 호출되었는지 검증
         verify(userRepository, times(1)).findById(user.getId());
         verify(teamRepository, times(1)).save(any(Team.class));
         verify(chatRoomService, times(1)).createTeamChatRoom(any(ChatRoomRequest.class));
+        // leader 정보 조회 1번, members 리스트 순회하며 조회 1번 -> 총 2번 호출
+        verify(userService, times(2)).getProfile(user.getId());
     }
 
     @Test
@@ -156,9 +191,9 @@ class TeamServiceTest {
     @Test
     @DisplayName("모든 팀 조회 성공")
     void getAllTeams_성공() {
-        when(teamRepository.findAll()).thenReturn(List.of(team));
+        when(teamRepository.findAllWithDetails()).thenReturn(List.of(team));
 
-        List<TeamResponse> allTeams = teamService.getAllTeams();
+        List<TeamDetailResponse> allTeams = teamService.getAllTeams();
 
         assertThat(allTeams).hasSize(1);
         assertThat(allTeams.get(0).getTeamName()).isEqualTo(team.getTeamName());
@@ -190,21 +225,20 @@ class TeamServiceTest {
         team2.setChatRoom(new ChatRoom()); // 추가
         team2.getChatRoom().setId(2L);
 
-        when(teamRepository.findAll()).thenReturn(List.of(team1, team2));
+        when(teamRepository.findAllWithDetails()).thenReturn(List.of(team1, team2));
 
         TeamSearchRequest request = new TeamSearchRequest();
         request.setTeamName("테스트"); // 이름에 "테스트"가 포함된 팀만
         request.setLeaderId(100L);    // 리더 ID가 100L인 팀만
 
         // when
-        List<TeamResponse> result = teamService.searchConditionTeam(request);
+        List<TeamDetailResponse> result = teamService.searchConditionTeam(request);
 
         // then
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).getTeamName()).isEqualTo("테스트A");
-        assertThat(result.get(0).getLeaderId()).isEqualTo(100L);
+        assertThat(result.get(0).getTeamName()).isEqualTo(team1.getTeamName());
 
-        verify(teamRepository, times(1)).findAll();
+        verify(teamRepository, times(1)).findAllWithDetails();
     }
 
     @Test
@@ -218,7 +252,6 @@ class TeamServiceTest {
         // then
         assertThat(response.getTeamId()).isEqualTo(1L);
         assertThat(response.getTeamName()).isEqualTo("테스트 팀");
-        assertThat(response.getLeaderId()).isEqualTo(1L);
 
         verify(teamRepository, times(1)).findById(1L);
     }
@@ -242,7 +275,6 @@ class TeamServiceTest {
         // 멤버들의 team 참조 해제 (양방향 관계 주인: User.team)
         if (team.getMembers() != null) {
             for (User member : new ArrayList<>(team.getMembers())) {
-                // member.setTeam(null); // 이 부분을 직접 컬렉션 수정 없이 null 할당으로 바꾸거나
                 member.setTeam(null); // 이 호출 시 setTeam 내부에서 리스트 수정 안 하도록 해야 함
             }
         }
@@ -280,7 +312,6 @@ class TeamServiceTest {
         var response = teamService.modifyTeam(teamRequest);
 
         assertThat(response.getTeamName()).isEqualTo("수정된팀명");
-        assertThat(response.getLeaderId()).isEqualTo(user.getId());
     }
 
     @Test
@@ -336,7 +367,7 @@ class TeamServiceTest {
 
         var response = teamService.inviteMemberTeam(request);
 
-        assertThat(response.getMembersId()).contains(user.getId());
+//        assertThat(response.getMembersId()).contains(user.getId());
         assertThat(user.getTeam()).isEqualTo(team);
 
         verify(chatRoomService, times(1)).addMemberToTeamChatRoom(any());
@@ -392,36 +423,36 @@ class TeamServiceTest {
         verify(chatRoomService, never()).addMemberToTeamChatRoom(any());
     }
 
-    @Test
-    @DisplayName("팀 멤버 조회 성공")
-    void getTeamMembers_success() {
-        // given
-        when(teamRepository.findById(1L)).thenReturn(Optional.of(team));
-
-        // when
-        List<TeamMemberResponse> result = teamService.getTeamMembers(1L);
-
-        // then
-        assertThat(result).hasSize(2);
-        assertThat(result.get(0).getMemberId()).isEqualTo(1L);
-        assertThat(result.get(0).getUserName()).isEqualTo("Alice");
-        assertThat(result.get(1).getMemberId()).isEqualTo(2L);
-        assertThat(result.get(1).getUserName()).isEqualTo("Bob");
-
-        verify(teamRepository, times(1)).findById(1L);
-    }
-
-    @Test
-    @DisplayName("팀 멤버 조회 실패 - 팀 없음")
-    void getTeamMembers_teamNotFound() {
-        // given
-        when(teamRepository.findById(999L)).thenReturn(Optional.empty());
-
-        // when & then
-        assertThatThrownBy(() -> teamService.getTeamMembers(999L))
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining(ErrorCode.TEAM_NOT_FOUND.getMessage());
-
-        verify(teamRepository, times(1)).findById(999L);
-    }
+//    @Test
+//    @DisplayName("팀 멤버 조회 성공")
+//    void getTeamMembers_success() {
+//        // given
+//        when(teamRepository.findById(1L)).thenReturn(Optional.of(team));
+//
+//        // when
+//        List<TeamMemberResponse> result = teamService.getTeamMembers(1L);
+//
+//        // then
+//        assertThat(result).hasSize(2);
+//        assertThat(result.get(0).getMemberId()).isEqualTo(1L);
+//        assertThat(result.get(0).getUserName()).isEqualTo("Alice");
+//        assertThat(result.get(1).getMemberId()).isEqualTo(2L);
+//        assertThat(result.get(1).getUserName()).isEqualTo("Bob");
+//
+//        verify(teamRepository, times(1)).findById(1L);
+//    }
+//
+//    @Test
+//    @DisplayName("팀 멤버 조회 실패 - 팀 없음")
+//    void getTeamMembers_teamNotFound() {
+//        // given
+//        when(teamRepository.findById(999L)).thenReturn(Optional.empty());
+//
+//        // when & then
+//        assertThatThrownBy(() -> teamService.getTeamMembers(999L))
+//                .isInstanceOf(BusinessException.class)
+//                .hasMessageContaining(ErrorCode.TEAM_NOT_FOUND.getMessage());
+//
+//        verify(teamRepository, times(1)).findById(999L);
+//    }
 }

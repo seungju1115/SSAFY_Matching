@@ -120,7 +120,6 @@ public class TeamIntegrationTest {
         team1 = new Team();
         team1.setTeamName("테스트 팀");
         team1.setTeamDomain("testteamdomain123"); // 최소 길이 10 이상이어야 함
-        team1.setMemberWanted("백엔드 개발자 모집");
         team1.setTeamDescription("통합 테스트용 팀 설명입니다.");
         team1.setTeamPreference(new HashSet<>(Arrays.asList(ProjectGoalEnum.AWARD, ProjectGoalEnum.IDEA))); // ✅ 가변 Set
         team1.setLeader(user2);

@@ -1,6 +1,7 @@
 package com.example.demo.common.exception;
 
 import com.example.demo.common.response.ApiResponse;
+import com.hazelcast.cp.lock.exception.LockAcquireLimitReachedException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -99,6 +100,20 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(code.getStatus())
                 .body(new ApiResponse<>(code.getStatus(), code.getMessage(), null));
+    }
+
+    //hazel
+    @ExceptionHandler(LockAcquireLimitReachedException.class)
+    public ResponseEntity<ApiResponse<Void>> handleLockAcquireLimitReachedException(LockAcquireLimitReachedException e) {
+        ErrorCode errorCode = ErrorCode.LOCK_ACQUIRE_FAILED;
+
+        ApiResponse<Void> responseBody = new ApiResponse<>(
+                errorCode.getStatus(),
+                errorCode.getMessage(), // ErrorCode에 정의된 메시지를 사용
+                null                  // 데이터 부분은 비워둡니다.
+        );
+
+        return ResponseEntity.status(errorCode.getStatus()).body(responseBody);
     }
 
     // 그외 예외 처리
