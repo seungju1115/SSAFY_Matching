@@ -6,7 +6,7 @@ services:
     image: rabent0207/matching-ssafy-backend:latest
     container_name: spring-backend
     ports:
-      - "8081:8080"
+      - "8080:8080"
     volumes:
       - gradle-cache:/root/.gradle  # Gradle 캐시 볼륨
     restart: unless-stopped
@@ -21,7 +21,7 @@ services:
       context: ./front_end
       dockerfile: Dockerfile.nginx
     ports:
-      - "8080:80"
+      - "80:80"
     volumes:
       # 소스 코드 볼륨 마운트 (실시간 수정을 위해)
       - ./front_end:/app
@@ -42,6 +42,18 @@ services:
     networks:
       - app-network
 
+  recsys:
+    build:
+      context: ./RecSys
+    ports:
+      - "8000:8000"  # 호스트:컨테이너
+    environment:
+      - PYTHONPATH=/app
+    volumes:
+      - ./logs:/app/logs  # 로그 파일용 (있다면)
+    restart: unless-stopped
+    networks:
+      - app-network
 
 volumes:
   gradle-cache:  # 도커 관리 볼륨 정의
