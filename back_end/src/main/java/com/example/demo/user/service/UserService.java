@@ -63,7 +63,7 @@ public class UserService {
         userRepository.delete(user);
     }
 
-    @CacheEvict(value = "longTermCache", key = "'user:'+ #id")
+//    @CacheEvict(value = "longTermCache", key = "'user:'+ #id")
     @Transactional
     public UserProfileResponse updateUserProfile(UserProfileUpdateRequest request, Long id) {
         System.out.println("유저 찾기 전");
