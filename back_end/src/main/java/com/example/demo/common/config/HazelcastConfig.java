@@ -55,7 +55,7 @@ public class HazelcastConfig {
 
         EvictionConfig evictionConfig = new EvictionConfig();
         evictionConfig.setEvictionPolicy(EvictionPolicy.LRU);
-        evictionConfig.setMaxSizePolicy(MaxSizePolicy.ENTRY_COUNT);
+        evictionConfig.setMaxSizePolicy(MaxSizePolicy.PER_NODE);
         evictionConfig.setSize(300);
         longTermConfig.setEvictionConfig(evictionConfig);
         config.addMapConfig(longTermConfig);
