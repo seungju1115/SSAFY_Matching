@@ -4,9 +4,7 @@ import com.example.demo.user.Enum.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import com.example.demo.user.entity.User;
-import com.example.demo.team.entity.Team;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 

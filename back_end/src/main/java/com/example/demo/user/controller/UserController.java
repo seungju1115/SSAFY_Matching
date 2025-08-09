@@ -2,11 +2,8 @@
 package com.example.demo.user.controller;
 
 import com.example.demo.common.response.ApiResponse;
-import com.example.demo.user.dto.SearchUserRequest;
-import com.example.demo.user.dto.SearchUserResponse;
-import com.example.demo.user.dto.UserProfileRequest;
-import com.example.demo.user.dto.UserProfileResponse;
-import com.example.demo.user.dto.UserProfileUpdateRequest;
+import com.example.demo.user.dto.*;
+import com.example.demo.user.dto.UserSearchRequest;
 import com.example.demo.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -365,16 +362,16 @@ public class UserController {
                     description = "잘못된 검색 조건"
             )
     })
-    @PostMapping("/search")
+    @GetMapping("/search")
     public ResponseEntity<ApiResponse> searchUsersWithoutTeam(
             @Parameter(
                     description = "팀원 검색 조건",
                     required = true,
-                    schema = @Schema(implementation = SearchUserRequest.class)
+                    schema = @Schema(implementation = UserSearchRequest.class)
             )
-            @Valid @RequestBody SearchUserRequest request
+            @Valid @RequestBody UserSearchRequest request
     ) {
-        List<SearchUserResponse> users = userService.searchUsersWithoutTeam(request);
+        List<UserSearchResponse> users = userService.searchUsersWithoutTeam(request);
         return ResponseEntity.ok(ApiResponse.ok(users));
     }
 }
