@@ -42,7 +42,7 @@ public class DashboardService {
 
         for (UserCountDto user : users) {
             boolean hasTeam = user.getTeam() != null;
-            if (user.isMajor()) {
+            if (user.getMajor()) {
                 if (hasTeam) matched_major++;
                 else unmatched_major++;
             } else {
@@ -124,7 +124,7 @@ public class DashboardService {
 
         for (UserCountDto user : users) {
             boolean hasTeam = user.getTeam() != null;
-            if (user.isMajor()) {
+            if (user.getMajor()) {
                 if (hasTeam) matched_major++;
                 else unmatched_major++;
             } else {

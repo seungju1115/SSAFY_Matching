@@ -31,7 +31,7 @@ public class UserDetailResponse {
     private String email;
 
     @Schema(description = "전공 여부", example = "true")
-    private boolean major;
+    private Boolean major;
 
     @Schema(description = "이전 반", example = "7")
     private Integer lastClass;
@@ -65,7 +65,7 @@ public class UserDetailResponse {
                 .userName(user.getUserName())
                 .role(user.getRole())
                 .email(user.getEmail())
-                .major(user.isMajor())
+                .major(user.getMajor())
                 .lastClass(user.getLastClass())
                 .userProfile(user.getUserProfile())
                 .wantedPosition(user.getWantedPosition())

@@ -29,7 +29,7 @@ public class SearchUserResponse {
     private String userProfile;
 
     @Schema(description = "전공 여부", example = "true")
-    private boolean major;
+    private Boolean major;
 
     @Schema(description = "이전 반", example = "7")
     private Integer lastClass;
@@ -57,7 +57,7 @@ public class SearchUserResponse {
         dto.setId(user.getId());
         dto.setUserName(user.getUserName());
         dto.setUserProfile(user.getUserProfile());
-        dto.setMajor(user.isMajor());
+        dto.setMajor(user.getMajor());
         dto.setLastClass(user.getLastClass());
         dto.setWantedPosition(user.getWantedPosition());
         dto.setTechStack(user.getTechStack());

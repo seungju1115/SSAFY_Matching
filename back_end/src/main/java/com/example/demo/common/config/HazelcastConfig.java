@@ -46,7 +46,7 @@ public class HazelcastConfig {
         // Docker 서비스명 또는 컨테이너 IP 사용
         tcpIpConfig.addMember("spring-backend1:5701")    // 서비스명
                 .addMember("spring-backend2:5701")    // 서비스명
-                .addMember("spring-backend3:5701");   // 서비스명
+                .addMember("spring-backend3:5701");
 
         // 캐시별 설정
         MapConfig longTermConfig = new MapConfig();

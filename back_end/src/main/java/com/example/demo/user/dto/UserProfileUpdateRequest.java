@@ -24,7 +24,7 @@ public class UserProfileUpdateRequest {
     private String userProfile;
 
     @Schema(description = "전공 여부", example = "true")
-    private boolean major;
+    private Boolean major;
 
     @Schema(description = "이전 반", example = "7")
     private Integer lastClass;
