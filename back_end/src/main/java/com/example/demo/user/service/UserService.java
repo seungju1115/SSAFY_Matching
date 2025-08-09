@@ -3,11 +3,8 @@ package com.example.demo.user.service;
 import com.example.demo.team.entity.Team;
 import com.example.demo.user.Enum.ProjectGoalEnum;
 import com.example.demo.user.dao.UserRepository;
-import com.example.demo.user.dto.SearchUserRequest;
-import com.example.demo.user.dto.SearchUserResponse;
-import com.example.demo.user.dto.UserProfileRequest;
-import com.example.demo.user.dto.UserProfileResponse;
-import com.example.demo.user.dto.UserProfileUpdateRequest;
+import com.example.demo.user.dto.*;
+import com.example.demo.user.dto.UserSearchRequest;
 import com.example.demo.user.entity.User;
 import com.example.demo.team.dao.TeamRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -94,19 +91,17 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public List<SearchUserResponse> searchUsersWithoutTeam(SearchUserRequest request) {
-        List<User> users;
-        
-        if (request.getWantedPosition() != null) {
-            users = userRepository.findUsersWithoutTeamByPosition(request.getWantedPosition());
-        } else {
-            users = userRepository.findUsersWithoutTeam();
-        }
+    public List<UserSearchResponse> searchUsersWithoutTeam(UserSearchRequest request) {
+        // 조건에 맞는 유저가 없으면 빈 리스트 반환하므로 null이 될 수 없음.
+        List<User> users = userRepository.findUsersWithoutTeamByFilters(
+                request.getMajor(),
+                request.getWantedPosition(),
+                request.getTechStack(),
+                request.getProjectVive(),
+                request.getProjectGoal());
         
         return users.stream()
-                .filter(user -> matchesTechStack(user, request.getTechStack()))
-                .filter(user -> matchesProjectPref(user, request.getProjectPref()))
-                .map(SearchUserResponse::fromUser)
+                .map(UserSearchResponse::fromUser)
                 .collect(java.util.stream.Collectors.toList());
     }
     

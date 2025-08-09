@@ -2,6 +2,7 @@ package com.example.demo.user.dto;
 
 import com.example.demo.user.Enum.PositionEnum;
 import com.example.demo.user.Enum.ProjectGoalEnum;
+import com.example.demo.user.Enum.ProjectViveEnum;
 import com.example.demo.user.Enum.TechEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -16,14 +18,20 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "팀원 검색 요청")
-public class SearchUserRequest {
+public class UserSearchRequest {
+
+    @Schema(
+            description = "전공 비전공",
+            example = "true"
+    )
+    private Boolean major;
 
     @Schema(
             description = "희망 포지션",
-            example = "BACKEND",
+            example = "[\"BACKEND\", \"AI\"]",
             implementation = PositionEnum.class
     )
-    private PositionEnum wantedPosition;
+    private List<PositionEnum> wantedPosition;
 
     @Schema(
             description = "기술 스택",
@@ -32,8 +40,14 @@ public class SearchUserRequest {
     private Set<TechEnum> techStack;
 
     @Schema(
-            description = "프로젝트 선호도",
-            example = "[\"도전적인 성향\", \"새로운 기술 적극 사용\"]"
+            description = "개인 성향",
+            example = "[\"CASUAL\", \"FORMAL\", \"BRANDNEW\"]"
     )
-    private Set<ProjectGoalEnum> projectPref;
+    private Set<ProjectViveEnum> projectVive;
+
+    @Schema(
+            description = "프로젝트 성향",
+            example = "[\"JOB\", \"AWARD\"]"
+    )
+    private Set<ProjectGoalEnum> projectGoal;
 }

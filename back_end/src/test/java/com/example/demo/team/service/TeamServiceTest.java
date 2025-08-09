@@ -1,6 +1,5 @@
 package com.example.demo.team.service;
 
-import com.example.demo.chat.dto.ChatRoomResponse;
 import com.example.demo.chat.entity.ChatRoom;
 import com.example.demo.common.exception.BusinessException;
 import com.example.demo.common.exception.ErrorCode;
