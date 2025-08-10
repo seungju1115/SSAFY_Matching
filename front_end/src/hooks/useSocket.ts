@@ -6,24 +6,19 @@ export const useSocket = () => {
   const [isConnected, setIsConnected] = useState(webSocketService.isConnected());
 
   useEffect(() => {
-    try {
-      const listener = (connected: boolean) => {
-        setIsConnected(connected);
-      };
+    const listener = (connected: boolean) => {
+      setIsConnected(connected);
+    };
 
-      webSocketService.addConnectionListener(listener);
+    webSocketService.addConnectionListener(listener);
 
-      if (!webSocketService.isConnected()) {
-        console.log("Attempting to connect from useSocket...");
-        webSocketService.connect();
-      }
-
-      return () => {
-        webSocketService.removeConnectionListener(listener);
-      };
-    } catch (error) {
-      console.error("Error in useSocket useEffect:", error);
+    if (!webSocketService.isConnected()) {
+      webSocketService.connect();
     }
+
+    return () => {
+      webSocketService.removeConnectionListener(listener);
+    };
   }, []);
 
   const subscribe = (topic: string, callback: (message: IMessage) => void) => {
