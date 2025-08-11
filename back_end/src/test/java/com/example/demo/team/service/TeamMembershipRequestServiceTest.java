@@ -4,7 +4,6 @@ import com.example.demo.common.exception.BusinessException;
 import com.example.demo.common.exception.ErrorCode;
 import com.example.demo.team.dao.TeamMembershipRequestRepository;
 import com.example.demo.team.dao.TeamRepository;
-import com.example.demo.team.dto.TeamMembershipResponse;
 import com.example.demo.team.dto.TeamOffer;
 import com.example.demo.team.entity.RequestStatus;
 import com.example.demo.team.entity.RequestType;
@@ -19,7 +18,6 @@ import com.example.demo.user.entity.User;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.cp.CPSubsystem;
 import com.hazelcast.cp.lock.FencedLock;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,7 +26,6 @@ import org.mockito.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;

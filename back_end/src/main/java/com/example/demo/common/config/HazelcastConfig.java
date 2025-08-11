@@ -46,7 +46,7 @@ public class HazelcastConfig {
         // Docker 서비스명 또는 컨테이너 IP 사용
         tcpIpConfig.addMember("spring-backend1:5701")    // 서비스명
                 .addMember("spring-backend2:5701")    // 서비스명
-                .addMember("spring-backend3:5701");   // 서비스명
+                .addMember("spring-backend3:5701");
 
         // 캐시별 설정
         MapConfig longTermConfig = new MapConfig();
@@ -55,7 +55,7 @@ public class HazelcastConfig {
 
         EvictionConfig evictionConfig = new EvictionConfig();
         evictionConfig.setEvictionPolicy(EvictionPolicy.LRU);
-        evictionConfig.setMaxSizePolicy(MaxSizePolicy.ENTRY_COUNT);
+        evictionConfig.setMaxSizePolicy(MaxSizePolicy.PER_NODE);
         evictionConfig.setSize(300);
         longTermConfig.setEvictionConfig(evictionConfig);
         config.addMapConfig(longTermConfig);
@@ -66,7 +66,7 @@ public class HazelcastConfig {
 
         EvictionConfig evictionConfig2 = new EvictionConfig();
         evictionConfig2.setEvictionPolicy(EvictionPolicy.LRU);
-        evictionConfig2.setMaxSizePolicy(MaxSizePolicy.ENTRY_COUNT);
+        evictionConfig2.setMaxSizePolicy(MaxSizePolicy.PER_NODE);
         evictionConfig2.setSize(10);
         shortTermConfig.setEvictionConfig(evictionConfig2);
         config.addMapConfig(shortTermConfig);

@@ -142,6 +142,7 @@ public class GlobalExceptionHandler {
             }
         }
 
+        log.error("Full Stack Trace: ", ex);
 
         ErrorCode code = ErrorCode.INTERNAL_ERROR;
         return ResponseEntity

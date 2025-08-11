@@ -4,9 +4,7 @@ import com.example.demo.user.Enum.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import com.example.demo.user.entity.User;
-import com.example.demo.team.entity.Team;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
@@ -31,7 +29,7 @@ public class UserDetailResponse {
     private String email;
 
     @Schema(description = "전공 여부", example = "true")
-    private boolean major;
+    private Boolean major;
 
     @Schema(description = "이전 반", example = "7")
     private Integer lastClass;
@@ -65,7 +63,7 @@ public class UserDetailResponse {
                 .userName(user.getUserName())
                 .role(user.getRole())
                 .email(user.getEmail())
-                .major(user.isMajor())
+                .major(user.getMajor())
                 .lastClass(user.getLastClass())
                 .userProfile(user.getUserProfile())
                 .wantedPosition(user.getWantedPosition())

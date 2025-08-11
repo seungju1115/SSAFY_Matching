@@ -3,14 +3,13 @@ package com.example.demo.user.service;
 import com.example.demo.team.entity.Team;
 import com.example.demo.user.Enum.ProjectGoalEnum;
 import com.example.demo.user.dao.UserRepository;
-import com.example.demo.user.dto.SearchUserRequest;
-import com.example.demo.user.dto.SearchUserResponse;
-import com.example.demo.user.dto.UserProfileRequest;
-import com.example.demo.user.dto.UserProfileResponse;
-import com.example.demo.user.dto.UserProfileUpdateRequest;
+import com.example.demo.user.dto.*;
+import com.example.demo.user.dto.UserSearchRequest;
 import com.example.demo.user.entity.User;
 import com.example.demo.team.dao.TeamRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -22,6 +21,8 @@ import java.util.List;
 
 @Service
 public class UserService {
+
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private UserRepository userRepository;
@@ -62,13 +63,16 @@ public class UserService {
     @CacheEvict(value = "longTermCache", key = "'user:'+ #id")
     @Transactional
     public UserProfileResponse updateUserProfile(UserProfileUpdateRequest request, Long id) {
+        System.out.println("유저 찾기 전");
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("유저를 찾을 수 없습니다."));
 
         // 전체 및 부분 업데이트
-        if (request.getUserName() != null) user.setUserName(request.getUserName());
+        if (request.getUserName() != null) {
+            user.setUserName(request.getUserName());
+        }
         if (request.getUserProfile() != null) user.setUserProfile(request.getUserProfile());
-        if (request.isMajor()) user.setMajor(true);
+        if (request.getMajor() != null) user.setMajor(request.getMajor());
         if (request.getLastClass() != null) user.setLastClass(request.getLastClass());
         if (request.getWantedPosition() != null) user.setWantedPosition(request.getWantedPosition());
         if (request.getProjectGoal() != null) user.setProjectGoal(request.getProjectGoal());
@@ -87,19 +91,17 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public List<SearchUserResponse> searchUsersWithoutTeam(SearchUserRequest request) {
-        List<User> users;
-        
-        if (request.getWantedPosition() != null) {
-            users = userRepository.findUsersWithoutTeamByPosition(request.getWantedPosition());
-        } else {
-            users = userRepository.findUsersWithoutTeam();
-        }
+    public List<UserSearchResponse> searchUsersWithoutTeam(UserSearchRequest request) {
+        // 조건에 맞는 유저가 없으면 빈 리스트 반환하므로 null이 될 수 없음.
+        List<User> users = userRepository.findUsersWithoutTeamByFilters(
+                request.getMajor(),
+                request.getWantedPosition(),
+                request.getTechStack(),
+                request.getProjectVive(),
+                request.getProjectGoal());
         
         return users.stream()
-                .filter(user -> matchesTechStack(user, request.getTechStack()))
-                .filter(user -> matchesProjectPref(user, request.getProjectPref()))
-                .map(SearchUserResponse::fromUser)
+                .map(UserSearchResponse::fromUser)
                 .collect(java.util.stream.Collectors.toList());
     }
     

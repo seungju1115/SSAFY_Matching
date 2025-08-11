@@ -7,7 +7,6 @@ import com.example.demo.team.entity.Team;
 import com.example.demo.team.entity.TeamMembershipRequest;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -55,7 +54,7 @@ public class User {
 
     // 기초정보
     @Column(name = "major",  nullable = false)
-    private boolean major=false;
+    private Boolean major;
 
     // 기초정보
     @Column(name = "last_class", nullable = false)
@@ -101,7 +100,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(name = "personal_preference", nullable = true, length = 50)
     @Size(max = 50)
-    private Set<ProjectViveEnum> ProjectVive;
+    private Set<ProjectViveEnum> projectVive;
 
     //@ManyToMany
     //@JoinTable(

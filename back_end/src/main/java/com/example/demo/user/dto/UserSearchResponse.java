@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "팀원 검색 결과")
-public class SearchUserResponse {
+public class UserSearchResponse {
 
     @Schema(description = "사용자 ID", example = "1")
     private Long id;
@@ -29,7 +29,7 @@ public class SearchUserResponse {
     private String userProfile;
 
     @Schema(description = "전공 여부", example = "true")
-    private boolean major;
+    private Boolean major;
 
     @Schema(description = "이전 반", example = "7")
     private Integer lastClass;
@@ -52,25 +52,25 @@ public class SearchUserResponse {
     @Schema(description = "자격증", example = "웹디자인기능사")
     private String qualification;
 
-    public static SearchUserResponse fromUser(User user) {
-        SearchUserResponse dto = new SearchUserResponse();
-        dto.setId(user.getId());
-        dto.setUserName(user.getUserName());
-        dto.setUserProfile(user.getUserProfile());
-        dto.setMajor(user.isMajor());
-        dto.setLastClass(user.getLastClass());
-        dto.setWantedPosition(user.getWantedPosition());
-        dto.setTechStack(user.getTechStack());
-        dto.setProjectGoal(user.getProjectGoal());
-        dto.setProjectVive(user.getProjectVive());
-        dto.setProjectExp(user.getProjectExp());
-        dto.setQualification(user.getQualification());
-        return dto;
+    public static UserSearchResponse fromUser(User user) {
+        UserSearchResponse response = new UserSearchResponse();
+        response.setId(user.getId());
+        response.setUserName(user.getUserName());
+        response.setUserProfile(user.getUserProfile());
+        response.setMajor(user.getMajor());
+        response.setLastClass(user.getLastClass());
+        response.setWantedPosition(user.getWantedPosition());
+        response.setTechStack(user.getTechStack());
+        response.setProjectGoal(user.getProjectGoal());
+        response.setProjectVive(user.getProjectVive());
+        response.setProjectExp(user.getProjectExp());
+        response.setQualification(user.getQualification());
+        return response;
     }
 
-    public static List<SearchUserResponse> fromUserList(List<User> users) {
+    public static List<UserSearchResponse> fromUserList(List<User> users) {
         return users.stream()
-                .map(SearchUserResponse::fromUser)
+                .map(UserSearchResponse::fromUser)
                 .collect(Collectors.toList());
     }
 }

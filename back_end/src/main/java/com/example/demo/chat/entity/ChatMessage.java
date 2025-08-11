@@ -28,7 +28,6 @@ public class ChatMessage {
     private User sender;
 
     @Lob
-    @Column(columnDefinition = "LONGTEXT")
     private String message;
 
     @Column(name = "created_at",updatable = false)
