@@ -1,9 +1,10 @@
-import { useState, useEffect, FormEvent } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import { useSocket } from '@/hooks/useSocket';
-import { IMessage } from '@stomp/stompjs';
+import type { IMessage } from '@stomp/stompjs';
 
 // A simple type for our chat messages
 interface ChatMessage {
+  id: string; // Add a unique ID for each message
   sender: string;
   content: string;
   timestamp: string;
@@ -65,8 +66,8 @@ export default function Chat() {
           marginBottom: '10px',
         }}
       >
-        {messages.map((msg, index) => (
-          <div key={index}>
+        {messages.map((msg) => (
+          <div key={msg.id}>
             <strong>{msg.sender}:</strong> {msg.content}
           </div>
         ))}

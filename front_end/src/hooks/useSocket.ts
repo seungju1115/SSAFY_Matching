@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { IMessage } from '@stomp/stompjs';
+import { type IMessage } from '@stomp/stompjs';
 import { webSocketService } from '@/services/socket';
 
 export const useSocket = () => {
