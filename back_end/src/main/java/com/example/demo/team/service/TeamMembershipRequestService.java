@@ -66,9 +66,6 @@ public class TeamMembershipRequestService {
             if (lockAcquired) lock.unlock(key);
         }
 
-        saveTeamOffer(teamOffer, team, user);
-
-
         messagingTemplate.convertAndSend("/queue/team/offer/" + teamOffer.getUserId(), teamOffer.getMessage());
     }
     @Transactional
