@@ -1,69 +1,90 @@
-import { useState, useEffect,useRef} from 'react';
-import { useChat } from '@/hooks/useChat';
+import { useState, useEffect, type FormEvent } from 'react';
+import { useSocket } from '@/hooks/useSocket';
+import type { IMessage } from '@stomp/stompjs';
 
-export default function ChatPage() {
-  // 실제에선 로그인 사용자 id/닉네임을 senderId로 넣어주세요
-  const { messages, send, connected } = useChat({ chatId: 'room-1', senderId: 'me' })
-  const [text, setText] = useState('')
-  const bottomRef = useRef<HTMLDivElement>(null)
+// A simple type for our chat messages
+interface ChatMessage {
+  id: string; // Add a unique ID for each message
+  sender: string;
+  content: string;
+  timestamp: string;
+}
+
+export default function Chat() {
+  const { isConnected, subscribe, publish } = useSocket();
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [newMessage, setNewMessage] = useState('');
+  
+  // Let's assume a static room ID for this example.
+  // In a real app, this would likely come from URL params or component props.
+  const roomId = 'general'; 
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
+    if (isConnected) {
+      const unsubscribe = subscribe(
+        `/topic/chat/room/${roomId}`,
+        (message: IMessage) => {
+          const receivedMessage: ChatMessage = JSON.parse(message.body);
+          setMessages((prevMessages) => [...prevMessages, receivedMessage]);
+        }
+      );
 
-  const onSend = async () => {
-    const trimmed = text.trim()
-    if (!trimmed) return
-    await send(trimmed)
-    setText('')
-  }
+      // Cleanup subscription on component unmount
+      return () => {
+        if (unsubscribe) {
+          unsubscribe();
+        }
+      };
+    }
+  }, [isConnected, roomId, subscribe]);
+
+  const handleSendMessage = (e: FormEvent) => {
+    e.preventDefault();
+    if (newMessage.trim() && isConnected) {
+      const chatMessage = {
+        roomId,
+        sender: 'CurrentUser', // This should be dynamically set based on logged-in user
+        content: newMessage,
+      };
+      publish(`/app/chat/message`, chatMessage);
+      setNewMessage('');
+    }
+  };
 
   return (
-    <div className="max-w-xl mx-auto p-4 flex flex-col gap-3">
-      <div className="font-semibold">
-        채팅 방: room-1 {connected ? '🟢' : '🔴'}
-      </div>
-
-      {/* Display connection status from useChat */}
+    <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto' }}>
+      <h2>Chat Room: {roomId}</h2>
       <div style={{ marginBottom: '10px' }}>
-        Connection Status: {connected ? 'Connected' : 'Disconnected'}
+        Connection Status: {isConnected ? 'Connected' : 'Disconnected'}
       </div>
-
-      <div className="h-96 overflow-y-auto bg-slate-50 rounded-lg p-3 border border-slate-200">
-        {messages.map(m => (
-          <div key={m.id} className="mb-2">
-            <div className="text-xs text-slate-500">
-              {m.senderId} · {new Date(m.timestamp).toLocaleTimeString()}
-            </div>
-            <div
-              className={[
-                'inline-block px-3 py-2 rounded-lg whitespace-pre-wrap break-words max-w-[280px]',
-                m.senderId === 'me' ? 'bg-blue-100 ml-auto' : 'bg-slate-200',
-              ].join(' ')}
-              style={{ display: 'inline-block' }}
-            >
-              {m.content}
-            </div>
+      <div
+        style={{
+          height: '400px',
+          border: '1px solid #ccc',
+          overflowY: 'scroll',
+          padding: '10px',
+          marginBottom: '10px',
+        }}
+      >
+        {messages.map((msg) => (
+          <div key={msg.id}>
+            <strong>{msg.sender}:</strong> {msg.content}
           </div>
         ))}
-        <div ref={bottomRef} />
       </div>
-
-      <div className="flex gap-2">
+      <form onSubmit={handleSendMessage}>
         <input
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && onSend()}
-          placeholder="메시지를 입력하세요"
-          className="flex-1 border border-slate-300 rounded-lg px-3 py-2"
+          type="text"
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
+          placeholder="Type a message..."
+          style={{ width: '80%', padding: '8px' }}
+          disabled={!isConnected}
         />
-        <button
-          onClick={onSend}
-          className="border border-blue-400 bg-blue-600 text-white rounded-lg px-4 py-2"
-        >
-          보내기
+        <button type="submit" style={{ width: '18%', padding: '8px' }} disabled={!isConnected}>
+          Send
         </button>
-      </div>
+      </form>
     </div>
   );
-}
+} 

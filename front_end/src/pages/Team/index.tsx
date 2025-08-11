@@ -1,16 +1,19 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTeamStore } from '@/store/teamStore'
+import useUserStore from '@/stores/userStore'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import Header from '@/components/layout/Header'
-import TeamChat from '@/components/TeamChat'
 import { 
   Crown, 
   MessageCircle, 
+  Send, 
   UserPlus, 
   LogOut
 } from 'lucide-react'
@@ -43,7 +46,7 @@ const projectVibeLabels: Record<ProjectViveEnum, string> = {
   WATERFALL: '워터폴 방식'
 }
 
-// 역할별 색상 매핑
+// 역할별 색상 매핑 (모던하고 절제된 색상)
 const roleColors = {
   backend: 'bg-slate-100 text-slate-700 border-slate-200',
   frontend: 'bg-emerald-100 text-emerald-700 border-emerald-200',
@@ -55,6 +58,14 @@ const roleColors = {
 const TeamPage: React.FC = () => {
   const navigate = useNavigate()
   const { isLoading } = useTeamStore()
+  const { user } = useUserStore()
+  
+  const [chatMessage, setChatMessage] = useState('')
+  const [chatMessages, setChatMessages] = useState([
+    { id: 1, sender: '김개발', message: '안녕하세요! 팀에 합류하게 되어 기쁩니다', time: '14:30' },
+    { id: 2, sender: '박디자인', message: '반가워요! 함께 멋진 프로젝트 만들어봐요', time: '14:32' },
+    { id: 3, sender: '이기획', message: '첫 회의는 언제 할까요?', time: '14:35' }
+  ])
 
   // 모의 팀원 데이터
   const mockTeamMembers = [
@@ -81,6 +92,19 @@ const TeamPage: React.FC = () => {
     }
   }
 
+  const handleSendMessage = () => {
+    if (chatMessage.trim()) {
+      const newMessage = {
+        id: chatMessages.length + 1,
+        sender: user?.userName || '나',
+        message: chatMessage,
+        time: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
+      }
+      setChatMessages([...chatMessages, newMessage])
+      setChatMessage('')
+    }
+  }
+
   const handleLeaveTeam = () => {
     if (confirm('정말로 팀을 나가시겠습니까?')) {
       navigate('/matching')
@@ -90,6 +114,7 @@ const TeamPage: React.FC = () => {
   const handleRecommendMember = () => {
     navigate('/matching?recommend=true')
   }
+
 
   if (isLoading) {
     return (
@@ -223,13 +248,41 @@ const TeamPage: React.FC = () => {
                   팀 채팅
                 </CardTitle>
               </CardHeader>
-
-              {/* ⬇️ 기존 ScrollArea + 입력영역 전체를 TeamChat으로 교체 */}
               <CardContent className="flex-1 flex flex-col p-0">
-                  <TeamChat />
+                <ScrollArea className="flex-1 px-6">
+                  <div className="space-y-4 py-4">
+                    {chatMessages.map((msg) => (
+                      <div key={msg.id} className="">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-sm font-medium text-gray-900">{msg.sender}</span>
+                          <span className="text-xs text-gray-500">{msg.time}</span>
+                        </div>
+                        <div className="bg-gray-50 p-3 rounded-lg max-w-md">
+                          <p className="text-sm text-gray-700">{msg.message}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+                <div className="flex-shrink-0 p-4 border-t border-gray-200">
+                  <div className="flex gap-2">
+                    <Input
+                      value={chatMessage}
+                      onChange={(e) => setChatMessage(e.target.value)}
+                      placeholder="메시지를 입력하세요..."
+                      className="flex-1"
+                      onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                    />
+                    <Button 
+                      onClick={handleSendMessage}
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      <Send className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
               </CardContent>
             </Card>
-
             {/* 팀 나가기 버튼 - 오른쪽 하단 고정 */}
             <div className="w-full flex justify-end mt-4">
               <Button 

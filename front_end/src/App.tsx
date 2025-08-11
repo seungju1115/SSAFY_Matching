@@ -8,8 +8,7 @@ import MakeTeam from './pages/MakeTeam/make'
 import AuthCallback from './pages/Auth/Callback'
 import Team from './pages/Team'
 import Dashboard from './pages/Dashboard'
-import ChatPage from './pages/Chat'
-import TeamChatPage from './pages/Team/Chat'
+import Chat from './pages/Chat'
 
 function App() {
   return (
@@ -23,10 +22,10 @@ function App() {
         <Route path="/make-team" element={<MakeTeam />} />
         <Route path="/oauth/callback" element={<AuthCallback />} />
         <Route path="/team/:teamId" element={<Team />} />
-        <Route path="/chat" element={<Chat />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </BrowserRouter>
   )
 }
 
-export default App
+export default App 
