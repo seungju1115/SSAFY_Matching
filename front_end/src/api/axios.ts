@@ -2,8 +2,11 @@
 import axios from 'axios'
 
 // 현재 브라우저 도메인을 기반으로 baseURL 생성
-const getBaseURL = () => {
-  return import.meta.env.VITE_API_URL || `${window.location.protocol}//${window.location.host}/api`
+export const getBaseURL = (path = '/api') => {
+  const baseUrl =
+    import.meta.env.VITE_API_URL ||
+    `${window.location.protocol}//${window.location.host}`
+  return `${baseUrl}${path}`
 }
 
 const apiClient = axios.create({
