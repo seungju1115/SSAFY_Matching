@@ -24,7 +24,7 @@ public class TeamRequest {
             minLength = 2,
             maxLength = 20
     )
-    @NotBlank(message = "팀 이름은 필수입니다.")
+//    @NotBlank(message = "팀 이름은 필수입니다.") 초기에 팀 이름 설정하지 않음.
     private String teamName;
 
     @Schema(
@@ -41,7 +41,7 @@ public class TeamRequest {
             required = true
     )
     @NotNull(message = "도메인은 필수입니다.")
-    @Size(min=10)
+    @Size(max=20)
     private String teamDomain;
 
     @Schema(

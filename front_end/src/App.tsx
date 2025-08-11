@@ -8,6 +8,7 @@ import MakeTeam from './pages/MakeTeam/make'
 import AuthCallback from './pages/Auth/Callback'
 import Team from './pages/Team'
 import Dashboard from './pages/Dashboard'
+import Chat from './pages/Chat'
 
 function App() {
   return (
@@ -21,7 +22,6 @@ function App() {
         <Route path="/make-team" element={<MakeTeam />} />
         <Route path="/oauth/callback" element={<AuthCallback />} />
         <Route path="/team/:teamId" element={<Team />} />
-        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </BrowserRouter>
   )
