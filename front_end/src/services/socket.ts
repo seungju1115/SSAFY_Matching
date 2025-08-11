@@ -1,4 +1,4 @@
-import { Client, type IMessage } from '@stomp/stompjs';
+import { Client, type IMessage, type Frame } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 // import { getBaseURL } from '../api/axios';
 
@@ -32,7 +32,7 @@ class WebSocketService {
     // StompJS v5+ 에서는 brokerURL 대신 webSocketFactory 를 사용합니다.
     this.stompClient = new Client({
       webSocketFactory: () => new SockJS('http://localhost:8081/ws-chat'),
-      debug: (str) => {
+      debug: (str: string) => {
         console.log(new Date(), str);
       },
       reconnectDelay: 5000,
@@ -47,7 +47,7 @@ class WebSocketService {
         console.log('STOMP Disconnected.');
         this.connectionListeners.forEach((listener) => listener(false));
       },
-      onStompError: (frame) => {
+      onStompError: (frame: Frame) => {
         console.error('Broker reported error: ' + frame.headers['message']);
         console.error('Additional details: ' + frame.body);
       },
@@ -71,7 +71,7 @@ class WebSocketService {
     }
 
     console.log(`Subscribing to ${topic}`);
-    const subscription = this.stompClient.subscribe(topic, (message) => {
+    const subscription = this.stompClient.subscribe(topic, (message: IMessage) => {
       callback(message);
     });
     
