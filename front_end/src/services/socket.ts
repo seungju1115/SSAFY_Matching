@@ -1,5 +1,6 @@
 import { Client, type IMessage } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
+// import { getBaseURL } from '../api/axios';
 
 // 구독 정보를 관리하기 위한 타입
 interface Subscription {
@@ -30,7 +31,7 @@ class WebSocketService {
 
     // StompJS v5+ 에서는 brokerURL 대신 webSocketFactory 를 사용합니다.
     this.stompClient = new Client({
-      webSocketFactory: () => new SockJS(`${import.meta.env.VITE_API_BASE_URL}/ws-chat`),
+      webSocketFactory: () => new SockJS('http://localhost:8081/ws-chat'),
       debug: (str) => {
         console.log(new Date(), str);
       },
