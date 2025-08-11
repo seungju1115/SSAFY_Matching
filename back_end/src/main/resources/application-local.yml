@@ -63,7 +63,7 @@ jwt:
   expiration: 3600000 # 1시간 (ms)
 
 front:
-  url: http://localhost:8080
+  url: http://localhost
 
 recsys:
   base-url: http://recsys:8000
