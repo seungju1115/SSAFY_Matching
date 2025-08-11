@@ -1,15 +1,23 @@
 import { useEffect, useRef, useState } from 'react'
+import { useParams } from 'react-router-dom'
 import { useChat } from '@/hooks/useChat'
 
-export default function ChatPage() {
-  // 실제에선 로그인 사용자 id/닉네임을 senderId로 넣어주세요
-  const { messages, send, connected } = useChat({ chatId: 'room-1', senderId: 'me' })
+export default function TeamChatPage() {
+  const { teamId } = useParams<{ teamId: string }>()
+  const senderId = localStorage.getItem('userId') ?? 'me'
+  const { messages, send, connected } = useChat({
+    chatId: teamId ?? '1',
+    senderId,
+  })
+
   const [text, setText] = useState('')
   const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
+
+  if (!teamId) return <div className="p-4">팀 ID가 필요합니다.</div>
 
   const onSend = async () => {
     const trimmed = text.trim()
@@ -21,7 +29,7 @@ export default function ChatPage() {
   return (
     <div className="max-w-xl mx-auto p-4 flex flex-col gap-3">
       <div className="font-semibold">
-        채팅 방: room-1 {connected ? '🟢' : '🔴'}
+        채팅 방: {teamId} {connected ? '🟢' : '🔴'}
       </div>
 
       <div className="h-96 overflow-y-auto bg-slate-50 rounded-lg p-3 border border-slate-200">
@@ -33,7 +41,7 @@ export default function ChatPage() {
             <div
               className={[
                 'inline-block px-3 py-2 rounded-lg whitespace-pre-wrap break-words max-w-[280px]',
-                m.senderId === 'me' ? 'bg-blue-100 ml-auto' : 'bg-slate-200',
+                m.senderId === senderId ? 'bg-blue-100 ml-auto' : 'bg-slate-200',
               ].join(' ')}
               style={{ display: 'inline-block' }}
             >
