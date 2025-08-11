@@ -13,6 +13,7 @@ import com.example.demo.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -51,11 +52,7 @@ public class AIService {
     public PersonToTeamDto findPersonToTeamDtoById(Long personId){
         PersonToTeamDto personToTeamDto = new PersonToTeamDto();
         CandidateDto curPerson = CandidateDto.from(userRepository.findCurUser(personId));
-        List<TeamAIDto> availableTeams = new ArrayList<>();
-        List<Team> list = teamRepository.findAvailableTeams();
-        for(Team team : list){
-            availableTeams.add(TeamAIDto.from(team));
-        }
+        List<TeamAIDto> availableTeams = teamRepository.findAvailableTeams();
         personToTeamDto.setPerson(curPerson);
         personToTeamDto.setTeams(availableTeams);
         return personToTeamDto;
@@ -66,7 +63,8 @@ public class AIService {
     /**
      * 팀에게 후보자 추천 (RecSys 호출)
      */
-    public List<CandidateDto> recommendCandidatesForTeam(Long teamId) {
+    @Cacheable(value = "shortTermCache", key = "'person candidates :' + #teamId")
+    public List<CandidateDto> recommendCandidatesForTeam(Long teamId, boolean all) {
         try {
             // 기존 메서드로 데이터 준비
             TeamToPersonDto teamToPersonDto = findTeamToPersonDtoById(teamId);
@@ -87,7 +85,8 @@ public class AIService {
     /**
      * 개인에게 팀 추천 (RecSys 호출)
      */
-    public List<TeamAIDto> recommendTeamsForPerson(Long personId) {
+    @Cacheable(value = "shortTermCache", key = "'team candidates:' + #personId")
+    public List<TeamAIDto> recommendTeamsForPerson(Long personId, boolean all) {
         try {
             // 기존 메서드로 데이터 준비
             PersonToTeamDto personToTeamDto = findPersonToTeamDtoById(personId);
