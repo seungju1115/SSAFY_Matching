@@ -34,14 +34,12 @@ apiClient.interceptors.request.use(
     console.log('API Request:', {
       url: config.url,
       isPublicPath,
-        hasToken: !!JSON.parse(sessionStorage.getItem('user-storage') || '{}')?.state?.token
-        // hasToken: !!localStorage.getItem('authToken')
-
+      hasToken: !!localStorage.getItem('authToken')
     })
-
+    
     // public path가 아니고 토큰이 있을 때만 헤더 추가
     if (!isPublicPath) {
-      const token = JSON.parse(sessionStorage.getItem('user-storage') || '{}')?.state?.token
+      const token = localStorage.getItem('authToken')
       if (token) {
         config.headers.Authorization = `Bearer ${token}`
         console.log('Token added to request')
@@ -64,7 +62,8 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // 토큰이 만료되었거나 유효하지 않은 경우
-      sessionStorage.removeItem('user-storage')
+      localStorage.removeItem('authToken')
+      localStorage.removeItem('user-storage')
       window.location.href = '/login'
     }
     return Promise.reject(error)
