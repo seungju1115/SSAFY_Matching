@@ -9,7 +9,7 @@ import { AlertCircle, CheckCircle2, Loader2 } from 'lucide-react'
 export default function AuthCallback() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const { login } = useUserStore()
+  const { login, setToken } = useUserStore()
   const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'signup-required'>('loading')
   const [message, setMessage] = useState('')
 
@@ -48,7 +48,8 @@ export default function AuthCallback() {
             return
           }
           // 토큰 저장 후 유저 정보 요청
-          localStorage.setItem('authToken', token)
+          // sessionStorage.setItem('authToken', token)
+          setToken(token)
           try {
             const res = await apiClient.get('/users/profile')
             const userData = res.data?.data
