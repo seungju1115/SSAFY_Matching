@@ -29,10 +29,8 @@ public class CandidateDto {
         this.userName = userName;
         this.goals = goals;
         this.vives = vives;
-        if (position != null && !position.isEmpty()) {
-            this.mainPos = position.get(0).name();
-            this.subPos = position.size() > 1 ? position.get(1).name() : null;
-        }
+        this.mainPos = position.get(0).name();
+        this.subPos = position.get(1).name();
     }
 
     public static CandidateDto from(User user) {

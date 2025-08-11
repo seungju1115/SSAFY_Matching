@@ -90,7 +90,4 @@ public class Team {
     public Team() {
         this.status = TeamStatus.UNLOCKED;
     }
-
-    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<TeamLockRequest> lockRequests = new ArrayList<>();
 }
