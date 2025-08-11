@@ -3,7 +3,6 @@ services:
     build:
       context: ./back_end
       dockerfile: Dockerfile
-    image: rabent0207/matching-ssafy-backend:latest
     container_name: spring-backend
     ports:
       - "8080:8080"
