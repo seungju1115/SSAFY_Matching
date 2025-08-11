@@ -15,7 +15,7 @@ COPY package*.json ./
 
 # 의존성 설치 (개발 의존성 포함)
 # shadcn/ui, Tailwind CSS, TypeScript 등 모든 새 라이브러리 설치
-RUN npm ci --silent && npm cache clean --force
+RUN npm ci --loglevel=verbose && npm cache clean --force
 
 # 소스 코드 복사
 COPY . .

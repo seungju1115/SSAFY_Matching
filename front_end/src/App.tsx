@@ -22,6 +22,7 @@ function App() {
         <Route path="/make-team" element={<MakeTeam />} />
         <Route path="/oauth/callback" element={<AuthCallback />} />
         <Route path="/team/:teamId" element={<Team />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </BrowserRouter>
   )
