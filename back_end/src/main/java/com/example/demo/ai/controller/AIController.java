@@ -21,6 +21,7 @@ public class AIController {
 
     private final AIService aiService;
 
+
     @GetMapping("/recommend/candidates/{teamId}")
     public ResponseEntity<List<CandidateDto>> recommendCandidates(@PathVariable Long teamId) {
         List<CandidateDto> recommendations = aiService.recommendCandidatesForTeam(teamId, false);
