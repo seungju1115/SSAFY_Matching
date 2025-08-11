@@ -31,7 +31,7 @@ class WebSocketService {
 
     // StompJS v5+ 에서는 brokerURL 대신 webSocketFactory 를 사용합니다.
     this.stompClient = new Client({
-      webSocketFactory: () => new SockJS('http://localhost:8081/ws-chat'),
+      webSocketFactory: () => new SockJS(import.meta.env.VITE_WEBSOCKET_URL || 'http://i13a307.p.ssafy.io/ws-chat'),
       debug: (str: string) => {
         console.log(new Date(), str);
       },
