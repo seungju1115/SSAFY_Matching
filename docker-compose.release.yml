@@ -32,20 +32,6 @@ services:
     networks:
       - app-network
 
-  recsys:
-    build:
-      context: ./RecSys
-    image: rabent0207/matching-ssafy-ai:latest
-    ports:
-      - "8000:8000"  # 호스트:컨테이너
-    environment:
-      - PYTHONPATH=/app
-    volumes:
-      - ./logs:/app/logs  # 로그 파일용 (있다면)
-    restart: unless-stopped
-    networks:
-      - app-network
-
 
 volumes:
   gradle-cache:  # 도커 관리 볼륨 정의
