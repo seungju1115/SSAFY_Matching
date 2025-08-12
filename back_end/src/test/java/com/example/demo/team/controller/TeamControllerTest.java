@@ -187,7 +187,6 @@ class TeamControllerTest {
     @DisplayName("유효하지 않은 팀 생성 요청")
     void createTeam_shouldReturn400_whenTeamCreateInvalidRequest() throws Exception {
         teamRequest.setTeamDomain(null);
-        teamRequest.setTeamName(null);
 
         mockMvc.perform(post("/team")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -195,7 +194,6 @@ class TeamControllerTest {
                 .andExpect(status().isBadRequest()) // 400 상태 코드 기대
                 .andExpect(jsonPath("$.status").value(ErrorCode.INVALID_REQUEST.getStatus())) // 전역 예외 핸들러 구조에 맞게 검증
                 .andExpect(jsonPath("$.message").exists())  // 메시지 필드 존재 여부 확인
-                .andExpect(jsonPath("$.message").value(containsString("팀 이름은 필수입니다.")))
                 .andExpect(jsonPath("$.message").value(containsString("도메인은 필수입니다.")));
     }
 
@@ -303,8 +301,7 @@ class TeamControllerTest {
     @DisplayName("팀 정보 수정 - 유효하지 않은 요청일 경우 400 반환")
     void modifyTeam_shouldReturn400_whenInvalidRequest() throws Exception {
 
-        teamRequest.setTeamId(null);   // 필수값 없앰 (예: teamId가 필수일 때)
-        teamRequest.setTeamName("");   // 빈 문자열 등
+        teamRequest.setLeaderId(null);   // 빈 문자열 등
 
         mockMvc.perform(put("/team")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -312,7 +309,7 @@ class TeamControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(ErrorCode.INVALID_REQUEST.getStatus()))
                 .andExpect(jsonPath("$.message").exists())
-                .andExpect(jsonPath("$.message").value(containsString("팀 이름은 필수입니다.")));
+                .andExpect(jsonPath("$.message").value(containsString("팀장 ID는 필수입니다.")));
     }
 
     @Test

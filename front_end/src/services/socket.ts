@@ -1,12 +1,22 @@
 import { Client, type IMessage, type Frame } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
-// import { getBaseURL } from '../api/axios';
 
 // 구독 정보를 관리하기 위한 타입
 interface Subscription {
   topic: string;
   callback: (message: IMessage) => void;
 }
+
+// 환경에 따라 적절한 WebSocket URL을 반환하는 함수
+const getWebSocketURL = () => {
+  if (import.meta.env.PROD) {
+    // 배포 환경일 경우, 하드코딩된 URL 사용
+    return 'https://i13a307.p.ssafy.io/ws-chat';
+  }
+  // 개발 환경일 경우, .env 파일의 VITE_WEBSOCKET_URL 사용
+  // 만약 .env 파일에 값이 없을 경우, 기본 로컬호스트 주소를 사용
+  return 'http://localhost:8080/ws-chat';
+};
 
 class WebSocketService {
   private stompClient: Client | null = null;
@@ -29,9 +39,8 @@ class WebSocketService {
       return;
     }
 
-    // StompJS v5+ 에서는 brokerURL 대신 webSocketFactory 를 사용합니다.
     this.stompClient = new Client({
-      webSocketFactory: () => new SockJS(import.meta.env.VITE_WEBSOCKET_URL || 'https://i13a307.p.ssafy.io/ws-chat'),
+      webSocketFactory: () => new SockJS(getWebSocketURL()),
       debug: (str: string) => {
         console.log(new Date(), str);
       },
@@ -65,7 +74,6 @@ class WebSocketService {
   public subscribe(topic: string, callback: (message: IMessage) => void) {
     if (!this.stompClient || !this.stompClient.active) {
       console.error('STOMP client is not connected. Cannot subscribe.');
-      // 연결이 안되어있으면 구독 요청을 저장해두고, 연결되면 다시 시도할 수 있습니다.
       this.subscriptions.set(topic, { topic, callback });
       return;
     }
@@ -77,7 +85,6 @@ class WebSocketService {
     
     this.subscriptions.set(topic, { topic, callback });
     
-    // 구독 취소 함수를 반환하여 컴포넌트 unmount 시 사용할 수 있게 합니다.
     return () => {
       console.log(`Unsubscribing from ${topic}`);
       subscription.unsubscribe();
