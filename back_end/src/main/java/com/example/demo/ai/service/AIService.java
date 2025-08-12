@@ -34,16 +34,58 @@ public class AIService {
     @Value("${recsys.base-url:http://recsys-server:8000}")
     private String recsysBaseUrl;
 
+    private CandidateDto mapToCandidateDto(Object[] row) {
+        Long userId = ((Number) row[0]).longValue();
+        String userName = (String) row[1];
+        String positionsStr = (String) row[2];
+        String goalsStr = (String) row[3];
+        String vivesStr = (String) row[4];
+
+        // Position 파싱
+        List<String> positions = parsePositions(positionsStr);
+        String mainPos = positions.isEmpty() ? null : positions.get(0);
+        String subPos = positions.size() > 1 ? positions.get(1) : null;
+
+        return CandidateDto.builder()
+                .userId(userId)
+                .userName(userName)
+                .mainPos(mainPos)
+                .subPos(subPos)
+                .goals(parseEnums(goalsStr, ProjectGoalEnum.class))
+                .vives(parseEnums(vivesStr, ProjectViveEnum.class))
+                .build();
+    }
+
+    private List<String> parsePositions(String positionsStr) {
+        if (positionsStr == null || positionsStr.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return Arrays.stream(positionsStr.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
+    }
+
+    private <T extends Enum<T>> Set<T> parseEnums(String str, Class<T> enumClass) {
+        if (str == null || str.isEmpty()) {
+            return new HashSet<>();
+        }
+        return Arrays.stream(str.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(s -> Enum.valueOf(enumClass, s))
+                .collect(Collectors.toSet());
+    }
+
     // ==================== 기존 메서드들 (그대로 유지) ====================
 
     public TeamToPersonDto findTeamToPersonDtoById(Long teamId){
         TeamToPersonDto teamToPersonDto = new TeamToPersonDto();
         TeamAIDto curTeam = TeamAIDto.from(teamRepository.findTeamAIDtoById(teamId));
-        List<CandidateDto> candidateDtos = new ArrayList<>();
-        List<User> list = userRepository.findAllCandidates(teamId);
-        for(User user : list){
-            candidateDtos.add(CandidateDto.from(user));
-        }
+        List<Object[]> results = userRepository.findAllCandidates(teamId);
+        List<CandidateDto> candidateDtos=results.stream()
+                .map(this::mapToCandidateDto)
+                .toList();
         teamToPersonDto.setCurrentTeam(curTeam);
         teamToPersonDto.setCandidates(candidateDtos);
         return teamToPersonDto;
@@ -52,7 +94,11 @@ public class AIService {
     public PersonToTeamDto findPersonToTeamDtoById(Long personId){
         PersonToTeamDto personToTeamDto = new PersonToTeamDto();
         CandidateDto curPerson = CandidateDto.from(userRepository.findCurUser(personId));
-        List<TeamAIDto> availableTeams = teamRepository.findAvailableTeams();
+        List<Team> teams=teamRepository.findAvailableTeams();
+        List<TeamAIDto> availableTeams = new ArrayList<>();
+        for(Team team:teams){
+            availableTeams.add(TeamAIDto.from(team));
+        }
         personToTeamDto.setPerson(curPerson);
         personToTeamDto.setTeams(availableTeams);
         return personToTeamDto;
