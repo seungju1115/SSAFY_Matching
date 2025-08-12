@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { type IMessage } from '@stomp/stompjs';
 import { webSocketService } from '@/services/socket';
+import type { ChatMessageRequest } from '@/api/chat'; // API 파일에서 타입 가져오기
 
 export const useSocket = () => {
   const [isConnected, setIsConnected] = useState(webSocketService.isConnected());
@@ -25,13 +26,44 @@ export const useSocket = () => {
     return webSocketService.subscribe(topic, callback);
   };
 
+  // 그룹 채팅방 구독용 함수
+  const subscribeToRoom = (roomId: string | number, callback: (message: IMessage) => void) => {
+    return subscribe(`/topic/chat/room/${roomId}`, callback);
+  };
+
+  // 1:1 채팅방 구독용 함수
+  const subscribeToPrivate = (roomId: string | number, callback: (message: IMessage) => void) => {
+    return subscribe(`/queue/chat/room/${roomId}`, callback);
+  };
+
+  // 범용 publish 함수 (유연성을 위해 유지)
   const publish = (destination: string, body: object) => {
     webSocketService.publish(destination, body);
   };
+
+  // 그룹 채팅 메시지 전송용 함수
+  const sendChatMessage = (message: ChatMessageRequest) => {
+    publish('/app/chat.sendMessage', message);
+  };
+
+  // 1:1 개인 메시지 전송용 함수
+  const sendPrivateMessage = (message: ChatMessageRequest) => {
+    publish('/app/chat.private', message);
+  };
+
 
   const disconnect = () => {
     webSocketService.disconnect();
   };
 
-  return { isConnected, subscribe, publish, disconnect };
+  return { 
+    isConnected, 
+    subscribe, 
+    subscribeToRoom, 
+    subscribeToPrivate, 
+    publish, 
+    sendChatMessage, 
+    sendPrivateMessage, 
+    disconnect 
+  };
 }; 
