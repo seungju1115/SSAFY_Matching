@@ -73,7 +73,14 @@ export const teamAPI = {
    * GET /team/{teamId}/members
    */
   getTeamMembers: (teamId: number): Promise<TeamMember[]> =>
-    apiClient.get(`/team/${teamId}/members`)
+    apiClient.get(`/team/${teamId}/members`),
+
+  /**
+   * 팀 떠나기
+   * POST /team/{userId}/leave
+   */
+  leaveTeam: (userId: number): Promise<ApiResponse<void>> =>
+    apiClient.post(`/team/${userId}/leave`)
 }
 
 // 편의를 위한 추가 함수들

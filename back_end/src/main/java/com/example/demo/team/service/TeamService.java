@@ -1,9 +1,9 @@
 package com.example.demo.team.service;
 
+import com.example.demo.chat.dao.ChatRoomMemberRepository;
+import com.example.demo.chat.entity.ChatRoomMember;
 import com.example.demo.common.exception.BusinessException;
 import com.example.demo.common.exception.ErrorCode;
-import com.example.demo.team.dao.TeamMembershipRequestRepository;
-import com.example.demo.team.entity.TeamMembershipRequest;
 import com.example.demo.team.entity.TeamStatus;
 import com.example.demo.user.dao.UserRepository;
 import com.example.demo.user.dto.UserDetailResponse;
@@ -33,6 +33,7 @@ public class TeamService {
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
     private final ChatRoomService chatRoomService;
+    private final ChatRoomMemberRepository chatRoomMemberRepository;
     // 1. 팀 생성
     @Transactional
     public TeamDetailResponse createTeam(TeamRequest dto) { // 팀장만 생성 가능
@@ -168,6 +169,24 @@ public class TeamService {
 
         if(team.getStatus() != TeamStatus.LOCKED)team.setStatus(TeamStatus.LOCKED);
         else throw new BusinessException(ErrorCode.TEAM_ALLREADY_LOCKED);
+    }
+
+    @Transactional
+    public void leaveTeam(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        Long teamId = user.getTeam() != null ? user.getTeam().getId() : null;
+        if (teamId == null) {
+            throw new BusinessException(ErrorCode.USER_NOT_IN_TEAM);
+        }
+
+        ChatRoomMember member = chatRoomMemberRepository.findByUserIdAndChatRoomTeamId(userId, teamId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.CHATROOM_MEMBER_NOT_FOUND));
+
+        chatRoomMemberRepository.delete(member);
+
+        user.setTeam(null);
     }
 
     public Team toTeam(TeamRequest teamRequest,Team team) {

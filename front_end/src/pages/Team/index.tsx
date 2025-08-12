@@ -1,7 +1,11 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTeamStore } from '@/stores/teamStore'
 import useUserStore from '@/stores/userStore'
+import { useSocket } from '@/hooks/useSocket'
+import { chatAPI } from '@/api/chat'
+import type { Message } from '@/types/chat'
+import type { ChatMessageRequest } from '@/api/chat'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -19,8 +23,10 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { ProjectGoalEnum, ProjectViveEnum } from '@/types/team'
+import { type IMessage } from '@stomp/stompjs'
+import { teamAPI } from '@/api/team' // teamAPI 임포트
 
-// 프로젝트 성향 라벨 매핑
+// --- (기존 라벨, 색상 매핑 데이터는 동일) ---
 const projectGoalLabels: Record<ProjectGoalEnum, string> = {
   JOB: '취업우선',
   AWARD: '수상목표', 
@@ -31,8 +37,6 @@ const projectGoalLabels: Record<ProjectGoalEnum, string> = {
   QUICK: '빠른개발',
   QUALITY: '완성도추구'
 }
-
-// 팀 분위기 라벨 매핑
 const projectVibeLabels: Record<ProjectViveEnum, string> = {
   CASUAL: '반말 지향',
   FORMAL: '존대 지향',
@@ -45,8 +49,6 @@ const projectVibeLabels: Record<ProjectViveEnum, string> = {
   AGILE: '애자일 방식',
   WATERFALL: '워터폴 방식'
 }
-
-// 역할별 색상 매핑 (모던하고 절제된 색상)
 const roleColors = {
   backend: 'bg-slate-100 text-slate-700 border-slate-200',
   frontend: 'bg-emerald-100 text-emerald-700 border-emerald-200',
@@ -54,67 +56,118 @@ const roleColors = {
   pm: 'bg-amber-100 text-amber-700 border-amber-200',
   design: 'bg-rose-100 text-rose-700 border-rose-200'
 }
+// --- (여기까지 동일) ---
 
 const TeamPage: React.FC = () => {
   const navigate = useNavigate()
-  const { isLoading } = useTeamStore()
+  const { isLoading, currentTeam, teamMembers, setLoading, setCurrentTeam, setTeamMembers, setError } = useTeamStore()
   const { user } = useUserStore()
-  
-  const [chatMessage, setChatMessage] = useState('')
-  const [chatMessages, setChatMessages] = useState([
-    { id: 1, sender: '김개발', message: '안녕하세요! 팀에 합류하게 되어 기쁩니다', time: '14:30' },
-    { id: 2, sender: '박디자인', message: '반가워요! 함께 멋진 프로젝트 만들어봐요', time: '14:32' },
-    { id: 3, sender: '이기획', message: '첫 회의는 언제 할까요?', time: '14:35' }
-  ])
+  const { isConnected, subscribeToRoom, sendChatMessage } = useSocket()
+  const scrollAreaRef = useRef<HTMLDivElement>(null)
 
-  // 모의 팀원 데이터
-  const mockTeamMembers = [
-    { id: 1, name: '김개발', role: 'backend', isLeader: true, avatar: '' },
-    { id: 2, name: '박디자인', role: 'design', isLeader: false, avatar: '' },
-    { id: 3, name: '이기획', role: 'pm', isLeader: false, avatar: '' },
-    { id: 4, name: '최프론트', role: 'frontend', isLeader: false, avatar: '' },
-    { id: 5, name: '정AI', role: 'ai', isLeader: false, avatar: '' }
-  ]
+  const [newMessage, setNewMessage] = useState('')
+  const [messages, setMessages] = useState<Message[]>([])
 
-  // 모의 팀 정보 데이터
-  const mockTeamInfo = {
-    teamName: 'AI 스마트 솔루션팀',
-    teamDomain: 'AI/머신러닝',
-    teamDescription: '혁신적인 AI 기술로 실생활 문제를 해결하는 서비스를 개발합니다.',
-    teamPreference: ['JOB', 'PROFESSIONAL', 'QUALITY'] as ProjectGoalEnum[],
-    teamVibe: ['CASUAL', 'COMFY', 'DEMOCRACY', 'AGILE'] as ProjectViveEnum[],
-    roleDistribution: {
-      backend: 2,
-      frontend: 2, 
-      ai: 1,
-      pm: 1,
-      design: 1
+  // 팀 데이터 불러오기
+  useEffect(() => {
+    const fetchTeamData = async () => {
+      if (!user.teamId) {
+        setError('팀 ID가 없습니다.')
+        setLoading(false)
+        return
+      }
+
+      setLoading(true)
+      try {
+        const [teamDetailResponse, teamMembersResponse] = await Promise.all([
+          teamAPI.getTeamDetail(user.teamId),
+          teamAPI.getTeamMembers(user.teamId)
+        ])
+        
+        setCurrentTeam(teamDetailResponse.data)
+        setTeamMembers(teamMembersResponse.data) // teamMembersResponse.data가 TeamMember[] 타입이라고 가정
+      } catch (err) {
+        console.error('팀 데이터 불러오기 실패:', err)
+        setError('팀 데이터를 불러오는 데 실패했습니다.')
+      } finally {
+        setLoading(false)
+      }
     }
-  }
+
+    fetchTeamData()
+  }, [user.teamId, setCurrentTeam, setTeamMembers, setLoading, setError])
+
+
+  // 채팅 메시지 불러오기 및 웹소켓 구독
+  useEffect(() => {
+    if (!isConnected || !user.teamId) return
+
+    const initChat = async () => {
+      try {
+        const response = await chatAPI.getMessages(user.teamId!)
+        // TODO: API 응답 타입 확인 후 수정 필요
+        setMessages(response.data || []) 
+      } catch (error) {
+        console.error('Error fetching chat history:', error)
+        setMessages([])
+      }
+    }
+
+    initChat()
+
+    const unsubscribe = subscribeToRoom(user.teamId, (message: IMessage) => {
+      const incomingMessage: Message = JSON.parse(message.body)
+      setMessages((prevMessages) => [...prevMessages, incomingMessage])
+    })
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe()
+      }
+    }
+  }, [isConnected, user.teamId, subscribeToRoom])
+
+  // 메시지 리스트가 업데이트될 때마다 스크롤을 맨 아래로 이동
+  useEffect(() => {
+    if (scrollAreaRef.current) {
+      scrollAreaRef.current.scrollTo({ top: scrollAreaRef.current.scrollHeight, behavior: 'smooth' })
+    }
+  }, [messages])
 
   const handleSendMessage = () => {
-    if (chatMessage.trim()) {
-      const newMessage = {
-        id: chatMessages.length + 1,
-        sender: user?.userName || '나',
-        message: chatMessage,
-        time: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
+    if (newMessage.trim() && user.id && user.teamId) {
+      const messagePayload: ChatMessageRequest = {
+        type: 'CHAT',
+        roomId: user.teamId,
+        senderId: user.id,
+        message: newMessage,
       }
-      setChatMessages([...chatMessages, newMessage])
-      setChatMessage('')
+      sendChatMessage(messagePayload)
+      setNewMessage('')
     }
   }
 
-  const handleLeaveTeam = () => {
+  // --- (기존 핸들러 함수들은 동일) ---
+  const handleLeaveTeam = async () => {
     if (confirm('정말로 팀을 나가시겠습니까?')) {
-      navigate('/matching')
+      try {
+        if (user.id) {
+          await teamAPI.leaveTeam(user.id)
+          alert('팀을 성공적으로 나갔습니다.')
+          navigate('/matching')
+        } else {
+          alert('사용자 정보를 찾을 수 없습니다.')
+        }
+      } catch (error) {
+        console.error('팀 나가기 실패:', error)
+        alert('팀 나가기에 실패했습니다. 다시 시도해주세요.')
+      }
     }
   }
-
   const handleRecommendMember = () => {
     navigate('/matching?recommend=true')
   }
-
+  // --- (여기까지 동일) ---
 
   if (isLoading) {
     return (
@@ -129,112 +182,94 @@ const TeamPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* 메인페이지 헤더 */}
       <Header />
       <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* 팀 정보 섹션 */}
+          {/* --- (팀 정보, 팀원 목록 섹션 JSX는 동일) --- */}
           <div className="lg:col-span-1 space-y-6">
-            {/* 팀 정보 카드 */}
+            {currentTeam && (
+              <Card className="bg-white border border-gray-200 shadow-sm">
+                <CardHeader>
+                  <CardTitle className="text-xl font-semibold text-gray-900">{currentTeam.teamName}</CardTitle>
+                  <p className="text-sm text-gray-500">{currentTeam.teamDomain}</p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <h3 className="text-md font-medium text-gray-700 mb-2">팀 설명</h3>
+                    <p className="text-sm text-gray-600">{currentTeam.teamDescription}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-md font-medium text-gray-700 mb-2">프로젝트 목표</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {currentTeam.teamPreference?.map((goal) => (
+                        <Badge key={goal} variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                          {projectGoalLabels[goal]}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-md font-medium text-gray-700 mb-2">팀 분위기</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {currentTeam.teamVibe?.map((vibe) => (
+                        <Badge key={vibe} variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                          {projectVibeLabels[vibe]}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-md font-medium text-gray-700 mb-2">역할 분배</h3>
+                    <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
+                      {Object.entries(currentTeam.roleDistribution || {}).map(([role, count]) => (
+                        <div key={role} className="flex justify-between">
+                          <span>{role.charAt(0).toUpperCase() + role.slice(1)}:</span>
+                          <span>{count}명</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             <Card className="bg-white border border-gray-200 shadow-sm">
               <CardHeader>
-                <CardTitle className="text-lg font-medium text-gray-900">팀 정보</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">팀 소개</h3>
-                  <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
-                    {mockTeamInfo.teamDescription}
-                  </p>
-                </div>
-
-                <Separator />
-
-                <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">모집 역할</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {Object.entries(mockTeamInfo.roleDistribution).map(([role, count]) => (
-                      <Badge 
-                        key={role} 
-                        variant="outline"
-                        className={cn("text-xs", roleColors[role as keyof typeof roleColors])}
-                      >
-                        {role.toUpperCase()} {count}명
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-
-                <Separator />
-
-                <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">프로젝트 성향</h3>
-                  <div className="flex flex-wrap gap-1">
-                    {mockTeamInfo.teamPreference.map((pref) => (
-                      <Badge key={pref} variant="secondary" className="text-xs">
-                        {projectGoalLabels[pref]}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">팀 분위기</h3>
-                  <div className="flex flex-wrap gap-1">
-                    {mockTeamInfo.teamVibe.map((vibe) => (
-                      <Badge key={vibe} variant="secondary" className="text-xs">
-                        {projectVibeLabels[vibe]}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* 팀원 목록 카드 */}
-            <Card className="bg-white border border-gray-200 shadow-sm">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg font-medium text-gray-900">팀원 목록</CardTitle>
-                  <Button 
-                    onClick={handleRecommendMember}
-                    size="sm"
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
-                  >
-                    <UserPlus className="w-4 h-4 mr-1" />
-                    추천
-                  </Button>
-                </div>
+                <CardTitle className="text-xl font-semibold text-gray-900">팀원 목록</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  {mockTeamMembers.map((member) => (
-                    <div key={member.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50">
-                      <Avatar className="w-8 h-8">
-                        <AvatarImage src={member.avatar} />
-                        <AvatarFallback className="bg-gray-200 text-gray-600 text-sm">
-                          {member.name.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-gray-900 truncate">
-                            {member.name}
-                          </span>
-                          {member.isLeader && (
-                            <Crown className="w-3 h-3 text-amber-500 flex-shrink-0" />
-                          )}
+                <div className="space-y-4">
+                  {teamMembers.length > 0 ? (
+                    teamMembers.map((member) => (
+                      <div key={member.id} className="flex items-center space-x-3">
+                        <Avatar>
+                          <AvatarImage src={member.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${member.name}`} />
+                          <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-gray-800">{member.name}</span>
+                            {member.isLeader && <Crown className="w-4 h-4 text-yellow-500" />}
+                          </div>
+                          <Badge className={cn("text-xs", roleColors[member.role as keyof typeof roleColors])}>
+                            {member.role}
+                          </Badge>
                         </div>
-                        <Badge 
-                          variant="outline"
-                          className={cn("text-xs mt-1", roleColors[member.role as keyof typeof roleColors])}
-                        >
-                          {member.role.toUpperCase()}
-                        </Badge>
+                        {/* TODO: 팀원 프로필 보기, 강퇴 등 액션 버튼 추가 */}
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  ) : (
+                    <p className="text-gray-500">팀원이 없습니다.</p>
+                  )}
                 </div>
+                <Separator className="my-4" />
+                <Button 
+                  onClick={handleRecommendMember}
+                  className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+                >
+                  <UserPlus className="w-4 h-4 mr-2" />
+                  팀원 추천받기
+                </Button>
               </CardContent>
             </Card>
           </div>
@@ -249,26 +284,32 @@ const TeamPage: React.FC = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="flex-1 flex flex-col p-0">
-                <ScrollArea className="flex-1 px-6">
+                <ScrollArea className="flex-1 px-6" ref={scrollAreaRef}>
                   <div className="space-y-4 py-4">
-                    {chatMessages.map((msg) => (
-                      <div key={msg.id} className="">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-sm font-medium text-gray-900">{msg.sender}</span>
-                          <span className="text-xs text-gray-500">{msg.time}</span>
+                    {messages.map((msg) => {
+                      const sender = teamMembers.find(member => member.id === msg.senderId);
+                      const senderName = sender ? sender.name : `User ${msg.senderId}`;
+                      return (
+                        <div key={msg.id} className="">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-sm font-medium text-gray-900">{senderName}</span>
+                            <span className="text-xs text-gray-500">
+                              {new Date(msg.timestamp).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </div>
+                          <div className="bg-gray-50 p-3 rounded-lg max-w-md">
+                            <p className="text-sm text-gray-700">{msg.content}</p>
+                          </div>
                         </div>
-                        <div className="bg-gray-50 p-3 rounded-lg max-w-md">
-                          <p className="text-sm text-gray-700">{msg.message}</p>
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </ScrollArea>
                 <div className="flex-shrink-0 p-4 border-t border-gray-200">
                   <div className="flex gap-2">
                     <Input
-                      value={chatMessage}
-                      onChange={(e) => setChatMessage(e.target.value)}
+                      value={newMessage}
+                      onChange={(e) => setNewMessage(e.target.value)}
                       placeholder="메시지를 입력하세요..."
                       className="flex-1"
                       onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
@@ -283,7 +324,6 @@ const TeamPage: React.FC = () => {
                 </div>
               </CardContent>
             </Card>
-            {/* 팀 나가기 버튼 - 오른쪽 하단 고정 */}
             <div className="w-full flex justify-end mt-4">
               <Button 
                 onClick={handleLeaveTeam}
@@ -302,3 +342,4 @@ const TeamPage: React.FC = () => {
 }
 
 export default TeamPage
+
