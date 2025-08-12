@@ -1,5 +1,5 @@
 // 매칭 관련 커스텀 훅
-import { useMatchStore } from '../store/matchStore'
+import { useMatchStore } from '../stores/matchStore'
 
 export const useMatch = () => {
   const { matches, setMatches } = useMatchStore()
