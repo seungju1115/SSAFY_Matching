@@ -50,6 +50,69 @@ export interface UserDetailResponse {
   projectExp?: string
   qualification?: string
   techStack?: TechEnum[]
+  userStatus?: UserStatus
+}
+
+// 사용자 프로필 수정 요청 타입 (백엔드 UserProfileUpdateRequest와 일치)
+export interface UserProfileUpdateRequest {
+  userName?: string
+  userProfile?: string // 자기소개
+  major?: boolean
+  lastClass?: number
+  wantedPosition?: string[] // 희망 포지션
+  projectGoal?: string[] // 프로젝트 선호도
+  projectVive?: string[] // 개인 성향
+  projectExp?: string // 프로젝트 경험
+  qualification?: string // 자격증
+  techStack?: string[] // 기술 스택
+  teamId?: number
+  userStatus?: UserStatus // 사용자 상태
+}
+
+// 사용자 프로필 응답 타입 (백엔드 UserProfileResponse와 일치)
+export interface UserProfileResponse {
+  data: any;
+  id: number
+  userName: string
+  role: string
+  email: string
+  userProfile?: string
+  major: boolean
+  lastClass: number
+  wantedPosition?: string[]
+  projectGoal?: string[]
+  projectVive?: string[]
+  projectExp?: string
+  qualification?: string
+  techStack?: string[]
+  teamId?: number
+  teamName?: string
+}
+
+// 팀원 검색 요청 타입
+export interface UserSearchRequest {
+  major?: boolean
+  wantedPosition?: string[]
+  techStack?: string[]
+  projectGoal?: string[]
+  projectVive?: string[]
+  userStatus?: UserStatus
+}
+
+// 팀원 검색 응답 타입
+export interface UserSearchResponse {
+  id: number
+  userName: string
+  userProfile?: string
+  major: boolean
+  lastClass: number
+  wantedPosition?: string[]
+  techStack?: string[]
+  projectGoal?: string[]
+  projectVive?: string[]
+  projectExp?: string
+  qualification?: string
+  userStatus?: UserStatus
 }
 
 // 학기 옵션
@@ -80,6 +143,8 @@ export const NON_MAJOR_TRACK_OPTIONS = [
 
 // 사용자 관련 Enum 타입들
 export type PositionEnum = 'BACKEND' | 'FRONTEND' | 'AI' | 'PM' | 'DESIGN'
+
+export type UserStatus = 'INACTIVE' | 'WAITING' | 'IN_TEAM'
 
 export type TechEnum = 
   // Frontend

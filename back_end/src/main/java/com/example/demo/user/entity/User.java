@@ -40,6 +40,11 @@ public class User {
     @JoinColumn(name = "team_id")
     private Team team;
 
+    // 사용자 상태 (INACTIVE: 대기중아님, WAITING: 대기중, IN_TEAM: 팀참여)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "user_status", nullable = false)
+    private UserStatus userStatus = UserStatus.INACTIVE;
+
     // 기초정보
     @Column(name="user_name", length = 10, nullable = false)
     @NotBlank

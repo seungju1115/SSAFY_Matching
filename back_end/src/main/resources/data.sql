@@ -29,25 +29,26 @@ INSERT INTO USERS (
     user_profile,
     project_experience,
     qualification,
-    team_id
+    team_id,
+    user_status
 ) VALUES
 -- 팀 1 (프론트엔드 팀) 멤버들
-('student', '김프론트', 'frontend1@test.com', true, 4, '프론트엔드 개발에 열정적인 학생입니다.', 'React 프로젝트 3개 경험', ' 정보처리기사', 1),
-('student', '이디자인', 'design1@test.com', false, 3, 'UI/UX 디자인을 전공하고 있습니다.', '앱 디자인 2개 프로젝트', 'GTQ 1급', 1),
+('student', '김프론트', 'frontend1@test.com', true, 4, '프론트엔드 개발에 열정적인 학생입니다.', 'React 프로젝트 3개 경험', ' 정보처리기사', 1, 'IN_TEAM'),
+('student', '이디자인', 'design1@test.com', false, 3, 'UI/UX 디자인을 전공하고 있습니다.', '앱 디자인 2개 프로젝트', 'GTQ 1급', 1, 'IN_TEAM'),
 
 -- 팀 2 (백엔드 팀) 멤버들
-('student', '박백엔드', 'backend1@test.com', true, 4, '서버 개발과 데이터베이스에 관심이 많습니다.', 'Spring Boot 프로젝트 5개', '정보처리기사', 2),
-('student', '최AI', 'ai1@test.com', true, 4, '머신러닝과 딥러닝을 공부하고 있습니다.', 'Python ML 프로젝트 3개', 'ADsP', 2),
+('student', '박백엔드', 'backend1@test.com', true, 4, '서버 개발과 데이터베이스에 관심이 많습니다.', 'Spring Boot 프로젝트 5개', '정보처리기사', 2, 'IN_TEAM'),
+('student', '최AI', 'ai1@test.com', true, 4, '머신러닝과 딥러닝을 공부하고 있습니다.', 'Python ML 프로젝트 3개', 'ADsP', 2, 'IN_TEAM'),
 
 -- 팀 3 (풀스택 팀) 멤버들
-('student', '정풀스택', 'fullstack1@test.com', true, 4, '프론트엔드와 백엔드 모두 경험이 있습니다.', '풀스택 프로젝트 4개', 'AWS 자격증', 3),
+('student', '정풀스택', 'fullstack1@test.com', true, 4, '프론트엔드와 백엔드 모두 경험이 있습니다.', '풀스택 프로젝트 4개', 'AWS 자격증', 3, 'IN_TEAM'),
 
 -- 팀 없는 후보자들 (추천 대상)
-('student', '홍길동', 'hong@test.com', true, 4, '새로운 팀을 찾고 있는 백엔드 개발자입니다.', 'Java Spring 프로젝트 경험', '정보처리기사', NULL),
-('student', '김철수', 'kim@test.com', false, 3, '프론트엔드 개발을 배우고 있는 학생입니다.', 'React 독학 중', NULL, NULL),
-('student', '이영희', 'lee@test.com', true, 4, '데이터 분석과 AI에 관심이 있습니다.', 'Python 데이터 분석 프로젝트', 'ADsP', NULL),
-('student', '박민수', 'park@test.com', false, 2, '디자인과 프론트엔드에 관심이 있습니다.', '포트폴리오 사이트 제작', NULL, NULL),
-('student', '조현우', 'cho@test.com', true, 4, '팀 리딩 경험이 있는 PM 지망생입니다.', '프로젝트 관리 경험 2회', 'PMP 준비중', NULL);
+('student', '홍길동', 'hong@test.com', true, 4, '새로운 팀을 찾고 있는 백엔드 개발자입니다.', 'Java Spring 프로젝트 경험', '정보처리기사', NULL, 'WAITING'),
+('student', '김철수', 'kim@test.com', false, 3, '프론트엔드 개발을 배우고 있는 학생입니다.', 'React 독학 중', NULL, NULL, 'WAITING'),
+('student', '이영희', 'lee@test.com', true, 4, '데이터 분석과 AI에 관심이 있습니다.', 'Python 데이터 분석 프로젝트', 'ADsP', NULL, 'WAITING'),
+('student', '박민수', 'park@test.com', false, 2, '디자인과 프론트엔드에 관심이 있습니다.', '포트폴리오 사이트 제작', NULL, NULL, 'WAITING'),
+('student', '조현우', 'cho@test.com', true, 4, '팀 리딩 경험이 있는 PM 지망생입니다.', '프로젝트 관리 경험 2회', 'PMP 준비중', NULL, 'WAITING');
 
 -- 사용자 포지션 정보 (wanted_position)
 INSERT INTO USER_WANTED_POSITION (user_user_id, wanted_position) VALUES

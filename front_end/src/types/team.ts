@@ -1,48 +1,48 @@
 // Team 관련 타입 정의
 import type { UserDetailResponse } from './user'
-export interface Team {
-  teamId: number
-  teamName: string
-  teamDomain?: string
-  memberWanted?: string
-  teamDescription?: string
-  teamPreference?: ProjectGoalEnum[]
-  teamVive?: ProjectViveEnum[]
-  leaderId: number
-  memberCount?: number
-}
-
-export interface TeamDetail extends Team {
-  membersId: number[]
-}
-
-export interface TeamMember {
-  memberId: number
-  username: string
-}
-
-// 팀 생성 요청 (백엔드 TeamCreateRequest와 매칭)
-export interface TeamCreateRequest {
-  leaderId: number
-  teamDomain: string
-  teamVive?: ProjectViveEnum[]
-  teamPreference?: ProjectGoalEnum[]
-  backendCount: number
-  frontendCount: number
-  aiCount: number
-  pmCount: number
-  designCount: number
-  teamDescription?: string
-}
-
-
-// 팀 응답 타입
-export interface TeamResponse {
-  teamId: number
-  teamName: string
-  leaderId: number
-  memberCount: number
-}
+// export interface Team {
+//   teamId: number
+//   teamName: string
+//   teamDomain?: string
+//   memberWanted?: string
+//   teamDescription?: string
+//   teamPreference?: ProjectGoalEnum[]
+//   teamVive?: ProjectViveEnum[]
+//   leaderId: number
+//   memberCount?: number
+// }
+//
+// export interface TeamDetail extends Team {
+//   membersId: number[]
+// }
+//
+// export interface TeamMember {
+//   memberId: number
+//   username: string
+// }
+//
+// // 팀 생성 요청 (백엔드 TeamCreateRequest와 매칭)
+// export interface TeamCreateRequest {
+//   leaderId: number
+//   teamDomain: string
+//   teamVive?: ProjectViveEnum[]
+//   teamPreference?: ProjectGoalEnum[]
+//   backendCount: number
+//   frontendCount: number
+//   aiCount: number
+//   pmCount: number
+//   designCount: number
+//   teamDescription?: string
+// }
+//
+//
+// // 팀 응답 타입
+// export interface TeamResponse {
+//   teamId: number
+//   teamName: string
+//   leaderId: number
+//   memberCount: number
+// }
 
 // Enum 타입들 (백엔드와 일치) - union type으로 대체
 export type RequestType = 'JOIN' | 'INVITE'

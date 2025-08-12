@@ -49,4 +49,10 @@ public class UserProfileUpdateRequest {
 
     @Schema(description = "변경할 팀 ID", example = "10")
     private Long teamId;
+
+    @Schema(
+            description = "유저 상태",
+            example = "[\"INACTIVE\", \"WAITING\", \"IN_TEAM\"]"
+    )
+    private UserStatus userStatus;
 }
