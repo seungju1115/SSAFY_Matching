@@ -10,7 +10,6 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import Header from '@/components/layout/Header'
-import UserRecommendationModal from '../../components/features/team/SimpleUserModal'
 import { 
   Crown, 
   MessageCircle, 
@@ -67,7 +66,6 @@ const TeamPage: React.FC = () => {
     { id: 2, sender: '박디자인', message: '반가워요! 함께 멋진 프로젝트 만들어봐요', time: '14:32' },
     { id: 3, sender: '이기획', message: '첫 회의는 언제 할까요?', time: '14:35' }
   ])
-  const [isRecommendModalOpen, setIsRecommendModalOpen] = useState(false)
 
   // 모의 팀원 데이터
   const mockTeamMembers = [
@@ -114,13 +112,9 @@ const TeamPage: React.FC = () => {
   }
 
   const handleRecommendMember = () => {
-    setIsRecommendModalOpen(true)
+    navigate('/matching?recommend=true')
   }
 
-  const handleSelectUser = (user: any) => {
-    console.log('선택된 사용자:', user)
-    // 여기서 실제 팀원 초대 로직을 구현할 수 있습니다
-  }
 
   if (isLoading) {
     return (
@@ -303,13 +297,6 @@ const TeamPage: React.FC = () => {
           </div>
         </div>
       </div>
-
-      {/* 사용자 추천 모달 */}
-      <UserRecommendationModal
-        isOpen={isRecommendModalOpen}
-        onClose={() => setIsRecommendModalOpen(false)}
-        onSelectUser={handleSelectUser}
-      />
     </div>
   )
 }
