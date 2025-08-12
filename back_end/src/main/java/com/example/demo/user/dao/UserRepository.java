@@ -4,6 +4,7 @@ import com.example.demo.user.Enum.PositionEnum;
 import com.example.demo.user.Enum.ProjectGoalEnum;
 import com.example.demo.user.Enum.ProjectViveEnum;
 import com.example.demo.user.Enum.TechEnum;
+import com.example.demo.user.Enum.UserStatus;
 import com.example.demo.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -42,14 +43,15 @@ public interface UserRepository extends JpaRepository<User,Long> {
             "AND (:wantedPosition IS NULL OR wp IN :wantedPosition) " +
             "AND (:techStack IS NULL OR ts IN :techStack) " +
             "AND (:projectVive IS NULL OR pv IN :projectVive) " +
-            "AND (:projectGoal IS NULL OR pg IN :projectGoal)")
+            "AND (:projectGoal IS NULL OR pg IN :projectGoal) " +
+            "AND (:userStatus IS NULL OR u.userStatus = :userStatus)")
     List<User> findUsersWithoutTeamByFilters(
             Boolean major,
             List<PositionEnum> wantedPosition,
             Set<TechEnum> techStack,
             Set<ProjectViveEnum> projectVive,
-            Set<ProjectGoalEnum> projectGoal
-    );
+            Set<ProjectGoalEnum> projectGoal,
+            UserStatus userStatus);
 
     @Query(value =
             "SELECT DISTINCT u FROM User u " +
@@ -66,4 +68,7 @@ public interface UserRepository extends JpaRepository<User,Long> {
                     "LEFT JOIN FETCH u.projectVive " +
                     "WHERE u.id=:id")
     User findCurUser(Long id);
+
+    // UserStatus가 WAITING인 사용자들 조회
+    List<User> findByUserStatus(UserStatus userStatus);
 }
