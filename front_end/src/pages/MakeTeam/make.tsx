@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTeam } from '@/hooks/useTeam'
-import useUserStore from '@/stores/userStore'
 import type { TeamCreateRequest, ProjectGoalEnum, ProjectViveEnum } from '@/types/team'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -39,7 +38,6 @@ interface TeamData {
 export default function MakeTeam() {
   const navigate = useNavigate()
   const { createTeam, isLoading } = useTeam()
-  const { user } = useUserStore()
   const [teamData, setTeamData] = useState<TeamData>({
     domains: [],
     projectPreferences: [],
@@ -129,7 +127,7 @@ export default function MakeTeam() {
       .filter(Boolean)
 
     return {
-      leaderId: user.id || 0,
+      leaderId: 1, // TODO: 실제 로그인한 사용자 ID로 변경
       teamDomain: data.domains.join(', '), // 도메인들을 문자열로 결합
       teamDescription: data.introduction,
       teamPreference: mappedPreferences,
