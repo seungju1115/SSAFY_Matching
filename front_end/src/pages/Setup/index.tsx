@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -17,7 +17,7 @@ import { publicApiClient } from '@/api/axios'
 import useUserStore from '@/stores/userStore'
 
 export default function Setup() {
-  // const navigate = useNavigate()
+  const navigate = useNavigate()
   const location = useLocation()
   const email = location.state?.email || ''
   const { setUser } = useUserStore()
@@ -51,7 +51,7 @@ export default function Setup() {
       }
       
       const response = await publicApiClient.post('/users/profile', userProfileData)
-
+      
       if (response.data && response.data.status === 200) {
         const userData = response.data.data
         setUser({
@@ -63,8 +63,7 @@ export default function Setup() {
           lastClass: userData.lastClass,
         })
         console.log('User profile created and state updated:', userData)
-        const baseUrl = window.location.origin
-        window.location.href = `${baseUrl}/users/login/google`
+        navigate('/')
       } else {
         console.error('Failed to create user profile:', response.data.message)
       }
