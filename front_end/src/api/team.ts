@@ -70,6 +70,13 @@ export const teamAPI = {
     apiClient.post('/team/offer', teamOffer),
 
   /**
+   * 팀 떠나기
+   * POST /team/{userId}/leave
+   */
+  leaveTeam: (userId: number): Promise<ApiResponse<void>> =>
+    apiClient.post(`/team/${userId}/leave`),
+
+  /**
    * 팀 요청 목록 조회
    * GET /team/{teamId}/request
    */
@@ -82,6 +89,7 @@ export const teamAPI = {
    */
   lockTeam: (teamId: number): Promise<ApiResponse<void>> =>
     apiClient.post(`/team/${teamId}/lock`),
+
 }
 
 // 편의 함수들
