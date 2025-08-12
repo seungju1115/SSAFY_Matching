@@ -38,7 +38,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(
                 c ->
                         c.requestMatchers("/error", "/users/profile", "/users/login", "/login/oauth2/code/**", "/h2-console/**"
-                                        , "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                                        , "/swagger-ui/**", "/v3/api-docs/**", "/ws-chat/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/team","/team/search").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/users/profile").permitAll()
                                 .anyRequest().permitAll()); // 개발용으로 다 열어놈

@@ -1,6 +1,6 @@
 // Team 관련 커스텀 훅
 import { useState } from 'react'
-import { useTeamStore } from '@/store/teamStore'
+import { useTeamStore } from '@/stores/teamStore'
 import { teamAPI, teamHelpers } from '@/api/team'
 import type { TeamRequest, TeamCreateRequest } from '@/types/team'
 import { useToast } from '@/hooks/use-toast'

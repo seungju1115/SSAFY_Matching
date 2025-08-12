@@ -7,7 +7,11 @@ import ProfileSetup from './pages/ProfileSetup'
 import MakeTeam from './pages/MakeTeam/make'
 import AuthCallback from './pages/Auth/Callback'
 import Team from './pages/Team'
-import Dashboard from './pages/Dashboard'
+import Chat from './pages/Chat'
+import ProfileLayout from './pages/Profile/Layout'
+import ProfileInfo from './pages/Profile/Info'
+import ProfileTeam from './pages/Profile/Team'
+import ProfileWaiting from './pages/Profile/Waiting'
 
 function App() {
   return (
@@ -27,4 +31,4 @@ function App() {
   )
 }
 
-export default App 
+export default App
