@@ -8,6 +8,10 @@ import MakeTeam from './pages/MakeTeam/make'
 import AuthCallback from './pages/Auth/Callback'
 import Team from './pages/Team'
 import Dashboard from './pages/Dashboard'
+import ProfileLayout from './pages/Profile/Layout'
+import ProfileInfo from './pages/Profile/Info'
+import ProfileTeam from './pages/Profile/Team'
+import ProfileWaiting from './pages/Profile/Waiting'
 
 function App() {
   return (
@@ -22,9 +26,14 @@ function App() {
         <Route path="/oauth/callback" element={<AuthCallback />} />
         <Route path="/team/:teamId" element={<Team />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/profile" element={<ProfileLayout />}>
+          <Route index element={<ProfileInfo />} />
+          <Route path="team" element={<ProfileTeam />} />
+          <Route path="waiting" element={<ProfileWaiting />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   )
 }
 
-export default App 
+export default App
