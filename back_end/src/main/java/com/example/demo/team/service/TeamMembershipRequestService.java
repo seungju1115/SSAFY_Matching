@@ -16,6 +16,7 @@ import com.hazelcast.cp.lock.FencedLock;
 import com.hazelcast.cp.lock.exception.LockAcquireLimitReachedException;
 import com.hazelcast.map.IMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.LockAcquisitionException;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -23,9 +24,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -44,13 +47,18 @@ public class TeamMembershipRequestService {
 
         String key = team.getId() + "+" + user.getId();
         IMap<String,String> lock = hazelcastInstance.getMap("teamMembershipRequestLock");
+        String lockValue = UUID.randomUUID().toString();
         boolean lockAcquired = false;
         try {
-            lockAcquired=lock.tryLock(key,5,TimeUnit.SECONDS);
-            if (!lockAcquired) {
+            log.info("락 획득 시도 중");
+            String existingLockValue = lock.putIfAbsent(key, lockValue,5,TimeUnit.SECONDS);
+            if(existingLockValue == null) {
+                lockAcquired = true;
+                log.info("락 획득 성공");
+            }
+            else {
                 throw new LockAcquireLimitReachedException("요청이 처리 중입니다. 잠시 후 다시 시도해주세요.");
             }
-
             boolean exists = team.getMembershipRequests().stream()
                     .anyMatch(req -> req.getUser().equals(user) && req.getStatus() != RequestStatus.REJECTED);
 
@@ -58,12 +66,14 @@ public class TeamMembershipRequestService {
                 throw new BusinessException(ErrorCode.TEAM_REQUEST_ALLREADY_EXIST);
             }
             saveTeamOffer(teamOffer, team, user);
-        } catch (InterruptedException | LockAcquisitionException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("요청 처리가 중단되었습니다.", e);
+            log.info("락 획득 후 요청 처리 완료");
         }
         finally {
-            if (lockAcquired) lock.unlock(key);
+            if (lockAcquired) {
+                lock.remove(key, lockValue);
+                log.info("락 해제됨");
+            }
+
         }
 
         messagingTemplate.convertAndSend("/queue/team/offer/" + teamOffer.getUserId(), teamOffer.getMessage());
@@ -75,10 +85,16 @@ public class TeamMembershipRequestService {
 
         String key = team.getId() + "+" + user.getId();
         IMap<String, String> lock = hazelcastInstance.getMap("teamMembershipRequestLock");
+        String lockValue = UUID.randomUUID().toString();
         boolean lockAcquired = false;
         try {
-            lockAcquired = lock.tryLock(key, 5, TimeUnit.SECONDS);
-            if (!lockAcquired) {
+            log.info("락 획득 시도 중");
+            String existingLockValue = lock.putIfAbsent(key, lockValue,5,TimeUnit.SECONDS);
+            if(existingLockValue == null) {
+                lockAcquired = true;
+                log.info("락 획득 성공");
+            }
+            else {
                 throw new LockAcquireLimitReachedException("요청이 처리 중입니다. 잠시 후 다시 시도해주세요.");
             }
 
@@ -88,12 +104,13 @@ public class TeamMembershipRequestService {
                 throw new BusinessException(ErrorCode.TEAM_REQUEST_ALLREADY_EXIST);
             }
             saveTeamOffer(teamOffer, team, user);
-        } catch (InterruptedException | LockAcquisitionException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("요청 처리가 중단되었습니다.", e);
+            log.info("락 획득 후 요청 처리 완료");
         }
         finally {
-            if (lockAcquired) lock.unlock(key);
+            if (lockAcquired) {
+                lock.remove(key, lockValue);
+                log.info("락 해제됨");
+            }
         }
 
 

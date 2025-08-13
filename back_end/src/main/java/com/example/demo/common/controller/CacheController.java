@@ -1,6 +1,5 @@
-package com.example.demo.dashboard.controller;
+package com.example.demo.common.controller;
 
-import com.example.demo.user.entity.User;
 import com.example.demo.user.service.UserService;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.map.IMap;
