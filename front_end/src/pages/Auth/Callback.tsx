@@ -5,11 +5,13 @@ import apiClient from '@/api/axios'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { AlertCircle, CheckCircle2, Loader2 } from 'lucide-react'
+import { useEnumMapper } from '@/hooks/useEnumMapper'
 
 export default function AuthCallback() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const { login, setToken } = useUserStore()
+  const { convertUserData } = useEnumMapper()
   const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'signup-required'>('loading')
   const [message, setMessage] = useState('')
 
@@ -56,7 +58,11 @@ export default function AuthCallback() {
             if (!userData) {
               throw new Error('사용자 정보를 가져오지 못했습니다.')
             }
-            login(userData, token)
+            
+            // Enum → 한글 문자열 변환 (useEnumMapper 훅 사용)
+            const convertedUserData = convertUserData(userData)
+            
+            login(convertedUserData, token)
             setStatus('success')
             setMessage('로그인이 완료되었습니다.')
             setTimeout(() => navigate('/'), 1500)
