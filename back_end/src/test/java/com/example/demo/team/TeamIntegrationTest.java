@@ -5,6 +5,7 @@ import com.example.demo.auth.filter.JwtFilter;
 import com.example.demo.auth.util.JwtUtil;
 import com.example.demo.chat.dao.ChatRoomRepository;
 import com.example.demo.chat.entity.ChatRoom;
+import com.example.demo.chat.entity.ChatRoomMember;
 import com.example.demo.chat.entity.RoomType;
 import com.example.demo.common.exception.ErrorCode;
 import com.example.demo.common.response.ApiResponse;
@@ -16,6 +17,7 @@ import com.example.demo.team.dto.TeamSearchRequest;
 import com.example.demo.team.entity.RequestType;
 import com.example.demo.team.entity.Team;
 import com.example.demo.team.entity.TeamStatus;
+import com.example.demo.team.service.TeamService;
 import com.example.demo.user.Enum.PositionEnum;
 import com.example.demo.user.Enum.ProjectGoalEnum;
 import com.example.demo.user.Enum.ProjectViveEnum;
@@ -67,6 +69,9 @@ public class TeamIntegrationTest {
 
     @Autowired
     private HazelcastInstance hazelcastInstance;
+
+    @Autowired
+    private TeamService teamService;
 
     @MockitoBean
     private JwtFilter jwtFilter; // JwtFilter 자체를 mock
@@ -195,14 +200,8 @@ public class TeamIntegrationTest {
     @Test
     @DisplayName("팀 생성 - 통합 테스트 유저 팀 보유 중")
     void createTeam_return400WithUserAllreadyHasTeam() throws Exception {
-        // 1. user1로 팀 한 번 생성
-        teamRequest.setLeaderId(user1.getId());
-        mockMvc.perform(post("/team")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(teamRequest)))
-                .andExpect(status().isOk());
 
-        // 2. 같은 user1로 다시 팀 생성 시도 → 이미 팀 있음 예외
+        teamService.createTeam(teamRequest);
         mockMvc.perform(post("/team")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(teamRequest)))
@@ -577,6 +576,18 @@ public class TeamIntegrationTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(ErrorCode.TEAM_ALLREADY_LOCKED.getStatus()));
 
+    }
+
+    @Test
+    @DisplayName("팀 떠나기 요청 통합 테스트 - 성공")
+    void leaveTeam_success() throws Exception {
+
+        teamService.createTeam(teamRequest);
+        // when
+        mockMvc.perform(post("/team/{userId}/leave", user1.getId())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(ApiResponse.ok().getStatus()));
     }
 }
 

@@ -75,7 +75,7 @@ public class User {
     @Column(name = "wanted_position")
     private List<PositionEnum> wantedPosition;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user")
     private List<ChatRoomMember> chatRoomMembers = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

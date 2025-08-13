@@ -49,7 +49,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DataAccessException.class)
     public ResponseEntity<ApiResponse<Void>> handleDataAccessException(DataAccessException ex) {
         ErrorCode code;
-
+        log.error(ex.getMessage());
         if (ex instanceof org.springframework.dao.DuplicateKeyException) {
             code = ErrorCode.DUPLICATE_KEY_ERROR;
         } else {
