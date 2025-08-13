@@ -132,7 +132,7 @@ export default function ProfileSetup() {
         description: "프로필이 성공적으로 설정되었습니다.",
       })
 
-      navigate('/')
+      navigate(-1)
     } catch (error) {
       console.error('Profile setup failed:', error)
       toast({

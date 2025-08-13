@@ -12,6 +12,11 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { ProjectGoalEnum, ProjectViveEnum } from '@/types/team'
+import useUserStore from '@/stores/userStore'
+import { useTeamStore } from '@/stores/teamStore'
+import { useNavigate } from 'react-router-dom'
+import { useTeam } from '@/hooks/useTeam'
+import { useEffect } from 'react'
 
 // 프로젝트 성향 라벨 매핑
 const projectGoalLabels: Record<ProjectGoalEnum, string> = {
@@ -50,32 +55,88 @@ const roleColors = {
 
 // 팀 정보 페이지
 export default function ProfileTeam() {
-  // Team/index.tsx와 동일한 구조의 팀 데이터
-  const mockTeamInfo = {
-    teamName: 'AI 스마트 솔루션팀',
-    teamDomain: 'AI/머신러닝',
-    teamDescription: '혁신적인 AI 기술로 실생활 문제를 해결하는 서비스를 개발합니다.',
-    teamPreference: ['JOB', 'PROFESSIONAL', 'QUALITY'] as ProjectGoalEnum[],
-    teamVibe: ['CASUAL', 'COMFY', 'DEMOCRACY', 'AGILE'] as ProjectViveEnum[],
-    roleDistribution: {
-      backend: 2,
-      frontend: 2, 
-      ai: 1,
-      pm: 1,
-      design: 1
+  const navigate = useNavigate()
+  const { user } = useUserStore()
+  const { getTeamDetailById } = useTeamStore()
+  const { fetchTeamDetail, isLoading, invalidateTeamCache } = useTeam()
+  
+  // userStore에서 teamId 가져와서 팀 정보 조회
+  const teamId = user.teamId
+  const teamDetail = teamId ? getTeamDetailById(teamId) : null
+  const hasTeam = !!teamDetail
+
+  // 페이지 진입시 팀 정보 API 호출하여 팀스토어에 저장
+  useEffect(() => {
+    if (teamId) {
+      // 캐시 무효화 후 새로운 데이터 가져오기
+      invalidateTeamCache(teamId)
+      fetchTeamDetail(teamId)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [teamId])
+
+  // teamStore 데이터를 UI에 맞게 변환
+  const teamInfo = teamDetail ? {
+    teamName: teamDetail.teamName,
+    teamDomain: teamDetail.teamDomain,
+    teamDescription: teamDetail.teamDescription || '팀 소개가 없습니다.',
+    teamPreference: teamDetail.teamPreference || [],
+    teamVibe: teamDetail.teamVive || [],
+    roleDistribution: {
+      backend: teamDetail.backendCount,
+      frontend: teamDetail.frontendCount,
+      ai: teamDetail.aiCount,
+      pm: teamDetail.pmCount,
+      design: teamDetail.designCount
+    }
+  } : null
+
+  // 팀원 데이터 (리더 + 멤버들, 단 일반 멤버에서는 리더 제외)
+  const teamMembers = teamDetail ? [
+    // 팀장 먼저
+    {
+      id: teamDetail.leader.id,
+      name: teamDetail.leader.userName,
+      role: (() => {
+        console.log('🔍 Leader Debug:')
+        console.log('teamDetail.leader:', teamDetail.leader)
+        console.log('wantedPosition:', teamDetail.leader.wantedPosition)
+        console.log('wantedPosition[0]:', teamDetail.leader.wantedPosition?.[0])
+        const role = teamDetail.leader.wantedPosition?.[0]?.toLowerCase() || 'leader'
+        console.log('final role:', role)
+        return role
+      })(),
+      isLeader: true,
+      avatar: ''
+    },
+    // 일반 멤버들 (리더 제외)
+    ...teamDetail.members
+      .filter(member => member.id !== teamDetail.leader.id)
+      .map(member => ({
+        id: member.id,
+        name: member.userName,
+        role: member.wantedPosition?.[0]?.toLowerCase() || 'member',
+        isLeader: false,
+        avatar: ''
+      }))
+  ] : []
+
+  // 로딩 상태 처리
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">내 팀 정보</h2>
+          <p className="text-gray-600">팀 정보를 불러오는 중...</p>
+        </div>
+        <Card>
+          <CardContent className="p-8 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
-
-  // Team/index.tsx와 동일한 구조의 팀원 데이터
-  const mockTeamMembers = [
-    { id: 1, name: '김개발', role: 'backend', isLeader: true, avatar: '' },
-    { id: 2, name: '박디자인', role: 'design', isLeader: false, avatar: '' },
-    { id: 3, name: '이기획', role: 'pm', isLeader: false, avatar: '' },
-    { id: 4, name: '최프론트', role: 'frontend', isLeader: false, avatar: '' },
-    { id: 5, name: '정AI', role: 'ai', isLeader: false, avatar: '' }
-  ]
-
-  const hasTeam = true // 실제로는 API 응답에 따라 결정
 
   if (!hasTeam) {
     return (
@@ -92,7 +153,7 @@ export default function ProfileTeam() {
             <p className="text-gray-600 mb-4">
               다른 사람들과 함께 학습하고 프로젝트를 진행할 수 있습니다.
             </p>
-            <Button>팀 찾기</Button>
+            <Button onClick={() => navigate('/matching')}>팀 찾기</Button>
           </CardContent>
         </Card>
       </div>
@@ -112,13 +173,13 @@ export default function ProfileTeam() {
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <CardTitle className="text-xl font-semibold text-gray-900 mb-2">
-                {mockTeamInfo.teamName}
+                {teamInfo?.teamName || '팀 이름을 정해주세요 !'}
               </CardTitle>
               <Badge variant="outline" className="mb-3 text-xs">
-                {mockTeamInfo.teamDomain}
+                {teamInfo?.teamDomain}
               </Badge>
               <p className="text-gray-600 text-sm leading-relaxed">
-                {mockTeamInfo.teamDescription}
+                {teamInfo?.teamDescription}
               </p>
             </div>
           </div>
@@ -131,7 +192,7 @@ export default function ProfileTeam() {
               <h3 className="text-sm font-medium text-gray-900">프로젝트 성향</h3>
             </div>
             <div className="flex flex-wrap gap-2">
-              {mockTeamInfo.teamPreference.map((pref) => (
+              {teamInfo?.teamPreference.map((pref) => (
                 <Badge key={pref} variant="secondary" className="text-xs">
                   {projectGoalLabels[pref]}
                 </Badge>
@@ -148,7 +209,7 @@ export default function ProfileTeam() {
               <h3 className="text-sm font-medium text-gray-900">팀 분위기</h3>
             </div>
             <div className="flex flex-wrap gap-2">
-              {mockTeamInfo.teamVibe.map((vibe) => (
+              {teamInfo?.teamVibe.map((vibe) => (
                 <Badge key={vibe} variant="outline" className="text-xs">
                   {projectVibeLabels[vibe]}
                 </Badge>
@@ -165,11 +226,13 @@ export default function ProfileTeam() {
               <h3 className="text-sm font-medium text-gray-900">역할 분배</h3>
             </div>
             <div className="flex flex-wrap gap-2">
-              {Object.entries(mockTeamInfo.roleDistribution).map(([role, count]) => (
-                <Badge key={role} variant="outline" className="text-xs">
-                  {role.toUpperCase()} {count}명
-                </Badge>
-              ))}
+              {Object.entries(teamInfo?.roleDistribution || {})
+                .filter(([, count]) => count > 0)
+                .map(([role, count]) => (
+                  <Badge key={role} variant="outline" className="text-xs">
+                    {role.toUpperCase()} {count}명
+                  </Badge>
+                ))}
             </div>
           </div>
         </CardContent>
@@ -180,12 +243,12 @@ export default function ProfileTeam() {
         <CardHeader>
           <CardTitle className="text-lg font-medium text-gray-900 flex items-center gap-2">
             <Users className="w-5 h-5" />
-            팀원 목록 ({mockTeamMembers.length}명)
+            팀원 목록 ({teamMembers.length}명)
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {mockTeamMembers.map((member) => (
+            {teamMembers.map((member) => (
               <div key={member.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                 <Avatar className="w-10 h-10">
                   <AvatarFallback className="bg-gray-200 text-gray-600 text-sm">
@@ -216,7 +279,10 @@ export default function ProfileTeam() {
 
       {/* 액션 버튼들 */}
       <div className="flex flex-wrap gap-3">
-        <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+        <Button 
+          className="bg-blue-600 hover:bg-blue-700 text-white"
+          onClick={() => navigate('/team')}
+        >
           <ExternalLink className="h-4 w-4 mr-2" />
           팀 페이지 보기
         </Button>

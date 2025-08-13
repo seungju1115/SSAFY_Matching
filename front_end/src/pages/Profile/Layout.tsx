@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react'
 import { useNavigate, useLocation, Outlet } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -26,42 +25,40 @@ export default function ProfileLayout() {
   const navigate = useNavigate()
   const location = useLocation()
   const { user, isLoggedIn, logout } = useUserStore()
-  const [userProfile, setUserProfile] = useState<{
-    id: string
-    email: string
-    name: string
-    profileImage?: string
-    semester: string
-    classNumber: string
-    major: string
-    isMajor: boolean
-    isProfileComplete: boolean
-    createdAt: Date
-  } | null>(null)
+  // const [userProfile, setUserProfile] = useState<{
+  //   id: number
+  //   email: string
+  //   userName: string
+  //   profileImage?: string
+  //   semester: string
+  //   lastClass: number
+  //   major: string
+  //   isProfileComplete: boolean
+  //   createdAt: Date
+  // } | null>(null)
 
   // 사용자 정보 로드
-  useEffect(() => {
-    if (isLoggedIn && user) {
-      // 실제로는 API에서 상세 정보를 가져와야 함
-      setUserProfile({
-        id: String(user.id || '1'),
-        email: user.email || 'user@ssafy.com',
-        name: user.userName || '홍길동',
-        profileImage: user.profileImage || undefined,
-        semester: String(user.semester || 2),
-        classNumber: String(user.classNumber || 5),
-        major: 'java',
-        isMajor: Boolean(user.major ?? true),
-        isProfileComplete: Boolean(user.isProfileComplete ?? true),
-        createdAt: new Date('2024-01-15')
-      })
-    }
-  }, [isLoggedIn, user])
+  // useEffect(() => {
+  //   if (isLoggedIn && user) {
+  //     // 실제로는 API에서 상세 정보를 가져와야 함
+  //     setUserProfile({
+  //       id: user.id,
+  //       email: user.email || 'user@ssafy.com',
+  //       name: user.userName || '홍길동',
+  //       profileImage: user.profileImage || undefined,
+  //       semester: String(user.semester || 2),
+  //       classNumber: user.lastClass,
+  //       major: user.major ? '전공' : '비전공',
+  //       // isMajor: Boolean(user.major ?? true),
+  //       isProfileComplete: Boolean(user.isProfileComplete ?? true),
+  //       createdAt: new Date('2024-01-15')
+  //     })
+  //   }
+  // }, [isLoggedIn, user])
 
   // 로그아웃 처리
   const handleLogout = () => {
     logout()
-    localStorage.removeItem('authToken')
     navigate('/')
   }
 
@@ -93,12 +90,12 @@ export default function ProfileLayout() {
   }
 
   // 전공/비전공 라벨 반환
-  const getMajorLabel = (isMajor: boolean, major?: string) => {
-    if (isMajor) {
-      return major === 'java' ? 'Java 전공' : '임베디드 전공'
-    }
-    return major === 'python' ? 'Python 비전공' : 'Java 비전공'
-  }
+  // const getMajorLabel = (isMajor: boolean, major?: string) => {
+  //   if (isMajor) {
+  //     return major === 'java' ? 'Java 전공' : '임베디드 전공'
+  //   }
+  //   return major === 'python' ? 'Python 비전공' : 'Java 비전공'
+  // }
 
   // 현재 활성 메뉴 확인
   const getActiveMenuItem = () => {
@@ -107,7 +104,7 @@ export default function ProfileLayout() {
   }
 
   // 로그인하지 않은 경우
-  if (!isLoggedIn || !userProfile) {
+  if (!isLoggedIn) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
         <Header />
@@ -137,20 +134,20 @@ export default function ProfileLayout() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center space-x-4">
             <Avatar className="h-16 w-16">
-              <AvatarImage src={user.profileImage || userProfile?.profileImage} />
+              <AvatarImage src={user.profileImage || undefined} />
               <AvatarFallback className="bg-blue-100 text-blue-600 text-xl font-semibold">
-                {getUserInitial(user.userName || userProfile?.name || '')}
+                {getUserInitial(user.userName || '사용자')}
               </AvatarFallback>
             </Avatar>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">{user.userName || userProfile?.name}</h1>
-              <p className="text-gray-600">{userProfile.email}</p>
+              <h1 className="text-2xl font-bold text-gray-900">{user.userName || '사용자'}</h1>
+              <p className="text-gray-600">{user.email || '이메일 없음'}</p>
               <div className="flex items-center space-x-2 mt-1">
                 <Badge variant="outline">
-                  {user.semester || userProfile?.semester}학기 {user.classNumber || userProfile?.classNumber}반
+                  {user.lastClass}반
                 </Badge>
                 <Badge variant="secondary">
-                  {getMajorLabel(Boolean(user.major ?? userProfile?.isMajor), userProfile?.major || 'java')}
+                  {user.major ? '전공' : '비전공'}
                 </Badge>
               </div>
             </div>
