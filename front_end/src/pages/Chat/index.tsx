@@ -1,65 +1,90 @@
-// src/pages/Chat/index.tsx
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import useUserStore from '@/stores/userStore';
-import { chatAPI } from '@/api/chat';
+import { useState, useEffect, type FormEvent } from 'react';
+import { useSocket } from '@/hooks/useSocket';
+import type { IMessage } from '@stomp/stompjs';
+
+// A simple type for our chat messages
+interface ChatMessage {
+  id: string; // Add a unique ID for each message
+  sender: string;
+  content: string;
+  timestamp: string;
+}
 
 export default function Chat() {
-  const myId = useUserStore((s) => s.user?.id);
+  const { isConnected, subscribe, publish } = useSocket();
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [newMessage, setNewMessage] = useState('');
+  
+  // Let's assume a static room ID for this example.
+  // In a real app, this would likely come from URL params or component props.
+  const roomId = 'general'; 
 
-  // /chat?userId=2
-  const [search] = useSearchParams();
-  // const peerId = useMemo(() => {
-  //   const v = search.get('userId');
-  //   const n = v ? Number(v) : NaN;
-  //   return Number.isFinite(n) ? n : undefined;
-  // }, [search]);
-  const peerId = 3
-  const [status, setStatus] = useState<'idle'|'creating'|'success'|'error'>('idle');
-  const [roomId, setRoomId] = useState<number | null>(null);
-  const [error, setError] = useState<string>('');
-  const runOnceRef = useRef(false);
+  useEffect(() => {
+    if (isConnected) {
+      const unsubscribe = subscribe(
+        `/topic/chat/room/${roomId}`,
+        (message: IMessage) => {
+          const receivedMessage: ChatMessage = JSON.parse(message.body);
+          setMessages((prevMessages) => [...prevMessages, receivedMessage]);
+        }
+      );
 
-  const createPrivate = async () => {
-    if (!myId) { setStatus('error'); setError('로그인이 필요합니다.'); return; }
-    if (!peerId) { setStatus('error'); setError('상대 userId가 없습니다. /chat?userId=2 로 접근하세요.'); return; }
-    if (myId === peerId) { setStatus('error'); setError('상대 ID가 본인입니다.'); return; }
+      // Cleanup subscription on component unmount
+      return () => {
+        if (unsubscribe) {
+          unsubscribe();
+        }
+      };
+    }
+  }, [isConnected, roomId, subscribe]);
 
-    try {
-      setStatus('creating');
-      const res = await chatAPI.createPrivateRoom({
-        roomType: 'PRIVATE',
-        user1Id: myId,
-        user2Id: peerId,
-      } as any);
-      const created = res.data?.data as { roomId: number } | undefined;
-      if (created?.roomId) {
-        setRoomId(created.roomId);
-        setStatus('success');
-        console.log('%c[chat] ✅ 방 생성/입장 완료', 'color:#16a34a', { roomId: created.roomId, myId, peerId });
-      } else {
-        setStatus('error'); setError('응답에 roomId 없음');
-      }
-    } catch (e) {
-      setStatus('error'); setError('방 생성 실패');
+  const handleSendMessage = (e: FormEvent) => {
+    e.preventDefault();
+    if (newMessage.trim() && isConnected) {
+      const chatMessage = {
+        roomId,
+        sender: 'CurrentUser', // This should be dynamically set based on logged-in user
+        content: newMessage,
+      };
+      publish(`/app/chat/message`, chatMessage);
+      setNewMessage('');
     }
   };
 
-  // ✅ 컴포넌트 "내부"에서만 Hook 사용!
-  useEffect(() => {
-    if (runOnceRef.current) return;
-    if (!myId || !peerId || myId === peerId) return;
-    runOnceRef.current = true;
-    createPrivate();
-  }, [myId, peerId]);
-
-  // 최소 상태 표시 (빈 화면 방지)
   return (
-    <div style={{ padding: 16 }}>
-      {status === 'idle' && <div>준비 중… (내 ID: {myId ?? '-'}, 상대 ID: {peerId ?? '-'})</div>}
-      {status === 'creating' && <div>방 생성 중…</div>}
-      {status === 'success' && <div>✅ 방 생성 완료! roomId: <b>{roomId}</b></div>}
-      {status === 'error' && <div style={{ color: '#b00' }}>❌ {error}</div>}
+    <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto' }}>
+      <h2>Chat Room: {roomId}</h2>
+      <div style={{ marginBottom: '10px' }}>
+        Connection Status: {isConnected ? 'Connected' : 'Disconnected'}
+      </div>
+      <div
+        style={{
+          height: '400px',
+          border: '1px solid #ccc',
+          overflowY: 'scroll',
+          padding: '10px',
+          marginBottom: '10px',
+        }}
+      >
+        {messages.map((msg) => (
+          <div key={msg.id}>
+            <strong>{msg.sender}:</strong> {msg.content}
+          </div>
+        ))}
+      </div>
+      <form onSubmit={handleSendMessage}>
+        <input
+          type="text"
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
+          placeholder="Type a message..."
+          style={{ width: '80%', padding: '8px' }}
+          disabled={!isConnected}
+        />
+        <button type="submit" style={{ width: '18%', padding: '8px' }} disabled={!isConnected}>
+          Send
+        </button>
+      </form>
     </div>
   );
-}
+} 
