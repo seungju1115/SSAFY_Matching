@@ -180,6 +180,30 @@ export const useTeam = () => {
     }
   }
 
+  // 팀 탈퇴
+  const leaveTeam = async (userId: number) => {
+    try {
+      setLoading(true)
+      clearError()
+      await teamAPI.leaveTeam(userId)
+      toast({
+        title: "성공",
+        description: "팀에서 탈퇴했습니다",
+      })
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || '팀 탈퇴에 실패했습니다'
+      setError(errorMessage)
+      toast({
+        title: "오류",
+        description: errorMessage,
+        variant: "destructive",
+      })
+      throw err
+    } finally {
+      setLoading(false)
+    }
+  }
+
   // 팀 가입 요청
   const requestJoinTeam = async (teamId: number, userId: number, message: string) => {
     try {
@@ -255,6 +279,7 @@ export const useTeam = () => {
     createTeam,
     updateTeam,
     deleteTeam,
+    leaveTeam,
     
     // 팀원 관련
     requestJoinTeam,
