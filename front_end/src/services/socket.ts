@@ -9,7 +9,7 @@ interface Subscription {
 
 // 환경에 따라 적절한 WebSocket URL을 반환하는 함수
 const getWebSocketURL = () => {
-  if (!import.meta.env.PROD) {
+  if (import.meta.env.PROD) {
     // 배포(Production) 환경: 외부 접속용 URL을 사용합니다.
     return 'https://i13a307.p.ssafy.io/ws-chat';
   }
