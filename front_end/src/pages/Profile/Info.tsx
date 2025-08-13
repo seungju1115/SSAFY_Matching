@@ -14,12 +14,12 @@ export default function ProfileInfo() {
   const { user } = useUserStore()
 
   // 전공/비전공 라벨 반환
-  const getMajorLabel = (isMajor: boolean, major?: string) => {
-    if (isMajor) {
-      return major === 'java' ? 'Java 전공' : '임베디드 전공'
-    }
-    return major === 'python' ? 'Python 비전공' : 'Java 비전공'
-  }
+  // const getMajorLabel = (isMajor: boolean, major?: string) => {
+  //   if (isMajor) {
+  //     return major === 'java' ? 'Java 전공' : '임베디드 전공'
+  //   }
+  //   return major === 'python' ? 'Python 비전공' : 'Java 비전공'
+  // }
 
   return (
     <div className="space-y-6">
@@ -50,16 +50,16 @@ export default function ProfileInfo() {
           <div className="flex items-center space-x-3">
             <Calendar className="h-5 w-5 text-gray-400" />
             <div>
-              <p className="text-sm text-gray-500">기수 및 반</p>
-              <p className="font-medium">2학기 5반</p>
+              <p className="text-sm text-gray-500">지난 반</p>
+              <p className="font-medium">{user.lastClass}</p>
             </div>
           </div>
           <Separator />
           <div className="flex items-center space-x-3">
             <BookOpen className="h-5 w-5 text-gray-400" />
             <div>
-              <p className="text-sm text-gray-500">전공</p>
-              <p className="font-medium">{getMajorLabel(true, 'java')}</p>
+              <p className="text-sm text-gray-500">전공 유무</p>
+              <p className="font-medium">{user.major ? '전공' : '비전공'}</p>
             </div>
           </div>
         </CardContent>

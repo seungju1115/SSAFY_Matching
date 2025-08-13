@@ -13,22 +13,28 @@ import {
   Edit3
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import useUserStore from '@/stores/userStore'
 
 // 대기자 등록 정보 페이지 - ProfileSetup 디자인 적용
 export default function ProfileWaiting() {
   const navigate = useNavigate()
-  // 임시 대기자 등록 데이터 (실제로는 API에서 가져와야 함)
+  const { user } = useUserStore()
+
+  // 프로필 데이터 정리 (상단에 정의해서 여러 곳에서 안전하게 사용)
   const profileData = {
-    positions: ['프론트엔드', '백엔드'],
-    skills: ['React', 'TypeScript', 'Node.js', 'MySQL'],
-    introduction: '안녕하세요! 열정적으로 개발을 배우고 있는 개발자입니다. 팀원들과 함께 성장하며 좋은 프로젝트를 만들고 싶습니다.',
-    projectPreferences: ['취업우선', '포트폴리오중심', '완성도추구'],
-    personalPreferences: ['편한 분위기', '합의 중심', '새로운 주제'],
-    certifications: [
-      { id: '1', name: '정보처리기사' },
-      { id: '2', name: 'SQLD' }
-    ]
+    positions: user.wantedPosition || [],
+    skills: user.techStack || [],
+    introduction: user.userProfile || '자기소개가 작성되지 않았습니다.',
+    projectPreferences: user.projectGoal || [],
+    personalPreferences: user.projectVive || [],
+    certifications: user.qualification 
+      ? user.qualification.split(',').map((cert, index) => ({ 
+          id: index, 
+          name: cert.trim() 
+        }))
+      : []
   }
+
 
   return (
     <div className="space-y-8">

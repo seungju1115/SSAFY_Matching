@@ -89,6 +89,9 @@ public class UserService {
             user.setTeam(team);
         }
 
+        // 변경사항을 데이터베이스에 저장
+        user = userRepository.save(user);
+        
         return UserProfileResponse.toUserProfileResponse(user);
     }
 
