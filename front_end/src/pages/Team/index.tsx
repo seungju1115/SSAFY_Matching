@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTeamStore } from '@/stores/teamStore';
 import useUserStore from '@/stores/userStore';
+import { useTeam } from '@/hooks/useTeam';
 import { teamAPI } from '@/api/team';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -61,6 +62,7 @@ const TeamPage: React.FC = () => {
     setError,
   } = useTeamStore();
   const { user } = useUserStore();
+  const { leaveTeam } = useTeam();
 
   // userStore에서 teamId 가져오기
   const teamId = user.teamId;
@@ -120,10 +122,14 @@ const TeamPage: React.FC = () => {
     }
   };
 
-  const handleLeaveTeam = () => {
-    if (confirm('정말 팀에서 탈퇴하시겠습니까?')) {
-      navigate('/matching');
-      
+  const handleLeaveTeam = async () => {
+    if (user && user.id !== null && confirm('정말로 팀을 나가시겠습니까?')) {
+      try {
+        await leaveTeam(user.id);
+        navigate('/matching');
+      } catch (error) {
+        console.error("Failed to leave team:", error);
+      }
     }
   };
 
