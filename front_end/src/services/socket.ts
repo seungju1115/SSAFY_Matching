@@ -1,7 +1,11 @@
 import { Client, type IMessage, type Frame } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 
-// const socket = io(process.env.REACT_APP_SOCKET_URL || 'http://localhost:8080')
+// 구독 정보를 관리하기 위한 타입
+interface Subscription {
+  topic: string;
+  callback: (message: IMessage) => void;
+}
 
 // 환경에 따라 적절한 WebSocket URL을 반환하는 함수
 const getWebSocketURL = () => {

@@ -13,7 +13,7 @@ export const mockTeams: Team[] = [
     deadline: "2024-02-15",
     leader: {
       name: "김개발",
-      avatar: "/api/placeholder/40/40",
+      avatar: "",
       role: "Frontend Developer"
     }
   },
@@ -27,7 +27,7 @@ export const mockTeams: Team[] = [
     deadline: "2024-03-01",
     leader: {
       name: "박AI",
-      avatar: "/api/placeholder/40/40",
+      avatar: "",
       role: "ML Engineer"
     }
   },
@@ -41,7 +41,7 @@ export const mockTeams: Team[] = [
     deadline: "2024-02-28",
     leader: {
       name: "이모바일",
-      avatar: "/api/placeholder/40/40",
+      avatar: "",
       role: "Mobile Developer"
     }
   }
@@ -58,7 +58,7 @@ export const mockDevelopers: Developer[] = [
     location: "서울",
     rating: 4.8,
     projects: 12,
-    avatar: "/api/placeholder/60/60",
+    avatar: "",
     bio: "사용자 경험을 중시하는 프론트엔드 개발자입니다."
   },
   {
@@ -70,7 +70,7 @@ export const mockDevelopers: Developer[] = [
     location: "부산",
     rating: 4.9,
     projects: 20,
-    avatar: "/api/placeholder/60/60",
+    avatar: "",
     bio: "확장 가능한 서버 아키텍처 설계 전문가"
   },
   {
@@ -82,7 +82,7 @@ export const mockDevelopers: Developer[] = [
     location: "대구",
     rating: 4.7,
     projects: 15,
-    avatar: "/api/placeholder/60/60",
+    avatar: "",
     bio: "프론트엔드부터 백엔드까지 전체 개발 가능"
   },
   {
@@ -94,7 +94,7 @@ export const mockDevelopers: Developer[] = [
     location: "서울",
     rating: 4.6,
     projects: 8,
-    avatar: "/api/placeholder/60/60",
+    avatar: "",
     bio: "사용자 중심의 디자인을 추구합니다"
   },
   {
@@ -106,7 +106,7 @@ export const mockDevelopers: Developer[] = [
     location: "서울",
     rating: 4.8,
     projects: 10,
-    avatar: "/api/placeholder/60/60",
+    avatar: "",
     bio: "데이터로 인사이트를 찾는 것을 좋아합니다"
   },
   {
@@ -118,7 +118,7 @@ export const mockDevelopers: Developer[] = [
     location: "인천",
     rating: 4.9,
     projects: 25,
-    avatar: "/api/placeholder/60/60",
+    avatar: "",
     bio: "안정적인 인프라 구축 및 자동화 전문"
   }
 ]

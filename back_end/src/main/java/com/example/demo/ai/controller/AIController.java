@@ -21,15 +21,28 @@ public class AIController {
 
     private final AIService aiService;
 
+
     @GetMapping("/recommend/candidates/{teamId}")
     public ResponseEntity<List<CandidateDto>> recommendCandidates(@PathVariable Long teamId) {
-        List<CandidateDto> recommendations = aiService.recommendCandidatesForTeam(teamId);
+        List<CandidateDto> recommendations = aiService.recommendCandidatesForTeam(teamId, false);
         return ResponseEntity.ok(recommendations);
     }
 
     @GetMapping("/recommend/teams/{personId}")
     public ResponseEntity<List<TeamAIDto>> recommendTeams(@PathVariable Long personId) {
-        List<TeamAIDto> recommendations = aiService.recommendTeamsForPerson(personId);
+        List<TeamAIDto> recommendations = aiService.recommendTeamsForPerson(personId,false);
+        return ResponseEntity.ok(recommendations);
+    }
+
+    @GetMapping("/recommend/candidates/{teamId}/all")
+    public ResponseEntity<List<CandidateDto>> recommendCandidatesAll(@PathVariable Long teamId) {
+        List<CandidateDto> recommendations = aiService.recommendCandidatesForTeam(teamId,true);
+        return ResponseEntity.ok(recommendations);
+    }
+
+    @GetMapping("/recommend/teams/{personId}/all")
+    public ResponseEntity<List<TeamAIDto>> recommendTeamsAll(@PathVariable Long personId) {
+        List<TeamAIDto> recommendations = aiService.recommendTeamsForPerson(personId,true);
         return ResponseEntity.ok(recommendations);
     }
 
