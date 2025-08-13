@@ -113,18 +113,6 @@ public class DashboardController {
                 .body(dto);
     }
 
-    @GetMapping("/graphnocache")
-    public ResponseEntity<DashboardResponseDto> getDashboardnoCache() {
-        dashboardService.getDashboardNoCache();
-
-        long time = System.nanoTime();
-        DashboardResponseDto dto = dashboardService.getDashboardNoCache();
-        long elapsed = System.nanoTime() - time;
-        return ResponseEntity.ok()
-                .header("X-Execution-Time-Ms", String.valueOf(elapsed))
-                .body(dto);
-    }
-
     @Operation(
             summary = "포지션별 요약 통계 조회",
             description = """

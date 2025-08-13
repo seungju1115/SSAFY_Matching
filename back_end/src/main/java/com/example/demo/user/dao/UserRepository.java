@@ -27,8 +27,16 @@ public interface UserRepository extends JpaRepository<User,Long> {
             "WHERE u.id = :id")
     Optional<com.example.demo.user.entity.User> findByIdWithChatRoomMembers(@Param("id") Long id);
 
-    @Query(value = "select u from User u")
-    List<User> CountUsers();
+    @Query(value = """
+        SELECT 
+            u.team_id,
+            u.major,
+            GROUP_CONCAT(DISTINCT up.wanted_position ORDER BY up.wanted_position SEPARATOR ',') as positions
+        FROM users u
+        LEFT JOIN user_wanted_position up ON u.user_id = up.user_user_id
+        GROUP BY u.user_id, u.user_name
+        """, nativeQuery = true)
+    List<Object[]> CountUsers();
 
     @Query("SELECT u FROM User u WHERE u.team IS NULL")
     List<User> findUsersWithoutTeam();
