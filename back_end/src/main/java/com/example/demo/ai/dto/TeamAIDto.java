@@ -4,6 +4,7 @@ import com.example.demo.team.entity.Team;
 import com.example.demo.user.Enum.ProjectGoalEnum;
 import com.example.demo.user.Enum.ProjectViveEnum;
 import com.example.demo.user.entity.User;
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -25,17 +26,12 @@ public class TeamAIDto {
     private Set<ProjectViveEnum> vives;
     private List<CandidateDto> members;
 
-    public TeamAIDto(Long teamId, String teamName, String memberWanted, Set<ProjectGoalEnum> goals, Set<ProjectViveEnum> vives
-    , List<User> users) {
+    @QueryProjection
+    public TeamAIDto(Long teamId, String teamName, String memberWanted) {
         this.teamId = teamId;
         this.teamName = teamName;
         this.memberWanted= Arrays.stream(memberWanted.split(",")).toList();
-        this.goals = goals;
-        this.vives = vives;
         this.members = new ArrayList<>();
-        for(User user : users){
-            this.members.add(CandidateDto.from(user));
-        }
     }
 
     public static TeamAIDto from(Team team) {

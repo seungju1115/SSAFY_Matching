@@ -38,12 +38,6 @@ export default function Header() {
           {/* 네비게이션 메뉴 */}
           <nav className="hidden md:flex items-center space-x-8">
             <button
-              onClick={() => navigate('/dashboard')}
-              className="text-gray-700 hover:text-blue-600 transition-colors"
-            >
-              대시보드
-            </button>
-            <button
               onClick={() => navigate('/teams')}
               className="text-gray-700 hover:text-blue-600 transition-colors"
             >

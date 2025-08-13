@@ -1,73 +1,48 @@
 // Team 관련 타입 정의
-export interface Team {
-  teamId: number
-  teamName: string
-  teamDomain?: string
-  memberWanted?: string
-  teamDescription?: string
-  teamPreference?: ProjectGoalEnum[]
-  teamVive?: ProjectViveEnum[]
-  leaderId: number
-  memberCount?: number
-}
-
-export interface TeamDetail extends Team {
-  membersId: number[]
-}
-
-export interface TeamMember {
-  memberId: number
-  username: string
-}
-
-// 팀 생성 요청 (백엔드 TeamCreateRequest와 매칭)
-export interface TeamCreateRequest {
-  leaderId: number
-  teamDomain: string
-  teamVive?: ProjectViveEnum[]
-  teamPreference?: ProjectGoalEnum[]
-  backendCount: number
-  frontendCount: number
-  aiCount: number
-  pmCount: number
-  designCount: number
-  teamDescription?: string
-}
-
-// 팀 생성/수정 요청 (기존 호환성 유지)
-export interface TeamRequest {
-  teamId?: number
-  teamName: string
-  teamDomain?: string
-  memberWanted?: string
-  teamDescription?: string
-  teamPreference?: ProjectGoalEnum[]
-  teamVive?: ProjectViveEnum[]
-  leaderId: number
-}
-
-// 팀 초대 요청
-export interface TeamInviteRequest {
-  teamId: number
-  userId: number
-  message?: string
-}
-
-// 팀 가입/초대 요청
-export interface TeamOffer {
-  teamId: number
-  userId: number
-  requestType: RequestType
-  message?: string
-}
-
-// 팀 응답 타입
-export interface TeamResponse {
-  teamId: number
-  teamName: string
-  leaderId: number
-  memberCount: number
-}
+import type { UserDetailResponse } from './user'
+// export interface Team {
+//   teamId: number
+//   teamName: string
+//   teamDomain?: string
+//   memberWanted?: string
+//   teamDescription?: string
+//   teamPreference?: ProjectGoalEnum[]
+//   teamVive?: ProjectViveEnum[]
+//   leaderId: number
+//   memberCount?: number
+// }
+//
+// export interface TeamDetail extends Team {
+//   membersId: number[]
+// }
+//
+// export interface TeamMember {
+//   memberId: number
+//   username: string
+// }
+//
+// // 팀 생성 요청 (백엔드 TeamCreateRequest와 매칭)
+// export interface TeamCreateRequest {
+//   leaderId: number
+//   teamDomain: string
+//   teamVive?: ProjectViveEnum[]
+//   teamPreference?: ProjectGoalEnum[]
+//   backendCount: number
+//   frontendCount: number
+//   aiCount: number
+//   pmCount: number
+//   designCount: number
+//   teamDescription?: string
+// }
+//
+//
+// // 팀 응답 타입
+// export interface TeamResponse {
+//   teamId: number
+//   teamName: string
+//   leaderId: number
+//   memberCount: number
+// }
 
 // Enum 타입들 (백엔드와 일치) - union type으로 대체
 export type RequestType = 'JOIN' | 'INVITE'
@@ -110,9 +85,80 @@ export const REQUEST_STATUS = {
   REJECTED: 'REJECTED' as const
 }
 
+// TeamDetailResponse - 백엔드 응답과 매칭
+export interface TeamDetailResponse {
+  teamId: number
+  chatRoomId: number
+  teamName: string
+  leader: UserDetailResponse
+  members: UserDetailResponse[]
+  teamDomain: string
+  teamVive?: ProjectViveEnum[]
+  teamPreference?: ProjectGoalEnum[]
+  backendCount: number
+  frontendCount: number
+  aiCount: number
+  pmCount: number
+  designCount: number
+  teamDescription?: string
+  teamStatus: TeamStatus
+}
+
+// 백엔드 TeamRequest DTO와 매칭
+export interface TeamRequest {
+  teamId?: number
+  teamName?: string
+  leaderId: number
+  teamDomain: string
+  teamVive?: ProjectViveEnum[]
+  teamPreference?: ProjectGoalEnum[]
+  backendCount: number
+  frontendCount: number
+  aiCount: number
+  pmCount: number
+  designCount: number
+  teamDescription?: string
+}
+
+// 팀 검색 요청
+export interface TeamSearchRequest {
+  teamName?: string
+  leaderId?: number
+}
+
+// 팀 초대 요청
+export interface TeamInviteRequest {
+  userId: number
+  teamId: number
+}
+
+// 팀 가입/초대 요청
+export interface TeamOffer {
+  requestType: RequestType
+  userId: number
+  message: string
+  teamId: number
+}
+
+// 팀 멤버십 응답
+export interface TeamMembershipResponse {
+  id: number
+  teamId: number
+  userId: number
+  requestType: RequestType
+  status: RequestStatus
+  message: string
+  createdAt: string
+}
+
+// 팀 상태 타입
+export type TeamStatus = 'RECRUITING' | 'FULL' | 'CLOSED'
+
 // API 응답을 위한 래퍼 타입
 export interface ApiResponse<T> {
-  status: number
-  message: string
-  data: T
+  data: {
+    status: number
+    message: string
+    data: T
+  }
 }
