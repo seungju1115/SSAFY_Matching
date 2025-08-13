@@ -40,6 +40,7 @@ interface TeamData {
 export default function MakeTeam() {
   const navigate = useNavigate()
   const { createTeam, isLoading } = useTeam()
+  const { user } = useUserStore()
   const [teamData, setTeamData] = useState<TeamData>({
     domains: [],
     projectPreferences: [],
@@ -129,7 +130,7 @@ export default function MakeTeam() {
       .filter(Boolean)
 
     return {
-      leaderId: 1, // TODO: 실제 로그인한 사용자 ID로 변경
+      leaderId: user.id || 0,
       teamDomain: data.domains.join(', '), // 도메인들을 문자열로 결합
       teamDescription: data.introduction,
       teamPreference: mappedPreferences,

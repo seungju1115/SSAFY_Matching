@@ -119,7 +119,7 @@ public class AIService {
                     teamToPersonDto.getCurrentTeam().getTeamName());
 
             // RecSys API 호출
-            return callRecsysForCandidates(teamToPersonDto);
+            return callRecsysForCandidates(teamToPersonDto,all);
 
         } catch (Exception e) {
             log.error("Failed to get AI recommendations for team: {}", teamId, e);
@@ -141,7 +141,7 @@ public class AIService {
                     personToTeamDto.getPerson().getUserName());
 
             // RecSys API 호출
-            return callRecsysForTeams(personToTeamDto);
+            return callRecsysForTeams(personToTeamDto,all);
 
         } catch (Exception e) {
             log.error("Failed to get AI recommendations for person: {}", personId, e);
@@ -152,17 +152,18 @@ public class AIService {
 
     // ==================== RecSys 호출 헬퍼 메서드들 ====================
 
-    private List<CandidateDto> callRecsysForCandidates(TeamToPersonDto teamToPersonDto) {
+    private List<CandidateDto> callRecsysForCandidates(TeamToPersonDto teamToPersonDto, boolean all) {
         String url = recsysBaseUrl + "/recommend/candidates";
-
+        int top_k=5;
+        if(all) top_k=teamToPersonDto.getCandidates().size();
         try {
             // RecSys 요청 형식으로 변환
             Map<String, Object> request = Map.of(
                     "team_info", convertTeamToRecsysFormat(teamToPersonDto.getCurrentTeam()),
                     "member_infos", convertMembersToRecsysFormat(teamToPersonDto.getCurrentTeam().getMembers()),
                     "candidate_pool", convertCandidatesToRecsysFormat(teamToPersonDto.getCandidates()),
-                    "alpha", 0.7,
-                    "top_k", 10
+                    "alpha", 0.5,
+                    "top_k", top_k
             );
 
             log.info("Sending request to RecSys: {}", request);
@@ -187,8 +188,10 @@ public class AIService {
         }
     }
 
-    private List<TeamAIDto> callRecsysForTeams(PersonToTeamDto personToTeamDto) {
+    private List<TeamAIDto> callRecsysForTeams(PersonToTeamDto personToTeamDto, boolean all) {
         String url = recsysBaseUrl + "/recommend/teams";
+        int top_k=5;
+        if(all) top_k=personToTeamDto.getTeams().size();
 
         try {
             // RecSys 요청 형식으로 변환
@@ -196,8 +199,8 @@ public class AIService {
                     "person", convertPersonToRecsysFormat(personToTeamDto.getPerson()),
                     "team_pool", convertTeamPoolToRecsysFormat(personToTeamDto.getTeams()),
                     "team_members_map", convertTeamMembersMapToRecsysFormat(personToTeamDto.getTeams()),
-                    "alpha", 0.8,
-                    "top_k", 5
+                    "alpha", 0.5,
+                    "top_k", top_k
             );
 
             log.info("Sending team request to RecSys: {}", request);
