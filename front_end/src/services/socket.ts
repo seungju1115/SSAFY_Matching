@@ -9,11 +9,12 @@ interface Subscription {
 
 // 환경에 따라 적절한 WebSocket URL을 반환하는 함수
 const getWebSocketURL = () => {
-  if (!import.meta.env.PROD) {
-    // 배포(Production) 환경: 외부 접속용 URL을 사용합니다.
+  if (import.meta.env.PROD) {
+    // 배포 환경일 경우, 하드코딩된 URL 사용
     return 'https://i13a307.p.ssafy.io/ws-chat';
   }
-  // 개발(Development) 환경: Docker 컨테이너 간 통신을 위해 서비스 이름을 사용합니다.
+  // 개발 환경일 경우, .env 파일의 VITE_WEBSOCKET_URL 사용
+  // 만약 .env 파일에 값이 없을 경우, 기본 로컬호스트 주소를 사용
   return 'http://localhost:8080/ws-chat';
 };
 

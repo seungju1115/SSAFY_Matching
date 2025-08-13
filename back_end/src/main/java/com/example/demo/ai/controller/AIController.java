@@ -5,7 +5,6 @@ import com.example.demo.ai.dto.PersonToTeamDto;
 import com.example.demo.ai.dto.TeamAIDto;
 import com.example.demo.ai.dto.TeamToPersonDto;
 import com.example.demo.ai.service.AIService;
-import com.example.demo.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +20,7 @@ import java.util.List;
 public class AIController {
 
     private final AIService aiService;
+
 
     @GetMapping("/recommend/candidates/{teamId}")
     public ResponseEntity<List<CandidateDto>> recommendCandidates(@PathVariable Long teamId) {

@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 public enum TechEnum {
     // Frontend
     REACT("React"),
@@ -80,10 +81,6 @@ public enum TechEnum {
     DEEP_LEARNING("Deep Learning");
 
     private final String displayName;
-
-    TechEnum(String displayName) {
-        this.displayName = displayName;
-    }
 
     public String getDisplayName() {
         return displayName;

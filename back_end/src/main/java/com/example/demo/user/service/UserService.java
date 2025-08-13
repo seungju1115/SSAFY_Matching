@@ -2,7 +2,6 @@ package com.example.demo.user.service;
 
 import com.example.demo.team.entity.Team;
 import com.example.demo.user.Enum.ProjectGoalEnum;
-import com.example.demo.user.Enum.UserStatus;
 import com.example.demo.user.dao.UserRepository;
 import com.example.demo.user.dto.*;
 import com.example.demo.user.dto.UserSearchRequest;
@@ -17,7 +16,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import lombok.extern.slf4j.Slf4j;
+
 import java.util.List;
 
 @Service
@@ -81,7 +80,6 @@ public class UserService {
         if (request.getProjectExp() != null) user.setProjectExp(request.getProjectExp());
         if (request.getQualification() != null) user.setQualification(request.getQualification());
         if (request.getTechStack() != null) user.setTechStack(request.getTechStack());
-        if (request.getUserStatus() != null) user.setUserStatus(request.getUserStatus());
 
         if (request.getTeamId() != null) {
             Team team = teamRepository.findById(request.getTeamId())
@@ -100,20 +98,9 @@ public class UserService {
                 request.getWantedPosition(),
                 request.getTechStack(),
                 request.getProjectVive(),
-                request.getProjectGoal(),
-                request.getUserStatus());
+                request.getProjectGoal());
         
         return users.stream()
-                .map(UserSearchResponse::fromUser)
-                .collect(java.util.stream.Collectors.toList());
-    }
-
-    @Transactional(readOnly = true)
-    public List<UserSearchResponse> getWaitingUsers() {
-        // UserStatus가 WAITING인 사용자들 조회
-        List<User> waitingUsers = userRepository.findByUserStatus(UserStatus.WAITING);
-        
-        return waitingUsers.stream()
                 .map(UserSearchResponse::fromUser)
                 .collect(java.util.stream.Collectors.toList());
     }

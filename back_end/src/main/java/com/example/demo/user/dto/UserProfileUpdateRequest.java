@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
@@ -16,7 +15,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Schema(description = "사용자 프로필 수정 요청 (부분 수정)")
-public class UserProfileUpdateRequest implements Serializable {
+public class UserProfileUpdateRequest {
 
     @Schema(description = "사용자 이름", example = "홍길동")
     private String userName;
@@ -50,10 +49,4 @@ public class UserProfileUpdateRequest implements Serializable {
 
     @Schema(description = "변경할 팀 ID", example = "10")
     private Long teamId;
-
-    @Schema(
-            description = "유저 상태",
-            example = "[\"INACTIVE\", \"WAITING\", \"IN_TEAM\"]"
-    )
-    private UserStatus userStatus;
 }
