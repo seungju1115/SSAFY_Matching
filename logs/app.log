@@ -1,0 +1,6 @@
+2025-08-13 08:12:40,671 - app.api.routes - INFO - Received candidate recommendation request for team: ['frontend', 'design']
+2025-08-13 08:12:40,688 - app.api.routes - INFO - Successfully recommended 5 candidates
+2025-08-13 08:22:45,545 - app.api.routes - INFO - Received candidate recommendation request for team: ['frontend', 'design']
+2025-08-13 08:22:45,561 - app.api.routes - INFO - Successfully recommended 5 candidates
+2025-08-13 08:30:29,921 - app.api.routes - INFO - Received candidate recommendation request for team: ['backend', 'ai']
+2025-08-13 08:30:29,937 - app.api.routes - INFO - Successfully recommended 5 candidates
