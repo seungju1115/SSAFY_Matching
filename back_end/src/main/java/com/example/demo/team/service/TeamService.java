@@ -96,7 +96,7 @@ public class TeamService {
     }
 
     // 4. 팀 정보 조회
-    @Cacheable(value = "longTermCache", key = "'team:' + #teamId")
+//    @Cacheable(value = "longTermCache", key = "'team:' + #teamId") // 유저 프로필 업데이트 후 동기화 안 됨.
     public TeamDetailResponse getTeam(Long teamId) {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.TEAM_NOT_FOUND));
