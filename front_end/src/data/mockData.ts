@@ -51,74 +51,98 @@ export const mockTeams: Team[] = [
 export const mockDevelopers: Developer[] = [
   {
     id: 1,
-    name: "최프론트",
-    role: "Frontend Developer",
-    experience: "3년",
-    skills: ["React", "Vue.js", "TypeScript", "CSS"],
-    location: "서울",
-    rating: 4.8,
-    projects: 12,
+    name: "김철수",
+    role: "백엔드",
     avatar: "",
-    bio: "사용자 경험을 중시하는 프론트엔드 개발자입니다."
+    isMajor: true,
+    positions: ["백엔드", "디자인"],
+    projectPreferences: ["취업우선", "수상목표"],
+    techStack: [
+      { name: "Java", level: 90 },
+      { name: "Spring", level: 85 },
+      { name: "MySQL", level: 80 },
+      { name: "Docker", level: 70 },
+      { name: "AWS", level: 65 }
+    ]
   },
   {
     id: 2,
-    name: "정백엔드",
-    role: "Backend Developer", 
-    experience: "5년",
-    skills: ["Node.js", "Python", "PostgreSQL", "AWS"],
-    location: "부산",
-    rating: 4.9,
-    projects: 20,
+    name: "이영희",
+    role: "프론트엔드",
     avatar: "",
-    bio: "확장 가능한 서버 아키텍처 설계 전문가"
+    isMajor: false,
+    positions: ["프론트엔드", "AI"],
+    projectPreferences: ["학습중심", "포트폴리오중심"],
+    techStack: [
+      { name: "React", level: 95 },
+      { name: "TypeScript", level: 88 },
+      { name: "Next.js", level: 82 },
+      { name: "Tailwind", level: 90 },
+      { name: "Python", level: 75 }
+    ]
   },
   {
     id: 3,
-    name: "한풀스택",
-    role: "Full Stack Developer",
-    experience: "4년", 
-    skills: ["React", "Node.js", "MongoDB", "Docker"],
-    location: "대구",
-    rating: 4.7,
-    projects: 15,
+    name: "박민수",
+    role: "AI",
     avatar: "",
-    bio: "프론트엔드부터 백엔드까지 전체 개발 가능"
+    isMajor: true,
+    positions: ["AI", "백엔드"],
+    projectPreferences: ["아이디어실현", "실무경험"],
+    techStack: [
+      { name: "Python", level: 95 },
+      { name: "TensorFlow", level: 88 },
+      { name: "PyTorch", level: 85 },
+      { name: "FastAPI", level: 80 },
+      { name: "PostgreSQL", level: 75 }
+    ]
   },
   {
     id: 4,
-    name: "김디자인",
-    role: "UI/UX Designer",
-    experience: "2년",
-    skills: ["Figma", "Adobe XD", "Sketch", "Prototyping"],
-    location: "서울",
-    rating: 4.6,
-    projects: 8,
+    name: "최지은",
+    role: "디자인",
     avatar: "",
-    bio: "사용자 중심의 디자인을 추구합니다"
+    isMajor: false,
+    positions: ["디자인", "PM"],
+    projectPreferences: ["완성도추구", "빠른개발"],
+    techStack: [
+      { name: "Figma", level: 95 },
+      { name: "Photoshop", level: 90 },
+      { name: "Illustrator", level: 85 },
+      { name: "Sketch", level: 80 },
+      { name: "Framer", level: 70 }
+    ]
   },
   {
     id: 5,
-    name: "박데이터",
-    role: "Data Scientist",
-    experience: "3년",
-    skills: ["Python", "R", "TensorFlow", "SQL"],
-    location: "서울",
-    rating: 4.8,
-    projects: 10,
+    name: "정우진",
+    role: "PM",
     avatar: "",
-    bio: "데이터로 인사이트를 찾는 것을 좋아합니다"
+    isMajor: true,
+    positions: ["PM", "프론트엔드"],
+    projectPreferences: ["취업우선", "학습중심"],
+    techStack: [
+      { name: "Notion", level: 95 },
+      { name: "Jira", level: 88 },
+      { name: "Slack", level: 90 },
+      { name: "React", level: 75 },
+      { name: "Git", level: 85 }
+    ]
   },
   {
     id: 6,
-    name: "이DevOps",
-    role: "DevOps Engineer",
-    experience: "6년",
-    skills: ["AWS", "Docker", "Kubernetes", "Jenkins"],
-    location: "인천",
-    rating: 4.9,
-    projects: 25,
+    name: "한지민",
+    role: "백엔드",
     avatar: "",
-    bio: "안정적인 인프라 구축 및 자동화 전문"
+    isMajor: true,
+    positions: ["백엔드"],
+    projectPreferences: ["포트폴리오중심", "완성도추구"],
+    techStack: [
+      { name: "Node.js", level: 92 },
+      { name: "Express", level: 88 },
+      { name: "MongoDB", level: 85 },
+      { name: "Redis", level: 78 },
+      { name: "GraphQL", level: 72 }
+    ]
   }
 ]
