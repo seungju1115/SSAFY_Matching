@@ -16,6 +16,9 @@ import { Crown, MessageCircle, Send, UserPlus, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ProjectGoalEnum, ProjectViveEnum } from '@/types/team';
 import type { UserDetailResponse } from '@/types/user';
+import { useSocket } from '@/hooks/useSocket'; // Added
+import type { IMessage } from '@stomp/stompjs'; // Added
+import type { ChatMessageRequest } from '@/api/chat'; // Added
 
 // 기존 상수들은 그대로 유지합니다.
 const projectGoalLabels: Record<ProjectGoalEnum, string> = {
@@ -61,7 +64,8 @@ const TeamPage: React.FC = () => {
     setLoading,
     setError,
   } = useTeamStore();
-  const { user } = useUserStore();
+  const setUser = useUserStore((state) => state.setUser);
+  const user = useUserStore((state) => state.user);
   const { leaveTeam } = useTeam();
 
   // userStore에서 teamId 가져오기
@@ -73,6 +77,9 @@ const TeamPage: React.FC = () => {
   const teamInfo = teamId ? getTeamDetailById(teamId) : null;
   // The store now holds the members, let's get them from there.
   const teamMembers: UserDetailResponse[] = teamInfo?.members || [];
+
+  // Use useSocket hook
+  const { isConnected,subscribeToRoom, sendChatMessage } = useSocket();
 
   useEffect(() => {
     const fetchTeamData = async () => {
@@ -98,26 +105,46 @@ const TeamPage: React.FC = () => {
     fetchTeamData();
   }, [teamId, getTeamDetailById, setTeamDetail, setLoading, setError]);
 
-  useEffect(() => {
-    if (teamInfo) {
-      const welcomeMessage = {
-        id: Date.now(),
-        sender: 'System',
-        message: `팀 '${teamInfo.teamName}'에 오신 것을 환영합니다.`,
-        time: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
-      };
-      setChatMessages([welcomeMessage]);
+  // WebSocket connection and subscription
+useEffect(() => {
+  if (!isConnected || !teamInfo?.chatRoomId) return;
+
+  const unsub = subscribeToRoom(teamInfo.chatRoomId, (message: IMessage) => {
+    try {
+      const parsed = JSON.parse(message.body);
+
+      const senderMember = teamInfo.members.find((m) => m.id === parsed.senderId);
+      const senderName = senderMember ? senderMember.userName : '알 수 없음';
+
+      setChatMessages((prev) => [
+        ...prev,
+        {
+          id: parsed.id ?? Date.now(),
+          senderId: parsed.senderId,
+          sender: senderName, 
+          message: parsed.message,
+          timestamp: parsed.createdAt,
+        },
+      ]);
+    } catch (err) {
+      console.error('메시지 파싱 실패', err);
     }
-  }, [teamInfo]);
+  });
+
+  return () => {
+    unsub?.();
+  };
+}, [isConnected, teamInfo?.chatRoomId, subscribeToRoom]);
 
   const handleSendMessage = () => {
-    if (chatMessage.trim() && user) {
-      const newMessage = {
-        id: Date.now(),
-        sender: user.userName || '나',
+    if (chatMessage.trim() && user && user.id !== null && teamInfo) {
+      const messageToSend: ChatMessageRequest = {
+        roomId: teamInfo.chatRoomId,
+        senderId: user.id, // user.id is now guaranteed to be number
         message: chatMessage,
+        type: 'CHAT', // Assuming 'CHAT' as MessageType
       };
-      setChatMessages([...chatMessages, newMessage]);
+      (sendChatMessage as (message: ChatMessageRequest) => void)(messageToSend);
       setChatMessage('');
     }
   };
@@ -126,7 +153,13 @@ const TeamPage: React.FC = () => {
     if (user && user.id !== null && confirm('정말로 팀을 나가시겠습니까?')) {
       try {
         await leaveTeam(user.id);
-        navigate('/matching');
+              // 기존 user를 복사하고 teamId, teamName만 null로 변경
+      setUser({
+        ...user,
+        teamId: null,
+        teamName: null,
+      });
+        navigate('/');
       } catch (error) {
         console.error("Failed to leave team:", error);
       }
@@ -307,7 +340,7 @@ const TeamPage: React.FC = () => {
                       <div key={msg.id} className="">
                         <div className="flex items-center gap-2 mb-1">
                           <span className="text-sm font-medium text-gray-900">{msg.sender}</span>
-                          <span className="text-xs text-gray-500">{msg.time}</span>
+                          <span className="text-xs text-gray-500">{msg.timestamp}</span>
                         </div>
                         <div className="bg-gray-50 p-3 rounded-lg max-w-md">
                           <p className="text-sm text-gray-700">{msg.message}</p>

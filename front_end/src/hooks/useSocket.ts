@@ -1,9 +1,20 @@
 import { useState, useEffect } from 'react';
 import { type IMessage } from '@stomp/stompjs';
 import { webSocketService } from '@/services/socket';
-import type { ChatMessageRequest } from '@/api/chat'; // API 파일에서 타입 가져오기
+import type { ChatMessageRequest } from '@/api/chat';
 
-export const useSocket = () => {
+interface UseSocketReturn {
+  isConnected: boolean;
+  subscribe: (topic: string, callback: (message: IMessage) => void) => () => void;
+  subscribeToRoom: (roomId: string | number, callback: (message: IMessage) => void) => () => void;
+  subscribeToPrivate: (roomId: string | number, callback: (message: IMessage) => void) => () => void;
+  publish: (destination: string, body: object) => void;
+  sendChatMessage: (message: ChatMessageRequest) => void;
+  sendPrivateMessage: (message: ChatMessageRequest) => void;
+  disconnect: () => void;
+}
+
+export const useSocket = (): UseSocketReturn => { // Explicitly define return type
   const [isConnected, setIsConnected] = useState(webSocketService.isConnected());
 
   useEffect(() => {
@@ -22,9 +33,10 @@ export const useSocket = () => {
     };
   }, []);
 
-  const subscribe = (topic: string, callback: (message: IMessage) => void) => {
-    return webSocketService.subscribe(topic, callback);
-  };
+  const subscribe = (topic: string, callback: (message: IMessage) => void): () => void => {
+  return webSocketService.subscribe(topic, callback) ?? (() => {});
+};
+
 
   // 그룹 채팅방 구독용 함수
   const subscribeToRoom = (roomId: string | number, callback: (message: IMessage) => void) => {
