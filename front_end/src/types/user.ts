@@ -3,12 +3,15 @@ import type {ProjectGoalEnum, ProjectViveEnum} from "@/types/team.ts";
 
 export interface User {
   id: number | null
-  userName: string | null
+  userName: string | null // 사용자 이름
   role: string | null
   email: string | null
   userProfile?: string | null // 자기소개
-  major: boolean | null
+  profileImage?: string | null // 프로필 이미지
+  major: boolean | null // 전공자 여부 (true: 전공자, false: 비전공자)
   lastClass: number | null
+  semester?: number | null // 학기 정보
+  classNumber?: number | null // 반 번호
   wantedPosition?: string[] | null // 희망 포지션
   projectGoal?: string[] | null // 프로젝트 선호도
   projectVive?: string[] | null // 개인 성향

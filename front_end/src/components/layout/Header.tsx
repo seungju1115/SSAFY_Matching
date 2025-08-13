@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { User, LogOut, Settings, ChevronDown } from 'lucide-react'
+import { User, LogOut, Settings, ChevronDown, BarChart3 } from 'lucide-react'
 import useUserStore from '@/stores/userStore'
 
 export default function Header() {
@@ -37,6 +37,13 @@ export default function Header() {
 
           {/* 네비게이션 메뉴 */}
           <nav className="hidden md:flex items-center space-x-8">
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 transition-colors"
+            >
+              <BarChart3 className="h-4 w-4" />
+              <span>대시보드</span>
+            </button>
             <button
               onClick={() => navigate('/teams')}
               className="text-gray-700 hover:text-blue-600 transition-colors"
