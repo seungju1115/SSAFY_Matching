@@ -6,7 +6,11 @@ import com.example.demo.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, Long> {
     boolean existsByUserAndChatRoom(User user, ChatRoom chatRoom);
+
+    Optional<ChatRoomMember> findByUserIdAndChatRoomTeamId(Long userId, Long teamId);
 }

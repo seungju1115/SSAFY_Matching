@@ -78,6 +78,12 @@ public class TeamController {
         return ResponseEntity.ok(ApiResponse.created(null));
     }
 
+    @PostMapping("/{userId}/leave")
+    public ResponseEntity<ApiResponse<Void>> leaveTeam(@PathVariable Long userId) {
+        teamService.leaveTeam(userId);
+        return ResponseEntity.ok(ApiResponse.ok());
+    }
+
     @GetMapping("/{teamId}/request")
     public ResponseEntity<ApiResponse<List<TeamMembershipResponse>>> getAllRequest(@PathVariable Long teamId) {
         return ResponseEntity.ok(ApiResponse.ok(teamMembershipRequestService.getAllRequest(teamId)));

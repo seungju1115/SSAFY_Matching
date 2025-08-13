@@ -1,9 +1,6 @@
 package com.example.demo.user.dto;
 
-import com.example.demo.user.Enum.PositionEnum;
-import com.example.demo.user.Enum.ProjectGoalEnum;
-import com.example.demo.user.Enum.ProjectViveEnum;
-import com.example.demo.user.Enum.TechEnum;
+import com.example.demo.user.Enum.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -50,4 +47,10 @@ public class UserSearchRequest {
             example = "[\"JOB\", \"AWARD\"]"
     )
     private Set<ProjectGoalEnum> projectGoal;
+
+    @Schema(
+            description = "유저 상태",
+            example = "[\"INACTIVE\", \"WAITING\", \"IN_TEAM\"]"
+    )
+    private UserStatus userStatus;
 }

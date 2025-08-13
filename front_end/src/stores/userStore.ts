@@ -1,25 +1,6 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
-
-interface User {
-  id: number | null
-  userName: string | null
-  role: string | null
-  email: string | null
-  userProfile?: string | null // 자기소개
-  major: boolean | null
-  lastClass: number | null
-  wantedPosition?: string[] | null // 희망 포지션
-  projectGoal?: string[] | null // 프로젝트 선호도
-  projectVive?: string[] | null // 개인 성향
-  projectExp?: string | null // 프로젝트 경험
-  qualification?: string | null // 자격증
-  techStack?: string[] | null // 기술 스택
-  teamId?: number | null // 소속 팀 ID
-  teamName?: string | null // 소속 팀 이름
-  isProfileComplete?: boolean | null // 프로필 완료 여부
-  isSigned?: boolean
-}
+import type {User} from "@/types/user.ts";
 
 interface UserState {
   user: User

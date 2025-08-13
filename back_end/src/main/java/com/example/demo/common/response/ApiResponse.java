@@ -57,6 +57,6 @@ public class ApiResponse<T> {
      * 204 No Content
      */
     public static <T> ApiResponse<T> noContent() {
-        return new ApiResponse<>(HttpStatus.NO_CONTENT.value(), DELETED_BASIC_MESSAGE, null);
+        return new ApiResponse<T>(HttpStatus.NO_CONTENT.value(), DELETED_BASIC_MESSAGE, null);
     }
 }

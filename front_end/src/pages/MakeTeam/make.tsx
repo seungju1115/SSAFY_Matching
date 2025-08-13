@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTeam } from '@/hooks/useTeam'
 import useUserStore from '@/stores/userStore'
-import type { TeamCreateRequest, ProjectGoalEnum, ProjectViveEnum } from '@/types/team'
+import type { TeamRequest, ProjectGoalEnum, ProjectViveEnum } from '@/types/team'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -20,6 +20,7 @@ import {
   Sparkles,
   Globe
 } from 'lucide-react'
+import {useTeamStore} from "@/stores/teamStore.ts";
 
 // 팀 생성 데이터 타입
 interface TeamData {
@@ -117,8 +118,8 @@ export default function MakeTeam() {
     }))
   }
 
-  // TeamData를 TeamCreateRequest로 매핑
-  const mapTeamDataToRequest = (data: TeamData): TeamCreateRequest => {
+  // TeamData를 TeamRequest로 매핑
+  const mapTeamDataToRequest = (data: TeamData): TeamRequest => {
     // enum으로 매핑
     const mappedPreferences = data.projectPreferences
       .map(pref => projectPreferenceToEnumMapping[pref])
@@ -147,7 +148,13 @@ export default function MakeTeam() {
     try {
       const teamRequest = mapTeamDataToRequest(teamData)
       console.log('팀 생성 요청 데이터:', teamRequest)
-      await createTeam(teamRequest)
+
+      const createdTeam = await createTeam(teamRequest)
+      console.log('생성된 팀 데이터:', createdTeam)
+
+      // teamStore 상태 확인
+      console.log('teamStore 상태:', useTeamStore.getState())
+
       navigate('/')
     } catch (error) {
       console.error('팀 생성 실패:', error)
