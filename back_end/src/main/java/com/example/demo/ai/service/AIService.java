@@ -12,6 +12,7 @@ import com.example.demo.user.dao.UserRepository;
 import com.example.demo.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.type.descriptor.java.ObjectJavaType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
@@ -78,11 +79,10 @@ public class AIService {
     }
 
     // ==================== 기존 메서드들 (그대로 유지) ====================
-
     public TeamToPersonDto findTeamToPersonDtoById(Long teamId){
         TeamToPersonDto teamToPersonDto = new TeamToPersonDto();
         TeamAIDto curTeam = TeamAIDto.from(teamRepository.findTeamAIDtoById(teamId));
-        List<Object[]> results = userRepository.findAllCandidates(teamId);
+        List<Object[]> results = userRepository.findAllCandidates();
         List<CandidateDto> candidateDtos=results.stream()
                 .map(this::mapToCandidateDto)
                 .toList();

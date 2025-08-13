@@ -65,9 +65,7 @@ public interface UserRepository extends JpaRepository<User,Long> {
         WHERE u.team_id IS NULL
         GROUP BY u.user_id, u.user_name
         """, nativeQuery = true)
-    List<Object[]> findAllCandidates (Long teamId);
-
-
+    List<Object[]> findAllCandidates ();
 
     @Query(value =
             "SELECT DISTINCT u FROM User u " +
