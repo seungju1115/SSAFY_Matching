@@ -26,7 +26,6 @@ spring:
     level:
       org.springframework.security: DEBUG
       org.springframework.security.oauth2: DEBUG
-      org.springframework.security.oauth2.client.web: DEBUG
 
   # PostgreSQL로 수정
   datasource:

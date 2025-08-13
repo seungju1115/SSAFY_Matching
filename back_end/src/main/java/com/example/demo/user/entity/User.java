@@ -1,6 +1,5 @@
 package com.example.demo.user.entity;
 
-import com.example.demo.team.entity.TeamLockRequest;
 import com.example.demo.user.Enum.*;
 import com.example.demo.chat.entity.ChatRoomMember;
 import com.example.demo.team.entity.Team;
@@ -12,7 +11,10 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "USERS"

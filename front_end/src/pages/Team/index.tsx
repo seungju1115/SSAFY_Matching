@@ -312,6 +312,13 @@ const TeamPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* 사용자 추천 모달 */}
+      <UserRecommendationModal
+        isOpen={isRecommendModalOpen}
+        onClose={() => setIsRecommendModalOpen(false)}
+        onSelectUser={handleSelectUser}
+      />
     </div>
   );
 };
