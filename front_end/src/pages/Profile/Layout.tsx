@@ -46,12 +46,12 @@ export default function ProfileLayout() {
       setUserProfile({
         id: String(user.id || '1'),
         email: user.email || 'user@ssafy.com',
-        name: user.name || user.userName || '홍길동',
+        name: user.userName || '홍길동',
         profileImage: user.profileImage || undefined,
         semester: String(user.semester || 2),
         classNumber: String(user.classNumber || 5),
         major: 'java',
-        isMajor: Boolean(user.isMajor ?? user.major ?? true),
+        isMajor: Boolean(user.major ?? true),
         isProfileComplete: Boolean(user.isProfileComplete ?? true),
         createdAt: new Date('2024-01-15')
       })
@@ -139,18 +139,18 @@ export default function ProfileLayout() {
             <Avatar className="h-16 w-16">
               <AvatarImage src={user.profileImage || userProfile?.profileImage} />
               <AvatarFallback className="bg-blue-100 text-blue-600 text-xl font-semibold">
-                {getUserInitial(user.name || user.userName || userProfile?.name || '')}
+                {getUserInitial(user.userName || userProfile?.name || '')}
               </AvatarFallback>
             </Avatar>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">{user.name || user.userName || userProfile?.name}</h1>
+              <h1 className="text-2xl font-bold text-gray-900">{user.userName || userProfile?.name}</h1>
               <p className="text-gray-600">{userProfile.email}</p>
               <div className="flex items-center space-x-2 mt-1">
                 <Badge variant="outline">
                   {user.semester || userProfile?.semester}학기 {user.classNumber || userProfile?.classNumber}반
                 </Badge>
                 <Badge variant="secondary">
-                  {getMajorLabel(Boolean(user.isMajor ?? user.major ?? userProfile?.isMajor), userProfile?.major || 'java')}
+                  {getMajorLabel(Boolean(user.major ?? userProfile?.isMajor), userProfile?.major || 'java')}
                 </Badge>
               </div>
             </div>
