@@ -79,9 +79,8 @@ public class ChatRoomService {
         chatRoom.setRoomType(RoomType.TEAM);
         chatRoom.setTeam(team);
 
-        chatMemberService.createChatRoomMember(creator, chatRoom);
-
         chatRoomRepository.save(chatRoom);
+        chatMemberService.createChatRoomMember(creator, chatRoom);
     }
 
     @Transactional

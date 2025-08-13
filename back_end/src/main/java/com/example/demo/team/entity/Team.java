@@ -75,7 +75,7 @@ public class Team {
     private User leader;
 
     // ✅ 팀 멤버들 (1:N 관계)
-    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL)
     private List<User> members = new ArrayList<>();
 
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL)

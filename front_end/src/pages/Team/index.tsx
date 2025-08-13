@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useTeamStore } from '@/stores/teamStore';
 import useUserStore from '@/stores/userStore';
+import { useTeam } from '@/hooks/useTeam';
 import { teamAPI } from '@/api/team';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -51,8 +52,6 @@ const roleColors = {
 
 const TeamPage: React.FC = () => {
   const navigate = useNavigate();
-  const { teamId: teamIdStr } = useParams<{ teamId: string }>();
-  const teamId = teamIdStr ? parseInt(teamIdStr, 10) : null;
 
   const {
     isLoading,
@@ -63,6 +62,10 @@ const TeamPage: React.FC = () => {
     setError,
   } = useTeamStore();
   const { user } = useUserStore();
+  const { leaveTeam } = useTeam();
+
+  // userStore에서 teamId 가져오기
+  const teamId = user.teamId;
 
   const [chatMessage, setChatMessage] = useState('');
   const [chatMessages, setChatMessages] = useState<any[]>([]);
@@ -70,7 +73,6 @@ const TeamPage: React.FC = () => {
   const teamInfo = teamId ? getTeamDetailById(teamId) : null;
   // The store now holds the members, let's get them from there.
   const teamMembers: UserDetailResponse[] = teamInfo?.members || [];
-
 
   useEffect(() => {
     const fetchTeamData = async () => {
@@ -120,10 +122,14 @@ const TeamPage: React.FC = () => {
     }
   };
 
-  const handleLeaveTeam = () => {
-    if (confirm('정말 팀에서 탈퇴하시겠습니까?')) {
-      navigate('/matching');
-      
+  const handleLeaveTeam = async () => {
+    if (user && user.id !== null && confirm('정말로 팀을 나가시겠습니까?')) {
+      try {
+        await leaveTeam(user.id);
+        navigate('/matching');
+      } catch (error) {
+        console.error("Failed to leave team:", error);
+      }
     }
   };
 
@@ -147,7 +153,30 @@ const TeamPage: React.FC = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center text-red-500">
           <p>{error}</p>
-          <Button onClick={() => navigate('/matching')} className="mt-4">돌아가기</Button>
+          <Button onClick={() => navigate('/')} className="mt-4">돌아가기</Button>
+        </div>
+      </div>
+    );
+  }
+
+  // 팀이 없는 경우 처리
+  if (!teamId) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="flex items-center justify-center pt-20">
+          <div className="text-center max-w-md">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">소속된 팀이 없습니다</h2>
+            <p className="text-gray-600 mb-6">새로운 팀을 만들거나 기존 팀에 참여해보세요.</p>
+            <div className="space-y-3">
+              <Button onClick={() => navigate('/make-team')} className="w-full">
+                팀 만들기
+              </Button>
+              <Button onClick={() => navigate('/matching')} variant="outline" className="w-full">
+                팀 찾기
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     );

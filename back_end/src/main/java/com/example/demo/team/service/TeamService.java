@@ -15,6 +15,8 @@ import com.example.demo.team.dao.TeamRepository;
 import com.example.demo.team.dto.*;
 import com.example.demo.team.entity.Team;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -25,10 +27,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class TeamService {
+    private static final Logger log = LoggerFactory.getLogger(TeamService.class);
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
@@ -176,17 +185,40 @@ public class TeamService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        Long teamId = user.getTeam() != null ? user.getTeam().getId() : null;
-        if (teamId == null) {
+        log.info("User 영속성: {}", entityManager.contains(user));
+        log.info("User chatRoomMembers size: {}", user.getChatRoomMembers().size());
+
+        Team team = user.getTeam();
+        if (team == null) {
             throw new BusinessException(ErrorCode.USER_NOT_IN_TEAM);
         }
+        log.info("Team 영속성: {}", entityManager.contains(team));
 
-        ChatRoomMember member = chatRoomMemberRepository.findByUserIdAndChatRoomTeamId(userId, teamId)
+        ChatRoomMember member = chatRoomMemberRepository.findByUserIdAndChatRoomId(userId, team.getChatRoom().getId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.CHATROOM_MEMBER_NOT_FOUND));
 
-        chatRoomMemberRepository.delete(member);
+        log.info("Member 영속성: {}", entityManager.contains(member));
+        log.info("Member.user 영속성: {}", member.getUser() != null ? entityManager.contains(member.getUser()) : "null");
 
+        // 연관관계 끊기 전 상태
+        log.info("Before unlink user.chatRoomMembers.size: {}", user.getChatRoomMembers().size());
+
+        member.setUser(null);
+        member.setChatRoom(null);
+
+        // 끊은 후 user의 chatRoomMembers 상태 출력
+        log.info("After unlink user.chatRoomMembers.size: {}", user.getChatRoomMembers().size());
+
+        
+
+        // user와 team 연결 끊기
         user.setTeam(null);
+        log.info("User before saveAndFlush: {}", user.getId());
+        log.info("User is managed by EntityManager before saveAndFlush: {}", entityManager.contains(user));
+        userRepository.saveAndFlush(user);
+
+        // 최종 영속성 상태 확인
+        log.info("최종 User 영속성: {}", entityManager.contains(user));
     }
 
     public Team toTeam(TeamRequest teamRequest,Team team) {

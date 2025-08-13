@@ -15,6 +15,7 @@ import { CLASS_OPTIONS } from '@/types/user'
 import { CheckCircle2, User, BookOpen, Users } from 'lucide-react'
 import { publicApiClient } from '@/api/axios'
 import useUserStore from '@/stores/userStore'
+import {userHelpers} from "@/api/user.ts";
 
 export default function Setup() {
   // const navigate = useNavigate()
@@ -61,6 +62,25 @@ export default function Setup() {
           email: userData.email,
           major: userData.major,
           lastClass: userData.lastClass,
+          teamId: userData.teamId,
+          teamName: userData.teamName,
+          projectExp: userData.projectExp,
+          isSigned: true,
+          userProfile: userData.userProfile,
+          wantedPosition: userData.wantedPosition?.map((pos: string) =>
+              userHelpers.mapEnumToDisplayValue(pos, 'position')
+          ) || null,
+          techStack: userData.techStack?.map((tech: string) =>
+              userHelpers.mapEnumToDisplayValue(tech, 'techStack')
+          ) || null,
+          projectGoal: userData.projectGoal?.map((goal: string) =>
+              userHelpers.mapEnumToDisplayValue(goal, 'projectGoal')
+          ) || null,
+          projectVive: userData.projectVive?.map((vibe: string) =>
+              userHelpers.mapEnumToDisplayValue(vibe, 'projectVive')
+          ) || null,
+          qualification: userData.qualification || null,
+          isProfileComplete: true
         })
         console.log('User profile created and state updated:', userData)
         const baseUrl = window.location.origin

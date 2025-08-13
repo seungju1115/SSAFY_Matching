@@ -3,6 +3,7 @@ import { useTeamStore } from '@/stores/teamStore'
 import { teamAPI, teamHelpers } from '@/api/team'
 import type { TeamRequest, TeamDetailResponse, ApiResponse } from '@/types/team'
 import { useToast } from '@/hooks/use-toast'
+import useUserStore from '@/stores/userStore';
 
 export const useTeam = () => {
   const {
@@ -21,6 +22,7 @@ export const useTeam = () => {
   } = useTeamStore()
 
   const { toast } = useToast()
+  const { user, setUser } = useUserStore();
 
   // 팀 상세 정보 조회 (캐시 고려)
   const fetchTeamDetail = async (teamId: number, forceRefresh = false) => {
@@ -40,7 +42,9 @@ export const useTeam = () => {
       
       // TeamDetailResponse를 teamStore에 정규화해서 저장
       setTeamDetail(response.data.data)
-      
+
+
+
       return response.data.data
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || '팀 정보를 불러오는데 실패했습니다'
@@ -100,6 +104,13 @@ export const useTeam = () => {
       // 생성된 TeamDetailResponse를 teamStore에 저장
       setTeamDetail(response.data.data)
       
+      // userStore에 팀 정보 업데이트 (기존 user 정보 유지)
+      setUser({
+        ...user,
+        teamId: response.data.data.teamId,
+        teamName: response.data.data.teamName
+      })
+
       toast({
         title: "성공",
         description: "팀이 성공적으로 생성되었습니다"
@@ -173,6 +184,30 @@ export const useTeam = () => {
         title: "오류",
         description: errorMessage,
         variant: "destructive"
+      })
+      throw err
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // 팀 탈퇴
+  const leaveTeam = async (userId: number) => {
+    try {
+      setLoading(true)
+      clearError()
+      await teamAPI.leaveTeam(userId)
+      toast({
+        title: "성공",
+        description: "팀에서 탈퇴했습니다",
+      })
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || '팀 탈퇴에 실패했습니다'
+      setError(errorMessage)
+      toast({
+        title: "오류",
+        description: errorMessage,
+        variant: "destructive",
       })
       throw err
     } finally {
@@ -255,6 +290,7 @@ export const useTeam = () => {
     createTeam,
     updateTeam,
     deleteTeam,
+    leaveTeam,
     
     // 팀원 관련
     requestJoinTeam,

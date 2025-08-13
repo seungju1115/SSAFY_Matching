@@ -25,7 +25,7 @@ function App() {
         <Route path="/profile-setup" element={<ProfileSetup />} />
         <Route path="/make-team" element={<MakeTeam />} />
         <Route path="/oauth/callback" element={<AuthCallback />} />
-        <Route path="/team/:teamId" element={<Team />} />
+        <Route path="/team" element={<Team />} />
         <Route path="/chat" element={<Chat />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/profile" element={<ProfileLayout />}>
