@@ -114,7 +114,6 @@ const TeamPage: React.FC = () => {
         id: Date.now(),
         sender: user.userName || '나',
         message: chatMessage,
-        time: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
       };
       setChatMessages([...chatMessages, newMessage]);
       setChatMessage('');
@@ -122,8 +121,9 @@ const TeamPage: React.FC = () => {
   };
 
   const handleLeaveTeam = () => {
-    if (confirm('정말로 팀을 나가시겠습니까?')) {
+    if (confirm('정말 팀에서 탈퇴하시겠습니까?')) {
       navigate('/matching');
+      
     }
   };
 
@@ -306,7 +306,7 @@ const TeamPage: React.FC = () => {
             <div className="w-full flex justify-end mt-4">
               <Button onClick={handleLeaveTeam} variant="destructive" className="w-full lg:w-auto">
                 <LogOut className="w-4 h-4 mr-2" />
-                팀 나가기
+                탈퇴하기
               </Button>
             </div>
           </div>
