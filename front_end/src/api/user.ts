@@ -1,11 +1,5 @@
 // 사용자 프로필 관련 API
 import apiClient from './axios'
-import type {
-  UserSearchRequest,
-  UserSearchResponse,
-  UserProfileResponse,
-  UserProfileUpdateRequest, UserStatus
-} from "@/types/user.ts";
 
 // API 응답을 위한 래퍼 타입
 export interface ApiResponse<T> {
@@ -16,7 +10,62 @@ export interface ApiResponse<T> {
   }
 }
 
+// 사용자 프로필 수정 요청 타입 (백엔드 UserProfileUpdateRequest와 일치)
+export interface UserProfileUpdateRequest {
+  userName?: string
+  userProfile?: string // 자기소개
+  major?: boolean
+  lastClass?: number
+  wantedPosition?: string[] // 희망 포지션
+  projectGoal?: string[] // 프로젝트 선호도
+  projectVive?: string[] // 개인 성향
+  projectExp?: string // 프로젝트 경험
+  qualification?: string // 자격증
+  techStack?: string[] // 기술 스택
+  teamId?: number
+}
 
+// 사용자 프로필 응답 타입 (백엔드 UserProfileResponse와 일치)
+export interface UserProfileResponse {
+  data: any;
+  id: number
+  userName: string
+  role: string
+  email: string
+  userProfile?: string
+  major: boolean
+  lastClass: number
+  wantedPosition?: string[]
+  projectGoal?: string[]
+  projectVive?: string[]
+  projectExp?: string
+  qualification?: string
+  techStack?: string[]
+  teamId?: number
+  teamName?: string
+}
+
+// 팀원 검색 요청 타입
+export interface SearchUserRequest {
+  wantedPosition?: string[]
+  techStack?: string[]
+  projectGoal?: string[]
+}
+
+// 팀원 검색 응답 타입
+export interface SearchUserResponse {
+  id: number
+  userName: string
+  userProfile?: string
+  major: boolean
+  lastClass: number
+  wantedPosition?: string[]
+  techStack?: string[]
+  projectGoal?: string[]
+  projectVive?: string[]
+  projectExp?: string
+  qualification?: string
+}
 
 export const userAPI = {
   /**
@@ -51,15 +100,8 @@ export const userAPI = {
    * 팀원 검색 (팀이 없는 사용자)
    * POST /users/profile/search
    */
-  searchUsersWithoutTeam: (searchCriteria: UserSearchRequest): Promise<ApiResponse<UserSearchResponse[]>> =>
-    apiClient.post('/users/profile/search', searchCriteria),
-
-  /**
-   * 대기중인 사용자 조회 (UserStatus가 WAITING인 사용자들)
-   * GET /users/profile/waiting
-   */
-  getWaitingUsers: (): Promise<ApiResponse<UserSearchResponse[]>> =>
-    apiClient.get('/users/profile/waiting')
+  searchUsersWithoutTeam: (searchCriteria: SearchUserRequest): Promise<ApiResponse<SearchUserResponse[]>> =>
+    apiClient.post('/users/profile/search', searchCriteria)
 }
 
 // 편의를 위한 추가 함수들
@@ -75,7 +117,6 @@ export const userHelpers = {
     projectPreferences: string[]
     personalPreferences: string[]
     certifications: { name: string }[]
-    userStatus: UserStatus
   }) => {
     // 포지션 문자열을 백엔드 Enum으로 매핑
     const positionMapping: Record<string, string> = {
@@ -182,8 +223,7 @@ export const userHelpers = {
       techStack: profileData.skills.map(skill => techStackMapping[skill] || skill),
       projectGoal: profileData.projectPreferences.map(pref => projectGoalMapping[pref] || pref),
       projectVive: profileData.personalPreferences.map(pref => projectViveMapping[pref] || pref),
-      qualification: profileData.certifications.map(cert => cert.name).join(', '),
-      userStatus: profileData.userStatus
+      qualification: profileData.certifications.map(cert => cert.name).join(', ')
     }
     
     return userAPI.updateUserProfile(userId, updateRequest)

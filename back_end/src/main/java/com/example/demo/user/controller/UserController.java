@@ -396,7 +396,7 @@ public class UserController {
             )
     })
     @GetMapping("/search")
-    public ResponseEntity<ApiResponse> searchUsersWithoutTeamWithCondition(
+    public ResponseEntity<ApiResponse> searchUsersWithoutTeam(
             @Parameter(
                     description = "팀원 검색 조건",
                     required = true,
@@ -406,41 +406,5 @@ public class UserController {
     ) {
         List<UserSearchResponse> users = userService.searchUsersWithoutTeam(request);
         return ResponseEntity.ok(ApiResponse.ok(users));
-    }
-
-    @Operation(
-            summary = "대기중인 사용자 조회",
-            description = """
-            UserStatus가 WAITING인 사용자들을 조회합니다.
-            
-            **조회 조건:**
-            - userStatus = WAITING (팀을 찾고 있는 상태)
-            - 팀에 소속되지 않은 사용자들
-            
-            **반환 정보:**
-            - 기본 프로필 정보
-            - 희망 포지션 및 기술 스택
-            - 프로젝트 선호도
-            
-            **활용 시나리오:**
-            - 팀 구성 시 대기중인 개발자 목록 보기
-            - 매칭 시스템에서 활용
-            """,
-            tags = {"사용자 프로필 관리"}
-    )
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "대기중인 사용자 조회 성공",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ApiResponse.class)
-                    )
-            )
-    })
-    @GetMapping("/waiting")
-    public ResponseEntity<ApiResponse> getWaitingUsers() {
-        List<UserSearchResponse> waitingUsers = userService.getWaitingUsers();
-        return ResponseEntity.ok(ApiResponse.ok(waitingUsers));
     }
 }

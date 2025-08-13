@@ -1,8 +1,15 @@
-export interface ChatMessageResponse {
-  id: number;
-  chatRoomId: number;
-  senderId: number;
-  message: string;
-  createdAt: string; // ISO 8601 format date string, e.g., "2024-01-15T10:30:00"
+// Chat 관련 타입 정의
+export interface Message {
+  id: string
+  chatId: string
+  senderId: string
+  content: string
+  timestamp: Date
 }
- 
+
+export interface Chat {
+  id: string
+  participants: string[]
+  messages: Message[]
+  createdAt: Date
+} 

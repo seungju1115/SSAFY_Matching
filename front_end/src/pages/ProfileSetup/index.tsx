@@ -18,7 +18,6 @@ import CertificationInput from '@/components/features/profile/CertificationInput
 // API import
 import { userHelpers } from '@/api/user'
 import useUserStore from '@/stores/userStore'
-import type {UserStatus} from "@/types/user.ts";
 
 // 프로필 설정 데이터 타입
 interface Certification {
@@ -33,7 +32,6 @@ interface ProfileSetupData {
   projectPreferences: string[]
   personalPreferences: string[]
   certifications: Certification[]
-  userStatus: UserStatus
 }
 
 export default function ProfileSetup() {
@@ -49,7 +47,6 @@ export default function ProfileSetup() {
     projectPreferences: [],
     personalPreferences: [],
     certifications: [],
-    userStatus: "WAITING" // 대기자 등록하면 WAITING 상태로 변하도록
   })
 
   const projectPreferenceSuggestions = [

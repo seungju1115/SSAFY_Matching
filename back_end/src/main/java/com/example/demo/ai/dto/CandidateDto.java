@@ -4,7 +4,6 @@ import com.example.demo.user.Enum.PositionEnum;
 import com.example.demo.user.Enum.ProjectGoalEnum;
 import com.example.demo.user.Enum.ProjectViveEnum;
 import com.example.demo.user.entity.User;
-import com.querydsl.core.annotations.QueryProjection;
 import lombok.*;
 
 import java.util.List;
@@ -25,10 +24,15 @@ public class CandidateDto {
     private Set<ProjectGoalEnum> goals;
     private Set<ProjectViveEnum> vives;
 
-    @QueryProjection
-    public CandidateDto(Long userId, String userName) {
+    public CandidateDto(Long userId, String userName, List<PositionEnum> position, Set<ProjectGoalEnum> goals, Set<ProjectViveEnum> vives) {
         this.userId = userId;
         this.userName = userName;
+        this.goals = goals;
+        this.vives = vives;
+        if (position != null && !position.isEmpty()) {
+            this.mainPos = position.get(0).name();
+            this.subPos = position.size() > 1 ? position.get(1).name() : null;
+        }
     }
 
     public static CandidateDto from(User user) {

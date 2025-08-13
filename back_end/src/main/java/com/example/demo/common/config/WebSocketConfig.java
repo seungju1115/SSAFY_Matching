@@ -26,7 +26,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // SockJS fallback 가능하게 만듦
-        registry.addEndpoint("/ws-chat").setAllowedOriginPatterns("*")  // CORS 문제를 해결하기 위해 와일드카드 패턴 사용
+        registry.addEndpoint("/ws-chat").setAllowedOrigins(frontCORSUrl)  // 프론트 포트 주소(필요시 와일드카드 "*"도 가능하나 권장하지 않음)
                 .withSockJS();
     }
 }

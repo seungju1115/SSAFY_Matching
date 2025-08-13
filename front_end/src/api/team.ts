@@ -1,14 +1,13 @@
-// Team API - Backend TeamController와 매칭
+// 팀 관련 API
 import apiClient from './axios'
-
-
 import type {
-  TeamDetailResponse,
+  TeamDetail,
   TeamRequest,
-  TeamSearchRequest,
+  TeamCreateRequest,
+  TeamResponse,
   TeamInviteRequest,
   TeamOffer,
-  TeamMembershipResponse,
+  TeamMember,
   ApiResponse
 } from '@/types/team'
 
@@ -17,28 +16,28 @@ export const teamAPI = {
    * 팀 생성
    * POST /team
    */
-  createTeam: (teamRequest: TeamRequest): Promise<ApiResponse<TeamDetailResponse>> =>
-    apiClient.post('/team', teamRequest),
+  createTeam: (teamData: TeamCreateRequest): Promise<ApiResponse<TeamResponse>> =>
+    apiClient.post('/team', teamData),
 
   /**
-   * 전체 팀 조회
+   * 전체 팀 목록 조회
    * GET /team
    */
-  getAllTeams: (): Promise<ApiResponse<TeamDetailResponse[]>> =>
+  getAllTeams: (): Promise<ApiResponse<TeamResponse[]>> =>
     apiClient.get('/team'),
 
   /**
-   * 팀 조건 검색
-   * POST /team/search
+   * 조건별 팀 검색
+   * GET /team/search
    */
-  searchTeams: (searchRequest: TeamSearchRequest): Promise<ApiResponse<TeamDetailResponse[]>> =>
-    apiClient.post('/team/search', searchRequest),
+  searchTeams: (searchCriteria: TeamRequest): Promise<ApiResponse<TeamResponse[]>> =>
+    apiClient.get('/team/search', { data: searchCriteria }),
 
   /**
    * 팀 상세 정보 조회
    * GET /team/{teamId}
    */
-  getTeamDetail: (teamId: number): Promise<ApiResponse<TeamDetailResponse>> =>
+  getTeamDetail: (teamId: number): Promise<ApiResponse<TeamDetail>> =>
     apiClient.get(`/team/${teamId}`),
 
   /**
@@ -52,67 +51,52 @@ export const teamAPI = {
    * 팀 정보 수정
    * PUT /team
    */
-  updateTeam: (teamRequest: TeamRequest): Promise<ApiResponse<TeamDetailResponse>> =>
-    apiClient.put('/team', teamRequest),
+  updateTeam: (teamData: TeamRequest): Promise<ApiResponse<TeamDetail>> =>
+    apiClient.put('/team', teamData),
 
   /**
-   * 팀 멤버 직접 초대 (관리자 권한)
-   * POST /team/invitation
+   * 팀원 직접 초대 (관리자 권한)
+   * GET /team/invitation
    */
-  inviteMemberToTeam: (inviteRequest: TeamInviteRequest): Promise<ApiResponse<void>> =>
-    apiClient.post('/team/invitation', inviteRequest),
+  inviteMemberToTeam: (inviteData: TeamInviteRequest): Promise<ApiResponse<TeamDetail>> =>
+    apiClient.get('/team/invitation', { data: inviteData }),
 
   /**
-   * 팀 가입/초대 요청
+   * 팀 가입 요청 / 초대 요청
    * POST /team/offer
    */
-  submitTeamOffer: (teamOffer: TeamOffer): Promise<ApiResponse<void>> =>
-    apiClient.post('/team/offer', teamOffer),
+  submitTeamOffer: (offerData: TeamOffer): Promise<ApiResponse<void>> =>
+    apiClient.post('/team/offer', offerData),
 
   /**
-   * 팀 떠나기
-   * POST /team/{userId}/leave
+   * 팀원 목록 조회
+   * GET /team/{teamId}/members
    */
-  leaveTeam: (userId: number): Promise<ApiResponse<void>> =>
-    apiClient.post(`/team/${userId}/leave`),
-
-  /**
-   * 팀 요청 목록 조회
-   * GET /team/{teamId}/request
-   */
-  getTeamRequests: (teamId: number): Promise<ApiResponse<TeamMembershipResponse[]>> =>
-    apiClient.get(`/team/${teamId}/request`),
-
-  /**
-   * 팀 잠금 (모집 마감)
-   * POST /team/{teamId}/lock
-   */
-  lockTeam: (teamId: number): Promise<ApiResponse<void>> =>
-    apiClient.post(`/team/${teamId}/lock`),
-
+  getTeamMembers: (teamId: number): Promise<TeamMember[]> =>
+    apiClient.get(`/team/${teamId}/members`)
 }
 
-// 편의 함수들
+// 편의를 위한 추가 함수들
 export const teamHelpers = {
   /**
    * 사용자가 팀에 가입 요청
    */
-  requestToJoinTeam: (teamId: number, userId: number, message: string) =>
+  requestToJoinTeam: (teamId: number, userId: number, message?: string) =>
     teamAPI.submitTeamOffer({
-      requestType: 'JOIN',
       teamId,
       userId,
+      requestType: 'JOIN' as any,
       message
     }),
 
   /**
    * 팀에서 사용자에게 초대 요청
    */
-  inviteUserToTeam: (teamId: number, userId: number, message: string) =>
+  inviteUserToTeam: (teamId: number, userId: number, message?: string) =>
     teamAPI.submitTeamOffer({
-      requestType: 'INVITE',
       teamId,
       userId,
+      requestType: 'INVITE' as any,
       message
     }),
 
@@ -120,13 +104,35 @@ export const teamHelpers = {
    * 팀 이름으로 검색
    */
   searchTeamsByName: (teamName: string) =>
-    teamAPI.searchTeams({ teamName }),
+    teamAPI.searchTeams({ teamName } as TeamRequest),
 
   /**
    * 팀장 ID로 검색
    */
   searchTeamsByLeader: (leaderId: number) =>
-    teamAPI.searchTeams({ leaderId }),
-}
+    teamAPI.searchTeams({ leaderId } as TeamRequest),
 
-export default teamAPI
+  /**
+   * 팀 생성 (최소 정보)
+   */
+  createSimpleTeam: (
+    leaderId: number, 
+    teamDomain: string, 
+    teamDescription?: string,
+    backendCount: number = 1,
+    frontendCount: number = 1,
+    aiCount: number = 0,
+    pmCount: number = 0,
+    designCount: number = 0
+  ) =>
+    teamAPI.createTeam({
+      leaderId,
+      teamDomain,
+      teamDescription,
+      backendCount,
+      frontendCount,
+      aiCount,
+      pmCount,
+      designCount
+    })
+}
