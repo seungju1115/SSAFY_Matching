@@ -9,7 +9,7 @@ interface Subscription {
 
 // 환경에 따라 적절한 WebSocket URL을 반환하는 함수
 const getWebSocketURL = () => {
-  if (import.meta.env.PROD) {
+  if (!import.meta.env.PROD) {
     // 배포(Production) 환경: 외부 접속용 URL을 사용합니다.
     return 'https://i13a307.p.ssafy.io/ws-chat';
   }
@@ -45,14 +45,14 @@ class WebSocketService {
       },
       reconnectDelay: 5000,
       onConnect: () => {
-        console.log('✅ STOMP Connected!');
+        console.log('✅ STOMP Connected! (socket.ts)');
         onConnected?.();
         this.connectionListeners.forEach((listener) => listener(true));
         // 재연결 시 기존 구독들을 다시 설정
         this.subscriptions.forEach((sub) => this.subscribe(sub.topic, sub.callback));
       },
       onDisconnect: () => {
-        console.log('STOMP Disconnected.');
+        console.log('STOMP Disconnected. (socket.ts)');
         this.connectionListeners.forEach((listener) => listener(false));
       },
       onStompError: (frame: Frame) => {
@@ -70,26 +70,48 @@ class WebSocketService {
     }
   }
 
-  public subscribe(topic: string, callback: (message: IMessage) => void) {
-    if (!this.stompClient || !this.stompClient.active) {
-      console.error('STOMP client is not connected. Cannot subscribe.');
-      this.subscriptions.set(topic, { topic, callback });
-      return;
-    }
-
-    console.log(`Subscribing to ${topic}`);
-    const subscription = this.stompClient.subscribe(topic, (message: IMessage) => {
-      callback(message);
-    });
-    
+ public subscribe(topic: string, callback: (message: IMessage) => void) {
+  // 이미 구독한 토픽이면 새로 구독하지 않음
+  if (this.subscriptions.has(topic)) {
+    console.log(`⚠️ Already subscribed to ${topic}, updating callback only.`);
     this.subscriptions.set(topic, { topic, callback });
-    
-    return () => {
-      console.log(`Unsubscribing from ${topic}`);
-      subscription.unsubscribe();
-      this.subscriptions.delete(topic);
-    };
+    return () => this.unsubscribe(topic);
   }
+
+  if (!this.stompClient || !this.stompClient.active) {
+    console.error('STOMP client is not connected. Cannot subscribe now.');
+    // 연결 안 된 경우: 콜백 저장 후, 연결 시 재구독
+    this.subscriptions.set(topic, { topic, callback });
+    return () => this.unsubscribe(topic);
+  }
+
+  console.log(`✅ Subscribing to ${topic}`);
+  const stompSub = this.stompClient.subscribe(topic, (message: IMessage) => {
+    // 항상 최신 콜백을 사용
+    const sub = this.subscriptions.get(topic);
+    if (sub) {
+      sub.callback(message);
+    }
+  });
+
+  this.subscriptions.set(topic, { topic, callback });
+
+  return () => {
+    console.log(`🛑 Unsubscribing from ${topic}`);
+    stompSub.unsubscribe();
+    this.subscriptions.delete(topic);
+  };
+}
+
+private unsubscribe(topic: string) {
+  // 연결 상태일 때만 실제 unsubscribe
+  if (this.stompClient && this.stompClient.active && this.subscriptions.has(topic)) {
+    console.log(`🛑 Unsubscribing from ${topic}`);
+    // STOMP의 unsubscribe는 subscribe할 때 받은 객체로 해야 함
+    // 여기선 return 함수 안에서 처리하므로 별도 관리 가능
+  }
+  this.subscriptions.delete(topic);
+}
 
   public publish(destination: string, body: object): void {
     if (!this.stompClient || !this.stompClient.active) {
