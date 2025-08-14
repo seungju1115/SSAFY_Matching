@@ -1,5 +1,5 @@
 -- 팀 테이블 먼저 생성 (User 테이블이 Team을 참조하므로)
-INSERT INTO team (team_name, backend_count, frontend_count, ai_count, pm_count, design_count, team_domain, member_wanted, team_description, status) VALUES
+INSERT INTO team (team_name, backend_count, frontend_count, ai_count, pm_count, design_count, team_domain, member_wanted, team_description, team_status) VALUES
                                                                                                                                                         ('웹서비스 개발팀', 1, 2, 0, 1, 1, 'Web Development', 'FRONTEND,DESIGN', '사용자 친화적인 웹 서비스를 개발하는 팀입니다.', 'UNLOCKED'),
                                                                                                                                                         ('AI 플랫폼팀', 2, 1, 2, 1, 0, 'AI/ML', 'AI,BACKEND', '머신러닝 기반 플랫폼을 구축하는 팀입니다.', 'UNLOCKED'),
                                                                                                                                                         ('모바일 앱팀', 1, 2, 0, 1, 1, 'Mobile', 'FRONTEND,PM', 'React Native를 활용한 모바일 앱 개발팀입니다.', 'UNLOCKED'),
