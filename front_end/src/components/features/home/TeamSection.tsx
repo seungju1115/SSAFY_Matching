@@ -1,53 +1,60 @@
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import TeamCard from "./TeamCard"
-
-interface TeamMember {
-  name: string
-  avatar: string
-  role: string
-}
-
-interface Team {
-  id: number
-  name: string
-  description: string
-  tech: string[]
-  members: number
-  maxMembers: number
-  deadline: string
-  leader: TeamMember
-  domain?: string
-  projectPreferences?: string[]
-  roleDistribution?: {
-    backend: number
-    frontend: number
-    ai: number
-    design: number
-    pm: number
-  }
-  roleCurrent?: {
-    backend: number
-    frontend: number
-    ai: number
-    design: number
-    pm: number
-  }
-}
+import { useTeam, type Team } from "@/hooks/useTeam"
 
 interface TeamSectionProps {
-  teams: Team[]
   onCreateTeam?: () => void
   onViewAll?: () => void
   onViewTeam?: (teamId: number) => void
 }
 
+
 export default function TeamSection({ 
-  teams, 
-  onCreateTeam, 
+  onCreateTeam,
   onViewAll, 
   onViewTeam 
 }: TeamSectionProps) {
+  const [teams, setTeams] = useState<Team[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const { fetchAllTeams, convertTeamDetailToTeam } = useTeam()
+
+  useEffect(() => {
+    const loadTeams = async () => {
+      try {
+        setIsLoading(true)
+        const response = await fetchAllTeams()
+        
+        if (response && Array.isArray(response)) {
+          // UNLOCKED 상태 팀만 필터링하고 최대 3개로 제한
+          const unlockedTeams = response
+            .filter(team => team.teamStatus === 'UNLOCKED')
+            .slice(0, 3)
+            .map(convertTeamDetailToTeam)
+          
+          setTeams(unlockedTeams)
+        }
+      } catch (error) {
+        console.error('팀 데이터 로딩 실패:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadTeams()
+  }, [])
+
+  if (isLoading) {
+    return (
+      <section className="mb-12 sm:mb-16">
+        <div className="flex justify-center items-center h-32">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        </div>
+      </section>
+    )
+  }
+
   return (
     <section className="mb-12 sm:mb-16">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8 gap-4">
@@ -67,40 +74,17 @@ export default function TeamSection({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-        {teams.map((team) => {
-          // 데모용 역할 비율 생성: maxMembers 합과 일치하도록 순환 분배
-          const demoDistribution = (() => {
-            if (team.roleDistribution) return team.roleDistribution
-            const order = ['frontend', 'backend', 'ai', 'design', 'pm'] as const
-            const dist: NonNullable<Team['roleDistribution']> = {
-              backend: 0, frontend: 0, ai: 0, design: 0, pm: 0
-            }
-            for (let i = 0; i < Math.max(team.maxMembers, 1); i++) {
-              const role = order[i % order.length]
-              dist[role]++
-            }
-            return dist
-          })()
-
-          const withDemo: Team = {
-            ...team,
-            domain: team.domain ?? '웹 서비스',
-            projectPreferences: team.projectPreferences ?? ['포트폴리오', '실무경험'],
-            roleDistribution: demoDistribution,
-          }
-
-          return (
-            <TeamCard 
-              key={team.id}
-              team={withDemo}
-              onClick={(teamId) => onViewTeam?.(teamId)}
-            />
-          )
-        })}
+        {teams.map((team) => (
+          <TeamCard 
+            key={team.id}
+            team={team}
+            onClick={(teamId) => onViewTeam?.(teamId)}
+          />
+        ))}
       </div>
     </section>
   )
 }
 
 // 타입 export
-export type { Team, TeamMember, TeamSectionProps }
+export type { TeamSectionProps }

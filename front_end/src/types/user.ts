@@ -115,7 +115,6 @@ export interface UserSearchResponse {
   projectVive?: string[]
   projectExp?: string
   qualification?: string
-  userStatus?: UserStatus
 }
 
 // 학기 옵션

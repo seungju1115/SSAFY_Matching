@@ -7,7 +7,7 @@ import TeamSection from "@/components/features/home/TeamSection"
 import DeveloperSection from "@/components/features/home/DeveloperSection"
 import TeamsModal from "@/components/features/home/TeamsModal"
 import DevelopersModal from "@/components/features/home/DevelopersModal"
-import { mockTeams, mockDevelopers } from "@/data/mockData"
+import { mockDevelopers } from "@/data/mockData"
 
 // Home 페이지 (메인페이지)
 export default function Home() {
@@ -46,7 +46,6 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-20">
         {/* Team Section */}
         <TeamSection 
-          teams={mockTeams}
           onCreateTeam={() => navigate('/make-team') }
           onViewAll={() => setIsTeamsModalOpen(true)}
           onViewTeam={(teamId) => console.log('팀 보기 클릭:', teamId)}
@@ -66,7 +65,6 @@ export default function Home() {
       <TeamsModal
         isOpen={isTeamsModalOpen}
         onClose={() => setIsTeamsModalOpen(false)}
-        teams={mockTeams}
         onViewTeam={(teamId) => {
           console.log('팀 보기 클릭:', teamId)
           setIsTeamsModalOpen(false)

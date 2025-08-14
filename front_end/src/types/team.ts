@@ -152,7 +152,8 @@ export interface TeamMembershipResponse {
 }
 
 // 팀 상태 타입
-export type TeamStatus = 'RECRUITING' | 'FULL' | 'CLOSED'
+// 팀 상태 타입 (백엔드 TeamStatus enum과 매칭)
+export type TeamStatus = 'FULL' | 'LOCKED' | 'UNLOCKED'
 
 // API 응답을 위한 래퍼 타입
 export interface ApiResponse<T> {
