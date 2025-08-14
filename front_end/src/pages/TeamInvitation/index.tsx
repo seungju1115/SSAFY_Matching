@@ -5,6 +5,7 @@ import { toast } from '@/hooks/use-toast'
 import Header from '@/components/layout/Header'
 import InvitationList from '@/components/features/invitation/InvitationList'
 import type { Team } from '@/components/features/home/TeamSection'
+import TeamDetailModal from '@/components/features/home/TeamDetailModal'
 
 // 임시 데이터 (실제로는 API에서 가져와야 함)
 const mockInvitations: Team[] = [
@@ -103,7 +104,9 @@ const mockInvitations: Team[] = [
 export default function TeamInvitation() {
   const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(false)
-  const invitations = mockInvitations
+  const [invitations, setInvitations] = useState<Team[]>(mockInvitations)
+  const [isDetailOpen, setIsDetailOpen] = useState(false)
+  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null)
 
   const handleAccept = async (teamId: number) => {
     setIsLoading(true)
@@ -112,6 +115,12 @@ export default function TeamInvitation() {
       await new Promise(resolve => setTimeout(resolve, 1000)) // 임시 딜레이
       
       const team = invitations.find(inv => inv.id === teamId)
+      // 목록에서 제거
+      setInvitations(prev => prev.filter(inv => inv.id !== teamId))
+      // 상세 모달이 해당 팀을 보고 있으면 닫기
+      if (selectedTeam?.id === teamId) {
+        setIsDetailOpen(false)
+      }
       toast({
         title: "초대 수락 완료",
         description: `${team?.leader.name} 팀에 성공적으로 참여했습니다.`,
@@ -141,7 +150,12 @@ export default function TeamInvitation() {
         description: `${team?.leader.name ?? '해당'} 팀 초대를 거절했습니다.`,
       })
       
-      // 실제로는 목록에서 해당 초대를 제거하거나 상태를 업데이트
+      // 목록에서 제거
+      setInvitations(prev => prev.filter(inv => inv.id !== teamId))
+      // 상세 모달이 해당 팀을 보고 있으면 닫기
+      if (selectedTeam?.id === teamId) {
+        setIsDetailOpen(false)
+      }
     } catch (error) {
       toast({
         title: "오류 발생",
@@ -154,8 +168,10 @@ export default function TeamInvitation() {
   }
 
   const handleViewTeam = (teamId: number) => {
-    // 현재 공통 사용 경로인 '/team'으로 이동. 팀 상세 라우팅이 준비되면 `/team/${teamId}`로 확장 가능
-    navigate('/team', { state: { teamId } })
+    // 상세 모달 열기
+    const team = invitations.find(inv => inv.id === teamId) || null
+    setSelectedTeam(team)
+    setIsDetailOpen(true)
   }
 
   return (
@@ -186,7 +202,14 @@ export default function TeamInvitation() {
           onNavigateToTeams={() => navigate('/teams')}
           onNavigateToMakeTeam={() => navigate('/make-team')}
         />
-
+        
+        <TeamDetailModal
+          isOpen={isDetailOpen}
+          onClose={() => setIsDetailOpen(false)}
+          team={selectedTeam}
+          onJoinRequest={(teamId) => handleAccept(teamId)}
+        />
+        
         {/* 하단 안내 */}
         <div className="mt-8 text-center">
           <p className="text-sm text-gray-500">
