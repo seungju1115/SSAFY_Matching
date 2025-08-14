@@ -11,6 +11,20 @@ export const mockTeams: Team[] = [
     members: 3,
     maxMembers: 5,
     deadline: "2024-02-15",
+    roleDistribution: {
+      backend: 2,
+      frontend: 2,
+      ai: 0,
+      design: 1,
+      pm: 0
+    },
+    roleCurrent: {
+      backend: 1,
+      frontend: 1,
+      ai: 0,
+      design: 1,
+      pm: 0
+    },
     leader: {
       name: "김개발",
       avatar: "",
@@ -25,6 +39,20 @@ export const mockTeams: Team[] = [
     members: 2,
     maxMembers: 4,
     deadline: "2024-03-01",
+    roleDistribution: {
+      backend: 1,
+      frontend: 0,
+      ai: 2,
+      design: 0,
+      pm: 1
+    },
+    roleCurrent: {
+      backend: 1,
+      frontend: 0,
+      ai: 1,
+      design: 0,
+      pm: 0
+    },
     leader: {
       name: "박AI",
       avatar: "",
@@ -39,6 +67,20 @@ export const mockTeams: Team[] = [
     members: 4,
     maxMembers: 6,
     deadline: "2024-02-28",
+    roleDistribution: {
+      backend: 2,
+      frontend: 2,
+      ai: 0,
+      design: 1,
+      pm: 1
+    },
+    roleCurrent: {
+      backend: 1,
+      frontend: 2,
+      ai: 0,
+      design: 1,
+      pm: 0
+    },
     leader: {
       name: "이모바일",
       avatar: "",

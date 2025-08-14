@@ -191,7 +191,7 @@ export default function DeveloperCard({
               onClick?.(developer.id)
             }}
           >
-            💬 대화하기
+            프로필 보기
           </Button>
         </div>
       </CardContent>
