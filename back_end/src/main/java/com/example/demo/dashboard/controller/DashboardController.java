@@ -147,8 +147,6 @@ public class DashboardController {
     })
     @GetMapping("/graph")
     public ResponseEntity<DashboardResponseDto> getDashboard() {
-        dashboardService.getDashboard();
-
         long time = System.nanoTime();
         DashboardResponseDto dto = dashboardService.getDashboard();
         long elapsed = System.nanoTime() - time;

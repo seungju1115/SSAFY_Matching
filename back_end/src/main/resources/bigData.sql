@@ -15,7 +15,6 @@ INSERT INTO team (team_name, backend_count, frontend_count, ai_count, pm_count, 
                                                                                                                                                         ('스마트시티팀', 2, 1, 1, 1, 1, 'Smart City', 'BACKEND,AI', '도시 관리 시스템을 개발하는 팀입니다.', 'UNLOCKED'),
                                                                                                                                                         ('미디어 플랫폼팀', 1, 2, 1, 1, 2, 'Media', 'FRONTEND,DESIGN', '동영상 스트리밍 플랫폼을 개발하는 팀입니다.', 'UNLOCKED'),
                                                                                                                                                         ('보안 솔루션팀', 3, 1, 1, 1, 0, 'Security', 'BACKEND,AI', '사이버 보안 플랫폼을 개발하는 팀입니다.', 'UNLOCKED');
-
 -- 사용자 테이블 (팀에 속한 40명 + 팀 없는 60명)
 INSERT INTO USERS (role, team_id, user_status, user_name, user_email, major, last_class, user_profile, project_experience, qualification) VALUES
 -- 팀 1: 웹서비스 개발팀 (3명)
@@ -254,7 +253,8 @@ INSERT INTO USER_WANTED_POSITION (USER_USER_ID, WANTED_POSITION) VALUES
 (95, 'AI'),
 (96, 'PM'),
 (97, 'FRONTEND'),
-(98, 'BACKEND');
+(98, 'BACKEND'),
+(99, 'PM');
 -- 사용자별 기술 스택 설정
 INSERT INTO USER_TECH_STACK (USER_USER_ID, TECH_STACK) VALUES
 -- 팀에 속한 사용자들 (1-40)
@@ -290,7 +290,7 @@ INSERT INTO USER_TECH_STACK (USER_USER_ID, TECH_STACK) VALUES
 (30, 'NODE_JS'), (30, 'EXPRESS'),
 (31, 'SPRING'), (31, 'JAVA'),
 (32, 'REACT'), (32, 'JAVASCRIPT'),
-(33, 'PYTHON'), (33, 'PANDAS'), (33, 'SCIKIT_LEARN'),
+(33, 'PYTHON'), (33, 'SCIKIT_LEARN'),
 (34, 'PYTHON'), (34, 'TENSORFLOW'), (34, 'PYTORCH'),
 (35, 'SPRING'), (35, 'JAVA'), (35, 'AWS'), (35, 'DOCKER'),
 (36, 'PYTHON'), (36, 'TENSORFLOW'),
@@ -304,14 +304,14 @@ INSERT INTO USER_TECH_STACK (USER_USER_ID, TECH_STACK) VALUES
 (42, 'REACT'), (42, 'TYPESCRIPT'), (42, 'REDUX'),
 (43, 'HTML'), (43, 'CSS'),
 (44, 'JAVASCRIPT'),
-(45, 'PYTHON'), (45, 'DJANGO'), (45, 'PANDAS'),
+(45, 'PYTHON'), (45, 'DJANGO'),
 (46, 'PYTHON'), (46, 'TENSORFLOW'), (46, 'NLP'),
 (47, 'FLUTTER'), (47, 'KOTLIN'),
 (48, 'VUE_JS'), (48, 'CSS'),
 (49, 'NODE_JS'), (49, 'EXPRESS'), (49, 'DOCKER'),
 (50, 'REACT_NATIVE'), (50, 'FIREBASE'),
 (51, 'JAVASCRIPT'),
-(52, 'PYTHON'), (52, 'PANDAS'),
+(52, 'PYTHON'),
 (53, 'SPRING'), (53, 'JAVA'),
 (54, 'JAVASCRIPT'), (54, 'HTML'), (54, 'CSS'),
 (55, 'PYTHON'), (55, 'OPENCV'), (55, 'COMPUTER_VISION'),
@@ -327,17 +327,17 @@ INSERT INTO USER_TECH_STACK (USER_USER_ID, TECH_STACK) VALUES
 (65, 'GO'),
 (66, 'KOTLIN'), (66, 'ANDROID'),
 (67, 'JAVASCRIPT'),
-(68, 'RUST'),
+(68, 'JAVA'),
 (69, 'NEXT_JS'), (69, 'REACT'),
 (70, 'PYTHON'), (70, 'NLP'),
 (71, 'JAVASCRIPT'),
-(72, 'PHP'), (72, 'LARAVEL'), (72, 'MYSQL'),
+(72, 'PHP'), (72, 'MYSQL'),
 (73, 'CSHARP'),
 (74, 'VUE_JS'),
 (75, 'JAVASCRIPT'),
 (76, 'RUBY_ON_RAILS'), (76, 'POSTGRESQL'),
 (77, 'ELASTICSEARCH'),
-(78, 'SCALA'),
+(78, 'JAVA'),
 (79, 'PYTHON'),
 (80, 'DJANGO'), (80, 'PYTHON'),
 (81, 'TENSORFLOW'), (81, 'PYTHON'),
@@ -347,7 +347,7 @@ INSERT INTO USER_TECH_STACK (USER_USER_ID, TECH_STACK) VALUES
 (85, 'REACT'), (85, 'REDUX'),
 (86, 'SWIFT'), (86, 'IOS'),
 (87, 'JAVASCRIPT'),
-(88, 'PANDAS'), (88, 'PYTHON'),
+(88, 'PYTHON'),
 (89, 'PYTHON'),
 (90, 'PYTHON'),
 (91, 'JAVASCRIPT'),
@@ -357,10 +357,11 @@ INSERT INTO USER_TECH_STACK (USER_USER_ID, TECH_STACK) VALUES
 (95, 'JAVASCRIPT'),
 (96, 'VUE_JS'),
 (97, 'DOCKER'),
-(98, 'PYTHON');
+(98, 'PYTHON'),
+(99, 'JAVASCRIPT');
 
 -- 사용자별 프로젝트 목표 설정
-INSERT INTO USER_PROJECT_GOAL (USER_USER_ID, PROJECT_GOAL) VALUES
+INSERT INTO USER_PROJECT_GOAL (USER_USER_ID, PROJECT_PREFERENCE) VALUES
 (1, 'JOB'), (1, 'PORTFOLIO'),
 (2, 'PORTFOLIO'), (2, 'STUDY'),
 (3, 'PROFESSIONAL'),
@@ -458,10 +459,11 @@ INSERT INTO USER_PROJECT_GOAL (USER_USER_ID, PROJECT_GOAL) VALUES
 (95, 'IDEA'), (95, 'STUDY'),
 (96, 'PORTFOLIO'), (96, 'PROFESSIONAL'),
 (97, 'PROFESSIONAL'), (97, 'JOB'),
-(98, 'STUDY'), (98, 'PROFESSIONAL');
+(98, 'STUDY'), (98, 'PROFESSIONAL'),
+(99, 'PORTFOLIO'), (99, 'JOB');
 
 -- 사용자별 프로젝트 분위기 설정
-INSERT INTO USER_PROJECT_VIVE (USER_USER_ID, PROJECT_VIVE) VALUES
+INSERT INTO USER_PROJECT_VIVE (USER_USER_ID, PERSONAL_PREFERENCE) VALUES
 (1, 'FORMAL'), (1, 'RULE'),
 (2, 'CASUAL'), (2, 'COMFY'),
 (3, 'FORMAL'), (3, 'LEADER'),
@@ -559,7 +561,8 @@ INSERT INTO USER_PROJECT_VIVE (USER_USER_ID, PROJECT_VIVE) VALUES
 (95, 'CASUAL'), (95, 'BRANDNEW'),
 (96, 'FORMAL'), (96, 'STABLE'),
 (97, 'FORMAL'), (97, 'WATERFALL'),
-(98, 'CASUAL'), (98, 'DEMOCRACY');
+(98, 'CASUAL'), (98, 'DEMOCRACY'),
+(99, 'CASUAL'), (99, 'BRANDNEW');
 -- 팀별 프로젝트 목표 설정
 INSERT INTO TEAM_TEAM_PREFERENCE (TEAM_TEAM_ID, TEAM_PREFERENCE) VALUES
 (1, 'JOB'), (1, 'PORTFOLIO'),
