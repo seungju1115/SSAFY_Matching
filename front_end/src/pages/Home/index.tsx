@@ -7,7 +7,6 @@ import TeamSection from "@/components/features/home/TeamSection"
 import DeveloperSection from "@/components/features/home/DeveloperSection"
 import TeamsModal from "@/components/features/home/TeamsModal"
 import DevelopersModal from "@/components/features/home/DevelopersModal"
-import { mockDevelopers } from "@/data/mockData"
 
 // Home 페이지 (메인페이지)
 export default function Home() {
@@ -53,7 +52,6 @@ export default function Home() {
 
         {/* Developer Section */}
         <DeveloperSection 
-          developers={mockDevelopers}
           onRegister={() => navigate('/profile-setup')}
           onFilter={() => console.log('필터 클릭')}
           onViewAll={() => setIsDevelopersModalOpen(true)}
@@ -74,7 +72,6 @@ export default function Home() {
       <DevelopersModal
         isOpen={isDevelopersModalOpen}
         onClose={() => setIsDevelopersModalOpen(false)}
-        developers={mockDevelopers}
         onViewProfile={(developerId) => {
           console.log('프로필 보기 클릭:', developerId)
           setIsDevelopersModalOpen(false)
