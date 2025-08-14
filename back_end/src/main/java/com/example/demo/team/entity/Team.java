@@ -83,7 +83,7 @@ public class Team {
 
     // 요청 상태: PENDING, ACCEPTED, REJECTED, CANCELED
     @Enumerated(EnumType.STRING)
-    @Column(length = 20, nullable = true)
+    @Column(name="team_status",length = 20, nullable = true)
     @Builder.Default
     private TeamStatus status = TeamStatus.UNLOCKED;
 
