@@ -3,10 +3,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent } from '@/components/ui/card'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Star, MapPin, Search, Filter, ChevronDown } from 'lucide-react'
+import { Search, Filter, ChevronDown } from 'lucide-react'
 import type { Developer } from './DeveloperSection'
+import DeveloperCard from './DeveloperCard'
 
 interface DevelopersModalProps {
   isOpen: boolean
@@ -18,26 +17,29 @@ interface DevelopersModalProps {
 export default function DevelopersModal({ 
   isOpen, 
   onClose, 
-  developers, 
-  onViewProfile 
+  developers,
+  onViewProfile,
 }: DevelopersModalProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedSkills, setSelectedSkills] = useState<string[]>([])
   const [selectedRole, setSelectedRole] = useState<string>('')
   const [isFilterOpen, setIsFilterOpen] = useState(false)
 
-  // 모든 스킬과 역할 추출
-  const allSkills = Array.from(new Set(developers.flatMap(dev => dev.skills)))
+  // 모든 포지션과 역할 추출
+  const allPositions = Array.from(new Set(developers.flatMap(dev => dev.positions || [dev.role])))
   const allRoles = Array.from(new Set(developers.map(dev => dev.role)))
 
   // 필터링된 개발자 목록
   const filteredDevelopers = developers.filter(dev => {
     const matchesSearch = dev.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          dev.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         dev.skills.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()))
+                         (dev.positions?.some(pos => pos.toLowerCase().includes(searchTerm.toLowerCase())) || false)
+    
     const matchesSkills = selectedSkills.length === 0 || 
-                         selectedSkills.some(skill => dev.skills.includes(skill))
+                         selectedSkills.some(skill => dev.positions?.includes(skill) || dev.role === skill)
+    
     const matchesRole = !selectedRole || dev.role === selectedRole
+    
     return matchesSearch && matchesSkills && matchesRole
   })
 
@@ -108,18 +110,18 @@ export default function DevelopersModal({
                 </div>
               </div>
 
-              {/* 기술 스택 필터 */}
+              {/* 포지션 필터 */}
               <div className="space-y-2">
-                <p className="text-sm font-medium text-gray-700">기술 스택</p>
+                <p className="text-sm font-medium text-gray-700">포지션</p>
                 <div className="flex flex-wrap gap-2">
-                  {allSkills.slice(0, 12).map(skill => (
+                  {allPositions.slice(0, 12).map((position: string) => (
                     <Badge
-                      key={skill}
-                      variant={selectedSkills.includes(skill) ? "default" : "outline"}
+                      key={position}
+                      variant={selectedSkills.includes(position) ? "default" : "outline"}
                       className="cursor-pointer"
-                      onClick={() => toggleSkill(skill)}
+                      onClick={() => toggleSkill(position)}
                     >
-                      {skill}
+                      {position}
                     </Badge>
                   ))}
                 </div>
@@ -130,58 +132,13 @@ export default function DevelopersModal({
 
         {/* 개발자 목록 */}
         <div className="flex-1 overflow-y-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 p-1">
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 p-1">
             {filteredDevelopers.map((dev) => (
-              <Card key={dev.id} className="hover:shadow-md transition-shadow duration-200 h-fit">
-                <CardContent className="p-4">
-                  <div className="space-y-3">
-                    {/* 개발자 기본 정보 */}
-                    <div className="flex items-center space-x-3">
-                      <Avatar className="h-10 w-10 flex-shrink-0">
-                        <AvatarImage src={dev.avatar} />
-                        <AvatarFallback className="text-sm">{dev.name[0]}</AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-sm truncate">{dev.name}</h4>
-                        <p className="text-xs text-gray-600">{dev.role}</p>
-                      </div>
-                      <div className="flex items-center space-x-1 text-xs text-gray-500">
-                        <Star className="h-3 w-3 text-yellow-400 fill-current" />
-                        <span>{dev.rating}</span>
-                      </div>
-                    </div>
-
-                    {/* 기술 스택 */}
-                    <div className="flex flex-wrap gap-1">
-                      {dev.skills.slice(0, 2).map((skill) => (
-                        <Badge key={skill} variant="outline" className="text-xs px-2 py-0.5">{skill}</Badge>
-                      ))}
-                      {dev.skills.length > 2 && (
-                        <Badge variant="secondary" className="text-xs px-2 py-0.5">+{dev.skills.length - 2}</Badge>
-                      )}
-                    </div>
-
-                    {/* 경력 및 위치 */}
-                    <div className="flex items-center justify-between text-xs text-gray-600">
-                      <span>경력 {dev.experience}</span>
-                      <div className="flex items-center space-x-1">
-                        <MapPin className="h-3 w-3" />
-                        <span>{dev.location}</span>
-                      </div>
-                    </div>
-
-                    {/* 프로필 보기 버튼 */}
-                    <Button 
-                      className="w-full h-8" 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => onViewProfile?.(dev.id)}
-                    >
-                      프로필 보기
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              <DeveloperCard 
+                key={dev.id}
+                developer={dev}
+                onClick={(developerId) => onViewProfile?.(developerId)}
+              />
             ))}
           </div>
 

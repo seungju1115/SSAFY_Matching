@@ -3,11 +3,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Separator } from '@/components/ui/separator'
-import { Users, Calendar, Search, Filter, ChevronDown } from 'lucide-react'
+import { Search, Filter, ChevronDown } from 'lucide-react'
 import type { Team } from './TeamSection'
+import TeamCard from './TeamCard'
 
 interface TeamsModalProps {
   isOpen: boolean
@@ -94,65 +92,36 @@ export default function TeamsModal({ isOpen, onClose, teams, onViewTeam }: Teams
         {/* 팀 목록 */}
         <div className="flex-1 overflow-y-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-1">
-            {filteredTeams.map((team) => (
-              <Card key={team.id} className="hover:shadow-lg transition-shadow duration-200">
-                <CardHeader className="pb-3">
-                  <div className="flex justify-between items-start gap-3">
-                    <div className="flex-1">
-                      <CardTitle className="text-lg leading-tight">{team.name}</CardTitle>
-                      <CardDescription className="mt-1 sm:mt-2 text-sm leading-relaxed">
-                        {team.description}
-                      </CardDescription>
-                    </div>
-                    <Badge variant="secondary" className="text-xs whitespace-nowrap">
-                      {team.members}/{team.maxMembers}명
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="space-y-3 sm:space-y-4">
-                    <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                      {team.tech.map((tech) => (
-                        <Badge key={tech} variant="outline" className="text-xs">{tech}</Badge>
-                      ))}
-                    </div>
-                    
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs sm:text-sm text-gray-600">
-                      <div className="flex items-center space-x-1">
-                        <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
-                        <span>마감: {team.deadline}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Users className="h-3 w-3 sm:h-4 sm:w-4" />
-                        <span>{team.maxMembers - team.members}명 모집</span>
-                      </div>
-                    </div>
+            {filteredTeams.map((team) => {
+              // TeamSection과 동일한 데모 역할 분배 적용 (없을 경우)
+              const demoDistribution = (() => {
+                if (team.roleDistribution) return team.roleDistribution
+                const order = ['frontend', 'backend', 'ai', 'design', 'pm'] as const
+                const dist: NonNullable<Team['roleDistribution']> = {
+                  backend: 0, frontend: 0, ai: 0, design: 0, pm: 0
+                }
+                for (let i = 0; i < Math.max(team.maxMembers, 1); i++) {
+                  const role = order[i % order.length]
+                  dist[role]++
+                }
+                return dist
+              })()
 
-                    <Separator />
+              const withDemo: Team = {
+                ...team,
+                domain: team.domain ?? '웹 서비스',
+                projectPreferences: team.projectPreferences ?? ['포트폴리오', '실무경험'],
+                roleDistribution: demoDistribution,
+              }
 
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <Avatar className="h-7 w-7 sm:h-8 sm:w-8">
-                          <AvatarImage src={team.leader.avatar} />
-                          <AvatarFallback className="text-xs">{team.leader.name[0]}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="text-xs sm:text-sm font-medium">{team.leader.name}</p>
-                          <p className="text-xs text-gray-500">{team.leader.role}</p>
-                        </div>
-                      </div>
-                      <Button 
-                        size="sm" 
-                        className="text-xs px-3"
-                        onClick={() => onViewTeam?.(team.id)}
-                      >
-                        팀 보기
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+              return (
+                <TeamCard
+                  key={team.id}
+                  team={withDemo}
+                  onClick={(teamId) => onViewTeam?.(teamId)}
+                />
+              )
+            })}
           </div>
 
           {filteredTeams.length === 0 && (
