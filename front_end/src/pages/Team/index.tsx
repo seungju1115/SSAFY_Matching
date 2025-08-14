@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTeamStore } from '@/stores/teamStore';
 import useUserStore from '@/stores/userStore';
@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import Header from '@/components/layout/Header';
+import UserRecommendationModal from '@/components/features/team/SimpleUserModal';
 import { Crown, UserPlus, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ProjectGoalEnum, ProjectViveEnum } from '@/types/team';
@@ -63,6 +64,12 @@ const TeamPage: React.FC = () => {
   const setUser = useUserStore((state) => state.setUser);
   const user = useUserStore((state) => state.user);
   const { leaveTeam } = useTeam();
+  const [isRecommendModalOpen, setIsRecommendModalOpen] = useState(false);
+
+  const handleSelectUser = (users: any[]) => {
+    console.log('선택된 사용자:', users);
+    // TODO: 선택 사용자 초대 로직 연동
+  };
 
   // userStore에서 teamId 가져오기
   const teamId = user.teamId;
@@ -113,7 +120,7 @@ const TeamPage: React.FC = () => {
   };
 
   const handleRecommendMember = () => {
-    navigate('/matching?recommend=true');
+    setIsRecommendModalOpen(true);
   };
 
   if (isLoading) {
@@ -282,6 +289,12 @@ const TeamPage: React.FC = () => {
           </div>
         </div>
       </div>
+      {/* 사용자 추천 모달 */}
+      <UserRecommendationModal
+        isOpen={isRecommendModalOpen}
+        onClose={() => setIsRecommendModalOpen(false)}
+        onSelectUser={handleSelectUser}
+      />
     </div>
   );
 };
