@@ -37,8 +37,8 @@ public class ProdSecurityConfig {
                 c ->
                         c.requestMatchers("/error", "/users/login",
                                         "/login/oauth2/code/**", "/h2-console/**", "/ws-chat/**").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/team", "/team/search", "/users/profile", "/hello").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/users/profile").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/team", "/team/search", "/users/profile", "/hello", "/users/profile/waiting").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/users/profile", "/users/profile/search").permitAll()
                                 .anyRequest().authenticated());
 
         http.oauth2Login(oauth2 -> oauth2
