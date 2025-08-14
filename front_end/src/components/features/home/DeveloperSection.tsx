@@ -12,6 +12,19 @@ interface DeveloperSectionProps {
   onViewProfile?: (developerId: number) => void
 }
 
+export interface Developer {
+  id: number
+  name: string
+  role: string
+  avatar?: string
+  domain?: string
+  isMajor?: boolean
+  projectPreferences?: string[]
+  personalPreferences?: string[]
+  positions?: string[]
+  techStack?: { name: string; level: number }[]
+}
+
 export default function DeveloperSection({ 
   onRegister, 
   onViewAll,
