@@ -395,7 +395,7 @@ public class UserController {
                     description = "잘못된 검색 조건"
             )
     })
-    @GetMapping("/search")
+    @PostMapping("/search")
     public ResponseEntity<ApiResponse> searchUsersWithoutTeamWithCondition(
             @Parameter(
                     description = "팀원 검색 조건",
