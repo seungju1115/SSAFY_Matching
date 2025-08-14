@@ -1,95 +1,97 @@
-import type { Team } from "@/components/features/home/TeamSection"
-import type { Developer } from "@/components/features/home/DeveloperSection"
-
-// 팀 더미 데이터
-export const mockTeams: Team[] = [
-  {
-    id: 1,
-    name: "React 프로젝트 팀",
-    description: "현대적인 웹 애플리케이션을 함께 만들어요!",
-    tech: ["React", "TypeScript", "Node.js"],
-    members: 3,
-    maxMembers: 5,
-    deadline: "2024-02-15",
-    roleDistribution: {
-      backend: 2,
-      frontend: 2,
-      ai: 0,
-      design: 1,
-      pm: 0
-    },
-    roleCurrent: {
-      backend: 1,
-      frontend: 1,
-      ai: 0,
-      design: 1,
-      pm: 0
-    },
-    leader: {
-      name: "김개발",
-      avatar: "",
-      role: "Frontend Developer"
-    }
-  },
-  {
-    id: 2,
-    name: "AI 스타트업 프로젝트",
-    description: "머신러닝을 활용한 혁신적인 서비스 개발",
-    tech: ["Python", "TensorFlow", "FastAPI"],
-    members: 2,
-    maxMembers: 4,
-    deadline: "2024-03-01",
-    roleDistribution: {
-      backend: 1,
-      frontend: 0,
-      ai: 2,
-      design: 0,
-      pm: 1
-    },
-    roleCurrent: {
-      backend: 1,
-      frontend: 0,
-      ai: 1,
-      design: 0,
-      pm: 0
-    },
-    leader: {
-      name: "박AI",
-      avatar: "",
-      role: "ML Engineer"
-    }
-  },
-  {
-    id: 3,
-    name: "모바일 앱 개발팀",
-    description: "크로스 플랫폼 모바일 앱 제작",
-    tech: ["Flutter", "Firebase", "Dart"],
-    members: 4,
-    maxMembers: 6,
-    deadline: "2024-02-28",
-    roleDistribution: {
-      backend: 2,
-      frontend: 2,
-      ai: 0,
-      design: 1,
-      pm: 1
-    },
-    roleCurrent: {
-      backend: 1,
-      frontend: 2,
-      ai: 0,
-      design: 1,
-      pm: 0
-    },
-    leader: {
-      name: "이모바일",
-      avatar: "",
-      role: "Mobile Developer"
-    }
-  }
-]
-
+// import type { Team } from "@/components/features/home/TeamSection"
+// import type { Developer } from "@/components/features/home/DeveloperSection"
+//
+// // 팀 더미 데이터
+// export const mockTeams: Team[] = [
+//   {
+//     id: 1,
+//     name: "React 프로젝트 팀",
+//     description: "현대적인 웹 애플리케이션을 함께 만들어요!",
+//     tech: ["React", "TypeScript", "Node.js"],
+//     members: 3,
+//     maxMembers: 5,
+//     deadline: "2024-02-15",
+//     roleDistribution: {
+//       backend: 2,
+//       frontend: 2,
+//       ai: 0,
+//       design: 1,
+//       pm: 0
+//     },
+//     roleCurrent: {
+//       backend: 1,
+//       frontend: 1,
+//       ai: 0,
+//       design: 1,
+//       pm: 0
+//     },
+//     leader: {
+//       name: "김개발",
+//       avatar: "",
+//       role: "Frontend Developer"
+//     }
+//   },
+//   {
+//     id: 2,
+//     name: "AI 스타트업 프로젝트",
+//     description: "머신러닝을 활용한 혁신적인 서비스 개발",
+//     tech: ["Python", "TensorFlow", "FastAPI"],
+//     members: 2,
+//     maxMembers: 4,
+//     deadline: "2024-03-01",
+//     roleDistribution: {
+//       backend: 1,
+//       frontend: 0,
+//       ai: 2,
+//       design: 0,
+//       pm: 1
+//     },
+//     roleCurrent: {
+//       backend: 1,
+//       frontend: 0,
+//       ai: 1,
+//       design: 0,
+//       pm: 0
+//     },
+//     leader: {
+//       name: "박AI",
+//       avatar: "",
+//       role: "ML Engineer"
+//     }
+//   },
+//   {
+//     id: 3,
+//     name: "모바일 앱 개발팀",
+//     description: "크로스 플랫폼 모바일 앱 제작",
+//     tech: ["Flutter", "Firebase", "Dart"],
+//     members: 4,
+//     maxMembers: 6,
+//     deadline: "2024-02-28",
+//     roleDistribution: {
+//       backend: 2,
+//       frontend: 2,
+//       ai: 0,
+//       design: 1,
+//       pm: 1
+//     },
+//     roleCurrent: {
+//       backend: 1,
+//       frontend: 2,
+//       ai: 0,
+//       design: 1,
+//       pm: 0
+//     },
+//     leader: {
+//       name: "이모바일",
+//       avatar: "",
+//       role: "Mobile Developer"
+//     }
+//   }
+// ]
+//
 // 개발자 더미 데이터
+import type {Developer} from "@/components/features/home/DeveloperSection.tsx";
+
 export const mockDevelopers: Developer[] = [
   {
     id: 1,

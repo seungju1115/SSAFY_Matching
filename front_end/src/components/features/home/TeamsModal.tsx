@@ -1,23 +1,54 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Search, Filter, ChevronDown } from 'lucide-react'
-import type { Team } from './TeamSection'
+import type { Team } from '@/hooks/useTeam'
 import TeamCard from './TeamCard'
+import { useTeam } from '@/hooks/useTeam'
 
 interface TeamsModalProps {
   isOpen: boolean
   onClose: () => void
-  teams: Team[]
   onViewTeam?: (teamId: number) => void
 }
 
-export default function TeamsModal({ isOpen, onClose, teams, onViewTeam }: TeamsModalProps) {
+
+export default function TeamsModal({ isOpen, onClose, onViewTeam }: TeamsModalProps) {
+  const [teams, setTeams] = useState<Team[]>([])
+  const [isLoading, setIsLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedTech, setSelectedTech] = useState<string[]>([])
   const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const { fetchAllTeams, convertTeamDetailToTeam } = useTeam()
+
+  // 모달이 열릴 때 팀 데이터 로드
+  useEffect(() => {
+    const loadTeams = async () => {
+      if (!isOpen) return
+
+      try {
+        setIsLoading(true)
+        const response = await fetchAllTeams()
+        
+        if (response && Array.isArray(response)) {
+          // UNLOCKED 상태 팀만 필터링 (전체보기이므로 개수 제한 없음)
+          const unlockedTeams = response
+            .filter(team => team.teamStatus === 'UNLOCKED')
+            .map(convertTeamDetailToTeam)
+          
+          setTeams(unlockedTeams)
+        }
+      } catch (error) {
+        console.error('팀 데이터 로딩 실패:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadTeams()
+  }, [isOpen])
 
   // 모든 기술 스택 추출
   const allTech = Array.from(new Set(teams.flatMap(team => team.tech)))
@@ -91,43 +122,30 @@ export default function TeamsModal({ isOpen, onClose, teams, onViewTeam }: Teams
 
         {/* 팀 목록 */}
         <div className="flex-1 overflow-y-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-1">
-            {filteredTeams.map((team) => {
-              // TeamSection과 동일한 데모 역할 분배 적용 (없을 경우)
-              const demoDistribution = (() => {
-                if (team.roleDistribution) return team.roleDistribution
-                const order = ['frontend', 'backend', 'ai', 'design', 'pm'] as const
-                const dist: NonNullable<Team['roleDistribution']> = {
-                  backend: 0, frontend: 0, ai: 0, design: 0, pm: 0
-                }
-                for (let i = 0; i < Math.max(team.maxMembers, 1); i++) {
-                  const role = order[i % order.length]
-                  dist[role]++
-                }
-                return dist
-              })()
-
-              const withDemo: Team = {
-                ...team,
-                domain: team.domain ?? '웹 서비스',
-                projectPreferences: team.projectPreferences ?? ['포트폴리오', '실무경험'],
-                roleDistribution: demoDistribution,
-              }
-
-              return (
-                <TeamCard
-                  key={team.id}
-                  team={withDemo}
-                  onClick={(teamId) => onViewTeam?.(teamId)}
-                />
-              )
-            })}
-          </div>
-
-          {filteredTeams.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-gray-500">검색 조건에 맞는 팀이 없습니다.</p>
+          {isLoading ? (
+            <div className="flex justify-center items-center h-32">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
             </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-1">
+                {filteredTeams.map((team) => (
+                  <TeamCard
+                    key={team.id}
+                    team={team}
+                    onClick={(teamId) => onViewTeam?.(teamId)}
+                  />
+                ))}
+              </div>
+
+              {!isLoading && filteredTeams.length === 0 && (
+                <div className="text-center py-12">
+                  <p className="text-gray-500">
+                    {teams.length === 0 ? '팀이 없습니다.' : '검색 조건에 맞는 팀이 없습니다.'}
+                  </p>
+                </div>
+              )}
+            </>
           )}
         </div>
 

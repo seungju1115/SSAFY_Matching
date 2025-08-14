@@ -11,13 +11,15 @@ INSERT INTO team (
     design_count,
     team_domain,
     member_wanted,
-    team_description
+    team_description,
+    team_status
+
 ) VALUES
-      ('프론트엔드 팀', 1, 2, 0, 1, 1, '웹 개발', 'FRONTEND,DESIGN', '사용자 경험을 중시하는 프론트엔드 개발팀입니다.'),
-      ('백엔드 팀', 3, 0, 1, 1, 0, '서버 개발', 'BACKEND,AI', '견고한 서버 아키텍처를 구축하는 백엔드팀입니다.'),
-      ('풀스택 팀', 2, 2, 1, 1, 1, '전체 개발', 'BACKEND,FRONTEND,AI', '전 영역을 다루는 풀스택 개발팀입니다.'),
-      ('AI 스타트업', 1, 1, 3, 1, 1, 'AI/ML', 'AI,BACKEND,FRONTEND', '혁신적인 AI 솔루션을 만드는 스타트업팀입니다.'),
-      ('디자인 중심팀', 1, 1, 0, 1, 2, 'UX/UI', 'DESIGN,FRONTEND', '사용자 중심의 디자인을 추구하는 팀입니다.');
+      ('프론트엔드 팀', 1, 2, 0, 1, 1, '웹 개발', 'FRONTEND,DESIGN', '사용자 경험을 중시하는 프론트엔드 개발팀입니다.','UNLOCKED'),
+      ('백엔드 팀', 3, 0, 1, 1, 0, '서버 개발', 'BACKEND,AI', '견고한 서버 아키텍처를 구축하는 백엔드팀입니다.','UNLOCKED'),
+      ('풀스택 팀', 2, 2, 1, 1, 1, '전체 개발', 'BACKEND,FRONTEND,AI', '전 영역을 다루는 풀스택 개발팀입니다.','UNLOCKED'),
+      ('AI 스타트업', 1, 1, 3, 1, 1, 'AI/ML', 'AI,BACKEND,FRONTEND', '혁신적인 AI 솔루션을 만드는 스타트업팀입니다.','UNLOCKED'),
+      ('디자인 중심팀', 1, 1, 0, 1, 2, 'UX/UI', 'DESIGN,FRONTEND', '사용자 중심의 디자인을 추구하는 팀입니다.','UNLOCKED');
 
 -- 사용자 데이터 삽입
 INSERT INTO USERS (

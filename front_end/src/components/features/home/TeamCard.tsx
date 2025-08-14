@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Users } from "lucide-react"
-import type { Team } from "./TeamSection"
+import type { Team } from "@/hooks/useTeam"
 
 interface TeamCardProps {
   team: Team
@@ -54,11 +54,11 @@ export default function TeamCard({
               {team.roleDistribution ? (
                 <div className="space-y-2">
                   {/* 역할별 충원율: 현재(추정)/목표 */}
-                  {team.roleDistribution.backend > 0 && (
+                  {team.roleDistribution.BACKEND > 0 && (
                     (() => {
-                      const target = team.roleDistribution!.backend
+                      const target = team.roleDistribution!.BACKEND
                       const estimated = Math.floor((team.members * target) / Math.max(team.maxMembers, 1))
-                      const provided = team.roleCurrent?.backend ?? estimated
+                      const provided = team.roleCurrent?.BACKEND ?? estimated
                       const current = Math.min(target, provided)
                       const pct = target ? Math.round((current / target) * 100) : 0
                       return (
@@ -72,11 +72,11 @@ export default function TeamCard({
                       )
                     })()
                   )}
-                  {team.roleDistribution.frontend > 0 && (
+                  {team.roleDistribution.FRONTEND > 0 && (
                     (() => {
-                      const target = team.roleDistribution!.frontend
+                      const target = team.roleDistribution!.FRONTEND
                       const estimated = Math.floor((team.members * target) / Math.max(team.maxMembers, 1))
-                      const provided = team.roleCurrent?.frontend ?? estimated
+                      const provided = team.roleCurrent?.FRONTEND ?? estimated
                       const current = Math.min(target, provided)
                       const pct = target ? Math.round((current / target) * 100) : 0
                       return (
@@ -90,11 +90,11 @@ export default function TeamCard({
                       )
                     })()
                   )}
-                  {team.roleDistribution.ai > 0 && (
+                  {team.roleDistribution.AI > 0 && (
                     (() => {
-                      const target = team.roleDistribution!.ai
+                      const target = team.roleDistribution!.AI
                       const estimated = Math.floor((team.members * target) / Math.max(team.maxMembers, 1))
-                      const provided = team.roleCurrent?.ai ?? estimated
+                      const provided = team.roleCurrent?.AI ?? estimated
                       const current = Math.min(target, provided)
                       const pct = target ? Math.round((current / target) * 100) : 0
                       return (
@@ -108,11 +108,11 @@ export default function TeamCard({
                       )
                     })()
                   )}
-                  {team.roleDistribution.design > 0 && (
+                  {team.roleDistribution.DESIGN > 0 && (
                     (() => {
-                      const target = team.roleDistribution!.design
+                      const target = team.roleDistribution!.DESIGN
                       const estimated = Math.floor((team.members * target) / Math.max(team.maxMembers, 1))
-                      const provided = team.roleCurrent?.design ?? estimated
+                      const provided = team.roleCurrent?.DESIGN ?? estimated
                       const current = Math.min(target, provided)
                       const pct = target ? Math.round((current / target) * 100) : 0
                       return (
@@ -126,11 +126,11 @@ export default function TeamCard({
                       )
                     })()
                   )}
-                  {team.roleDistribution.pm > 0 && (
+                  {team.roleDistribution.PM > 0 && (
                     (() => {
-                      const target = team.roleDistribution!.pm
+                      const target = team.roleDistribution!.PM
                       const estimated = Math.floor((team.members * target) / Math.max(team.maxMembers, 1))
-                      const provided = team.roleCurrent?.pm ?? estimated
+                      const provided = team.roleCurrent?.PM ?? estimated
                       const current = Math.min(target, provided)
                       const pct = target ? Math.round((current / target) * 100) : 0
                       return (
