@@ -18,6 +18,7 @@ const apiClient = axios.create({
 export const publicApiClient = axios.create({
   baseURL: getBaseURL(),
   timeout: 10000,
+  withCredentials: true,
 })
 
 // 요청 인터셉터: JWT 토큰을 헤더에 자동 추가

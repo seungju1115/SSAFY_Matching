@@ -70,11 +70,13 @@ useEffect(() => {
 
     const initPrivateChat = async () => {
       try {
-        const response = await chatAPI.createPrivateRoom({
-          roomType: 'PRIVATE',
-          user1Id: myId,
-          user2Id: otherUserId,
-        });
+        const response = await chatAPI.createPrivateRoom(
+         {
+        roomType: 'PRIVATE',
+        user1Id: myId,
+        user2Id: otherUserId,
+        }
+      );
         const newRoomId = response.data.data?.roomId;
         if (newRoomId) {
           setRoomId(newRoomId);
