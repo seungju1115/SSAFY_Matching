@@ -80,7 +80,6 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-20">
         {/* Team Section */}
         <TeamSection 
-          teams={mockTeams}
           onCreateTeam={() => navigate('/make-team') }
           onViewAll={() => setIsTeamsModalOpen(true)}
           onViewTeam={(teamId) => {

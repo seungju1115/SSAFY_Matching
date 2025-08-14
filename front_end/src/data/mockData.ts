@@ -99,6 +99,8 @@ export const mockTeams: Team[] = [
 ]
 
 // 개발자 더미 데이터
+import type {Developer} from "@/components/features/home/DeveloperSection.tsx";
+
 export const mockDevelopers: Developer[] = [
   {
     id: 1,

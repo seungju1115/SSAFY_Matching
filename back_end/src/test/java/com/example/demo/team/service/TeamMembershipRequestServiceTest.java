@@ -125,11 +125,11 @@ class TeamMembershipRequestServiceTest {
     @DisplayName("팀 -> 멤버 요청 성공")
     void requestTeamToMember_success() {
         when(hazelcastInstance.getMap("teamMembershipRequestLock")).thenReturn(lock);
-        try {
-            doReturn(true).when(lock).tryLock(anyString(), anyLong(), any(TimeUnit.class));
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        //try {
+        //    doReturn(true).when(lock).tryLock(anyString(), anyLong(), any(TimeUnit.class));
+        //} catch (InterruptedException e) {
+        //    throw new RuntimeException(e);
+       // }
         // given
         when(teamRepository.findById(teamOffer.getTeamId())).thenReturn(Optional.of(team));
         when(userRepository.findById(teamOffer.getUserId())).thenReturn(Optional.of(user));
@@ -169,11 +169,11 @@ class TeamMembershipRequestServiceTest {
     void requestTeamToMember_duplicateRequest() {
         team.setMembershipRequests(List.of(existingRequest));
         when(hazelcastInstance.getMap("teamMembershipRequestLock")).thenReturn(lock);
-        try {
-            doReturn(true).when(lock).tryLock(anyString(), anyLong(), any(TimeUnit.class));
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        //try {
+       //     doReturn(true).when(lock).tryLock(anyString(), anyLong(), any(TimeUnit.class));
+       // } catch (InterruptedException e) {
+       //     throw new RuntimeException(e);
+       // }
 
         when(teamRepository.findById(teamOffer.getTeamId())).thenReturn(Optional.of(team));
         when(userRepository.findById(teamOffer.getUserId())).thenReturn(Optional.of(user));
@@ -190,11 +190,11 @@ class TeamMembershipRequestServiceTest {
 
         user.setMembershipRequests(new ArrayList<>());
         when(hazelcastInstance.getMap("teamMembershipRequestLock")).thenReturn(lock);
-        try {
-            doReturn(true).when(lock).tryLock(anyString(), anyLong(), any(TimeUnit.class));
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+       // try {
+            //doReturn(true).when(lock).tryLock(anyString(), anyLong(), any(TimeUnit.class));
+        //} catch (InterruptedException e) {
+         //   throw new RuntimeException(e);
+       // }
 
         when(teamRepository.findById(teamOffer.getTeamId())).thenReturn(Optional.of(team));
         when(userRepository.findById(teamOffer.getUserId())).thenReturn(Optional.of(user));
@@ -234,11 +234,11 @@ class TeamMembershipRequestServiceTest {
         team.setMembershipRequests(List.of(existingRequest));
 
         when(hazelcastInstance.getMap("teamMembershipRequestLock")).thenReturn(lock);
-        try {
-            doReturn(true).when(lock).tryLock(anyString(), anyLong(), any(TimeUnit.class));
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+       // try {
+        //    doReturn(true).when(lock).tryLock(anyString(), anyLong(), any(TimeUnit.class));
+        //} catch (InterruptedException e) {
+        //   throw new RuntimeException(e);
+        //}
 
         when(teamRepository.findById(teamOffer.getTeamId())).thenReturn(Optional.of(team));
         when(userRepository.findById(teamOffer.getUserId())).thenReturn(Optional.of(user));

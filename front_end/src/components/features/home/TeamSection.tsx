@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import TeamCard from "./TeamCard"
@@ -39,18 +40,56 @@ interface Team {
 }
 
 interface TeamSectionProps {
-  teams: Team[]
   onCreateTeam?: () => void
   onViewAll?: () => void
   onViewTeam?: (teamId: number) => void
 }
 
+
 export default function TeamSection({ 
-  teams, 
-  onCreateTeam, 
+  onCreateTeam,
   onViewAll, 
   onViewTeam 
 }: TeamSectionProps) {
+  const [teams, setTeams] = useState<Team[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const { fetchAllTeams, convertTeamDetailToTeam } = useTeam()
+
+  useEffect(() => {
+    const loadTeams = async () => {
+      try {
+        setIsLoading(true)
+        const response = await fetchAllTeams()
+        
+        if (response && Array.isArray(response)) {
+          // UNLOCKED 상태 팀만 필터링하고 최대 3개로 제한
+          const unlockedTeams = response
+            .filter(team => team.teamStatus === 'UNLOCKED')
+            .slice(0, 3)
+            .map(convertTeamDetailToTeam)
+          
+          setTeams(unlockedTeams)
+        }
+      } catch (error) {
+        console.error('팀 데이터 로딩 실패:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadTeams()
+  }, [])
+
+  if (isLoading) {
+    return (
+      <section className="mb-12 sm:mb-16">
+        <div className="flex justify-center items-center h-32">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        </div>
+      </section>
+    )
+  }
+
   return (
     <section className="mb-12 sm:mb-16">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8 gap-4">
@@ -106,4 +145,4 @@ export default function TeamSection({
 }
 
 // 타입 export
-export type { Team, TeamMember, TeamSectionProps }
+export type { TeamSectionProps }
