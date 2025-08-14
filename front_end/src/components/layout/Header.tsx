@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { User, LogOut, Settings, ChevronDown, BarChart3 } from 'lucide-react'
+import { User, LogOut, Settings, ChevronDown, BarChart3, Bell } from 'lucide-react'
 import useUserStore from '@/stores/userStore'
 
 export default function Header() {
@@ -55,6 +55,13 @@ export default function Header() {
               className="text-gray-700 hover:text-blue-600 transition-colors"
             >
               팀 만들기
+            </button>
+            <button
+              onClick={() => navigate('/team-invitation/1')}
+              className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 transition-colors"
+            >
+              <Bell className="h-4 w-4" />
+              <span>알림</span>
             </button>
           </nav>
 

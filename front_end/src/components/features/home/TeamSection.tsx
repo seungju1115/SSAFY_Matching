@@ -12,13 +12,16 @@ interface Team {
   id: number
   name: string
   description: string
+  introduction?: string
   tech: string[]
   members: number
   maxMembers: number
   deadline: string
   leader: TeamMember
+  domains?: string[]
   domain?: string
   projectPreferences?: string[]
+  teamAtmosphere?: string[]
   roleDistribution?: {
     backend: number
     frontend: number
@@ -84,7 +87,7 @@ export default function TeamSection({
 
           const withDemo: Team = {
             ...team,
-            domain: team.domain ?? '웹 서비스',
+            domain: team.domain ?? ((team.domains && team.domains.length > 0) ? team.domains[0] : '웹 서비스'),
             projectPreferences: team.projectPreferences ?? ['포트폴리오', '실무경험'],
             roleDistribution: demoDistribution,
           }

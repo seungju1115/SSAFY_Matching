@@ -12,9 +12,11 @@ interface TeamsModalProps {
   onClose: () => void
   teams: Team[]
   onViewTeam?: (teamId: number) => void
+  // 팀 상세 모달 열림 여부 (중첩 모달 시 ESC/바깥 클릭 무시용)
+  isDetailOpen?: boolean
 }
 
-export default function TeamsModal({ isOpen, onClose, teams, onViewTeam }: TeamsModalProps) {
+export default function TeamsModal({ isOpen, onClose, teams, onViewTeam, isDetailOpen = false }: TeamsModalProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedTech, setSelectedTech] = useState<string[]>([])
   const [isFilterOpen, setIsFilterOpen] = useState(false)
@@ -40,8 +42,19 @@ export default function TeamsModal({ isOpen, onClose, teams, onViewTeam }: Teams
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
+    <Dialog
+      open={isOpen}
+      modal={false}
+      onOpenChange={(open) => {
+        // 상세 모달이 열려 있을 때는 TeamsModal 닫힘을 무시
+        if (!open && isDetailOpen) return
+        if (!open) onClose()
+      }}
+    >
+      <DialogContent
+        overlayClassName={isDetailOpen ? 'pointer-events-none' : undefined}
+        className="max-w-6xl max-h-[90vh] overflow-hidden flex flex-col"
+      >
         <DialogHeader className="flex-shrink-0">
           <DialogTitle className="text-2xl font-bold">팀 전체보기</DialogTitle>
         </DialogHeader>
@@ -109,7 +122,7 @@ export default function TeamsModal({ isOpen, onClose, teams, onViewTeam }: Teams
 
               const withDemo: Team = {
                 ...team,
-                domain: team.domain ?? '웹 서비스',
+                domain: team.domain ?? ((team.domains && team.domains.length > 0) ? team.domains[0] : '웹 서비스'),
                 projectPreferences: team.projectPreferences ?? ['포트폴리오', '실무경험'],
                 roleDistribution: demoDistribution,
               }
