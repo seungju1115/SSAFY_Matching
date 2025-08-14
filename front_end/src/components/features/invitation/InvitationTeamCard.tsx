@@ -1,23 +1,28 @@
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Users } from "lucide-react"
-import type { Team } from "@/hooks/useTeam"
+import { Users, Check, X } from "lucide-react"
+import type { Team } from "../home/TeamSection"
 
-interface TeamCardProps {
+interface InvitationTeamCardProps {
   team: Team
-  onClick?: (teamId: number) => void
+  onAccept: (teamId: number) => void
+  onReject: (teamId: number) => void
+  isLoading?: boolean
+  onViewTeam?: (teamId: number) => void
   className?: string
 }
 
-export default function TeamCard({ 
+export default function InvitationTeamCard({ 
   team, 
-  onClick,
+  onAccept,
+  onReject,
+  isLoading = false,
+  onViewTeam,
   className = ""
-}: TeamCardProps) {
+}: InvitationTeamCardProps) {
   return (
-    <Card className={`hover:shadow-md transition-shadow duration-200 cursor-pointer bg-white border border-gray-100 rounded-lg h-full flex flex-col ${className}`} 
-          onClick={() => onClick?.(team.id)}>
+    <Card className={`hover:shadow-md transition-shadow duration-200 bg-white border border-gray-100 rounded-lg h-full flex flex-col ${className}`}>
       <CardHeader className="pb-3">
         <div className="flex items-start gap-3">
           <div className="flex-1">
@@ -25,6 +30,35 @@ export default function TeamCard({
             <Badge variant="secondary" className="text-xs mt-2">
               {team.members}/{team.maxMembers}명 모집
             </Badge>
+          </div>
+          
+          {/* 수락/거절 버튼 */}
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={(e) => {
+                e.stopPropagation()
+                onReject(team.id)
+              }}
+              disabled={isLoading}
+              className="text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300"
+            >
+              <X className="h-3 w-3 mr-1" />
+              거절
+            </Button>
+            <Button
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation()
+                onAccept(team.id)
+              }}
+              disabled={isLoading}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              <Check className="h-3 w-3 mr-1" />
+              수락
+            </Button>
           </div>
         </div>
       </CardHeader>
@@ -54,11 +88,11 @@ export default function TeamCard({
               {team.roleDistribution ? (
                 <div className="space-y-2">
                   {/* 역할별 충원율: 현재(추정)/목표 */}
-                  {team.roleDistribution.BACKEND > 0 && (
+                  {team.roleDistribution.backend > 0 && (
                     (() => {
-                      const target = team.roleDistribution!.BACKEND
+                      const target = team.roleDistribution!.backend
                       const estimated = Math.floor((team.members * target) / Math.max(team.maxMembers, 1))
-                      const provided = team.roleCurrent?.BACKEND ?? estimated
+                      const provided = team.roleCurrent?.backend ?? estimated
                       const current = Math.min(target, provided)
                       const pct = target ? Math.round((current / target) * 100) : 0
                       return (
@@ -72,11 +106,11 @@ export default function TeamCard({
                       )
                     })()
                   )}
-                  {team.roleDistribution.FRONTEND > 0 && (
+                  {team.roleDistribution.frontend > 0 && (
                     (() => {
-                      const target = team.roleDistribution!.FRONTEND
+                      const target = team.roleDistribution!.frontend
                       const estimated = Math.floor((team.members * target) / Math.max(team.maxMembers, 1))
-                      const provided = team.roleCurrent?.FRONTEND ?? estimated
+                      const provided = team.roleCurrent?.frontend ?? estimated
                       const current = Math.min(target, provided)
                       const pct = target ? Math.round((current / target) * 100) : 0
                       return (
@@ -90,11 +124,11 @@ export default function TeamCard({
                       )
                     })()
                   )}
-                  {team.roleDistribution.AI > 0 && (
+                  {team.roleDistribution.ai > 0 && (
                     (() => {
-                      const target = team.roleDistribution!.AI
+                      const target = team.roleDistribution!.ai
                       const estimated = Math.floor((team.members * target) / Math.max(team.maxMembers, 1))
-                      const provided = team.roleCurrent?.AI ?? estimated
+                      const provided = team.roleCurrent?.ai ?? estimated
                       const current = Math.min(target, provided)
                       const pct = target ? Math.round((current / target) * 100) : 0
                       return (
@@ -108,11 +142,11 @@ export default function TeamCard({
                       )
                     })()
                   )}
-                  {team.roleDistribution.DESIGN > 0 && (
+                  {team.roleDistribution.design > 0 && (
                     (() => {
-                      const target = team.roleDistribution!.DESIGN
+                      const target = team.roleDistribution!.design
                       const estimated = Math.floor((team.members * target) / Math.max(team.maxMembers, 1))
-                      const provided = team.roleCurrent?.DESIGN ?? estimated
+                      const provided = team.roleCurrent?.design ?? estimated
                       const current = Math.min(target, provided)
                       const pct = target ? Math.round((current / target) * 100) : 0
                       return (
@@ -126,11 +160,11 @@ export default function TeamCard({
                       )
                     })()
                   )}
-                  {team.roleDistribution.PM > 0 && (
+                  {team.roleDistribution.pm > 0 && (
                     (() => {
-                      const target = team.roleDistribution!.PM
+                      const target = team.roleDistribution!.pm
                       const estimated = Math.floor((team.members * target) / Math.max(team.maxMembers, 1))
-                      const provided = team.roleCurrent?.PM ?? estimated
+                      const provided = team.roleCurrent?.pm ?? estimated
                       const current = Math.min(target, provided)
                       const pct = target ? Math.round((current / target) * 100) : 0
                       return (
@@ -192,8 +226,9 @@ export default function TeamCard({
             className="text-xs px-4 h-8"
             onClick={(e) => {
               e.stopPropagation()
-              onClick?.(team.id)
+              onViewTeam?.(team.id)
             }}
+            disabled={isLoading}
           >
             팀 보기
           </Button>
