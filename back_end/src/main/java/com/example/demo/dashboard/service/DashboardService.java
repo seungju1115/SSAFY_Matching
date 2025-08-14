@@ -84,26 +84,28 @@ public class DashboardService {
         int back_sub = 0, front_sub = 0, ai_sub = 0, design_sub = 0, pm_sub = 0;
 
         for (UserCountDto user : users) {
-            PositionEnum position = user.getPosition().get(0);
-            switch (position) {
-                case BACKEND:
-                    back_main++;
-                    break;
-                case FRONTEND:
-                    front_main++;
-                    break;
-                case AI:
-                    ai_main++;
-                    break;
-                case DESIGN:
-                    design_main++;
-                    break;
-                case PM:
-                    pm_main++;
-                    break;
+            if (user.getPosition().size() > 0) {
+                PositionEnum position = user.getPosition().get(0);
+                switch (position) {
+                    case BACKEND:
+                        back_main++;
+                        break;
+                    case FRONTEND:
+                        front_main++;
+                        break;
+                    case AI:
+                        ai_main++;
+                        break;
+                    case DESIGN:
+                        design_main++;
+                        break;
+                    case PM:
+                        pm_main++;
+                        break;
+                }
             }
-
-            position = user.getPosition().get(1);
+            if (user.getPosition().size() > 1) {
+                PositionEnum position = user.getPosition().get(1);
             switch (position) {
                 case BACKEND:
                     back_sub++;
@@ -121,6 +123,7 @@ public class DashboardService {
                     pm_sub++;
                     break;
             }
+        }
         }
 
             Map<String, Long> map = new HashMap<>();
