@@ -1,5 +1,6 @@
 package com.example.demo.user.dao;
 
+import com.example.demo.dashboard.dto.TechStackCountDto;
 import com.example.demo.user.Enum.PositionEnum;
 import com.example.demo.user.Enum.ProjectGoalEnum;
 import com.example.demo.user.Enum.ProjectViveEnum;
@@ -40,6 +41,10 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
     @Query("SELECT u FROM User u WHERE u.team IS NULL")
     List<User> findUsersWithoutTeam();
+
+    @Query(value = "select new com.example.demo.dashboard.dto.TechStackCountDto(t,count(u)) from User u join u.techStack t "
+            + "group by t")
+    List<TechStackCountDto> countTechStack();
 
     @Query("SELECT DISTINCT u FROM User u " +
             "LEFT JOIN u.wantedPosition wp " +
