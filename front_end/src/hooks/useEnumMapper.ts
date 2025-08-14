@@ -61,7 +61,7 @@ const techStackLabels: Record<TechEnum, string> = {
 const positionLabels: Record<PositionEnum, string> = {
   BACKEND: '백엔드',
   FRONTEND: '프론트엔드',
-  AI: 'AI/ML',
+  AI: 'AI',
   PM: 'PM',
   DESIGN: '디자인'
 }
