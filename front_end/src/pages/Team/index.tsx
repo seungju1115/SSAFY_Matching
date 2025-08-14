@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTeamStore } from '@/stores/teamStore';
 import useUserStore from '@/stores/userStore';
@@ -8,17 +8,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import Header from '@/components/layout/Header';
-import { Crown, MessageCircle, Send, UserPlus, LogOut } from 'lucide-react';
+import UserRecommendationModal from '@/components/features/team/SimpleUserModal';
+import { Crown, UserPlus, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ProjectGoalEnum, ProjectViveEnum } from '@/types/team';
 import type { UserDetailResponse } from '@/types/user';
-import { useSocket } from '@/hooks/useSocket'; // Added
-import type { IMessage } from '@stomp/stompjs'; // Added
-import type { ChatMessageRequest } from '@/api/chat'; // Added
+import TeamChat from '@/components/features/teamchat';
 
 // 기존 상수들은 그대로 유지합니다.
 const projectGoalLabels: Record<ProjectGoalEnum, string> = {
@@ -67,19 +64,19 @@ const TeamPage: React.FC = () => {
   const setUser = useUserStore((state) => state.setUser);
   const user = useUserStore((state) => state.user);
   const { leaveTeam } = useTeam();
+  const [isRecommendModalOpen, setIsRecommendModalOpen] = useState(false);
+
+  const handleSelectUser = (users: any[]) => {
+    console.log('선택된 사용자:', users);
+    // TODO: 선택 사용자 초대 로직 연동
+  };
 
   // userStore에서 teamId 가져오기
   const teamId = user.teamId;
 
-  const [chatMessage, setChatMessage] = useState('');
-  const [chatMessages, setChatMessages] = useState<any[]>([]);
-
   const teamInfo = teamId ? getTeamDetailById(teamId) : null;
   // The store now holds the members, let's get them from there.
   const teamMembers: UserDetailResponse[] = teamInfo?.members || [];
-
-  // Use useSocket hook
-  const { isConnected,subscribeToRoom, sendChatMessage } = useSocket();
 
   useEffect(() => {
     const fetchTeamData = async () => {
@@ -105,50 +102,6 @@ const TeamPage: React.FC = () => {
     fetchTeamData();
   }, [teamId, getTeamDetailById, setTeamDetail, setLoading, setError]);
 
-  // WebSocket connection and subscription
-useEffect(() => {
-  if (!isConnected || !teamInfo?.chatRoomId) return;
-
-  const unsub = subscribeToRoom(teamInfo.chatRoomId, (message: IMessage) => {
-    try {
-      const parsed = JSON.parse(message.body);
-
-      const senderMember = teamInfo.members.find((m) => m.id === parsed.senderId);
-      const senderName = senderMember ? senderMember.userName : '알 수 없음';
-
-      setChatMessages((prev) => [
-        ...prev,
-        {
-          id: parsed.id ?? Date.now(),
-          senderId: parsed.senderId,
-          sender: senderName, 
-          message: parsed.message,
-          timestamp: parsed.createdAt,
-        },
-      ]);
-    } catch (err) {
-      console.error('메시지 파싱 실패', err);
-    }
-  });
-
-  return () => {
-    unsub?.();
-  };
-}, [isConnected, teamInfo?.chatRoomId, subscribeToRoom]);
-
-  const handleSendMessage = () => {
-    if (chatMessage.trim() && user && user.id !== null && teamInfo) {
-      const messageToSend: ChatMessageRequest = {
-        roomId: teamInfo.chatRoomId,
-        senderId: user.id, // user.id is now guaranteed to be number
-        message: chatMessage,
-        type: 'CHAT', // Assuming 'CHAT' as MessageType
-      };
-      (sendChatMessage as (message: ChatMessageRequest) => void)(messageToSend);
-      setChatMessage('');
-    }
-  };
-
   const handleLeaveTeam = async () => {
     if (user && user.id !== null && confirm('정말로 팀을 나가시겠습니까?')) {
       try {
@@ -167,7 +120,7 @@ useEffect(() => {
   };
 
   const handleRecommendMember = () => {
-    navigate('/matching?recommend=true');
+    setIsRecommendModalOpen(true);
   };
 
   if (isLoading) {
@@ -326,45 +279,7 @@ useEffect(() => {
           </div>
 
           <div className="relative lg:col-span-2 flex flex-col h-full">
-            <Card className="bg-white border border-gray-200 shadow-sm h-[600px] lg:h-[700px] flex flex-col">
-              <CardHeader className="flex-shrink-0">
-                <CardTitle className="flex items-center gap-2 text-lg font-medium text-gray-900">
-                  <MessageCircle className="w-5 h-5" />
-                  팀 채팅
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex-1 flex flex-col p-0">
-                <ScrollArea className="flex-1 px-6">
-                  <div className="space-y-4 py-4">
-                    {chatMessages.map((msg) => (
-                      <div key={msg.id} className="">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-sm font-medium text-gray-900">{msg.sender}</span>
-                          <span className="text-xs text-gray-500">{msg.timestamp}</span>
-                        </div>
-                        <div className="bg-gray-50 p-3 rounded-lg max-w-md">
-                          <p className="text-sm text-gray-700">{msg.message}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </ScrollArea>
-                <div className="flex-shrink-0 p-4 border-t border-gray-200">
-                  <div className="flex gap-2">
-                    <Input
-                      value={chatMessage}
-                      onChange={(e) => setChatMessage(e.target.value)}
-                      placeholder="메시지를 입력하세요..."
-                      className="flex-1"
-                      onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                    />
-                    <Button onClick={handleSendMessage} className="bg-blue-600 hover:bg-blue-700 text-white">
-                      <Send className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <TeamChat roomId={teamInfo.chatRoomId} teamId={teamId} />
             <div className="w-full flex justify-end mt-4">
               <Button onClick={handleLeaveTeam} variant="destructive" className="w-full lg:w-auto">
                 <LogOut className="w-4 h-4 mr-2" />
@@ -374,6 +289,12 @@ useEffect(() => {
           </div>
         </div>
       </div>
+      {/* 사용자 추천 모달 */}
+      <UserRecommendationModal
+        isOpen={isRecommendModalOpen}
+        onClose={() => setIsRecommendModalOpen(false)}
+        onSelectUser={handleSelectUser}
+      />
     </div>
   );
 };

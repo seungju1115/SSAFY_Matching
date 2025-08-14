@@ -1,90 +1,66 @@
-import { useState, useEffect, type FormEvent } from 'react';
-import { useSocket } from '@/hooks/useSocket';
-import type { IMessage } from '@stomp/stompjs';
-
-// A simple type for our chat messages
-interface ChatMessage {
-  id: string; // Add a unique ID for each message
-  sender: string;
-  content: string;
-  timestamp: string;
-}
+import { useEffect, useState } from 'react';
+import { userAPI } from '@/api/user';
+import type { UserSearchResponse } from '@/types/user';
+import PrivateChat from '@/components/features/privatechat';
+import { Button } from '@/components/ui/button';
+import useUserStore from '@/stores/userStore';
 
 export default function Chat() {
-  const { isConnected, subscribe, publish } = useSocket();
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [newMessage, setNewMessage] = useState('');
-  
-  // Let's assume a static room ID for this example.
-  // In a real app, this would likely come from URL params or component props.
-  const roomId = 'general'; 
+  const [users, setUsers] = useState<UserSearchResponse[]>([]);
+  const [openChats, setOpenChats] = useState<Record<number, boolean>>({});
+  const myId = useUserStore(state => state.user?.id); // 내 ID
+  // 🔹 렌더링 시 로그
+  console.log('[Chat] Render', { usersLength: users.length, openChats });
 
   useEffect(() => {
-    if (isConnected) {
-      const unsubscribe = subscribe(
-        `/topic/chat/room/${roomId}`,
-        (message: IMessage) => {
-          const receivedMessage: ChatMessage = JSON.parse(message.body);
-          setMessages((prevMessages) => [...prevMessages, receivedMessage]);
+    console.log('[Chat] useEffect: fetch users');
+    const fetchUsers = async () => {
+      try {
+        const response = await userAPI.searchUsersWithoutTeam({});
+        if (response.data.status === 200) {
+          setUsers(response.data.data);
+          console.log('[Chat] Users fetched', response.data.data);
+        } else {
+          console.error('[Chat] Failed to fetch users:', response.data.message);
         }
-      );
+      } catch (error) {
+        console.error('[Chat] Error fetching users:', error);
+      }
+    };
 
-      // Cleanup subscription on component unmount
-      return () => {
-        if (unsubscribe) {
-          unsubscribe();
-        }
-      };
-    }
-  }, [isConnected, roomId, subscribe]);
+    fetchUsers();
+  }, []);
 
-  const handleSendMessage = (e: FormEvent) => {
-    e.preventDefault();
-    if (newMessage.trim() && isConnected) {
-      const chatMessage = {
-        roomId,
-        sender: 'CurrentUser', // This should be dynamically set based on logged-in user
-        content: newMessage,
-      };
-      publish(`/app/chat/message`, chatMessage);
-      setNewMessage('');
-    }
+  const toggleChat = (userId: number) => {
+    if (userId === myId) return;
+    console.log('[Chat] toggleChat called', { userId, prev: openChats[userId] });
+    setOpenChats(prev => {
+      const newState = { ...prev, [userId]: !prev[userId] };
+      console.log('[Chat] toggleChat newState', newState);
+      return newState;
+    });
   };
 
   return (
-    <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto' }}>
-      <h2>Chat Room: {roomId}</h2>
-      <div style={{ marginBottom: '10px' }}>
-        Connection Status: {isConnected ? 'Connected' : 'Disconnected'}
-      </div>
-      <div
-        style={{
-          height: '400px',
-          border: '1px solid #ccc',
-          overflowY: 'scroll',
-          padding: '10px',
-          marginBottom: '10px',
-        }}
-      >
-        {messages.map((msg) => (
-          <div key={msg.id}>
-            <strong>{msg.sender}:</strong> {msg.content}
-          </div>
+    <div style={{ padding: '20px' }}>
+      <h1>Hello World</h1>
+      <h2>Users without a team:</h2>
+      <ul>
+        {users
+        .filter(user => user.id !== myId)
+        .map(user => (
+          <li key={user.id} style={{ marginBottom: '10px' }}>
+            <div className="flex items-center gap-2">
+              <span>{user.userName}</span>
+              <Button size="sm" onClick={() => toggleChat(user.id)}>
+                {openChats[user.id] ? 'Hide Chat' : 'Open Chat'}
+              </Button>
+            </div>
+
+            {openChats[user.id] && <PrivateChat otherUserId={user.id} />}
+          </li>
         ))}
-      </div>
-      <form onSubmit={handleSendMessage}>
-        <input
-          type="text"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Type a message..."
-          style={{ width: '80%', padding: '8px' }}
-          disabled={!isConnected}
-        />
-        <button type="submit" style={{ width: '18%', padding: '8px' }} disabled={!isConnected}>
-          Send
-        </button>
-      </form>
+      </ul>
     </div>
   );
-} 
+}

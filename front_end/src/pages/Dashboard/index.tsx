@@ -7,8 +7,10 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import TeamDomainChart from "@/components/features/dashboard/TeamDomainChart"
 import TeamPositionChart from "@/components/features/dashboard/TeamPositionChart"
-import PositionPieChart from "@/components/features/dashboard/PositionPieChart"
+import PositionDonutChart from "@/components/features/dashboard/PositionDonutChart"
+import MajorMinorPieChart from "@/components/features/dashboard/MajorMinorPieChart"
 import TechStackTreemap from "@/components/features/dashboard/TechStackTreemap"
+import { mockDevelopers } from "@/data/mockData"
 
 export default function Dashboard() {
   const [selectedDomain, setSelectedDomain] = useState<string>("all")
@@ -17,6 +19,19 @@ export default function Dashboard() {
   const totalWaitingUsers = 1250
   const matchedUsers = 875
   const matchingRate = (matchedUsers / totalWaitingUsers) * 100
+
+  // 전공/비전공 비율을 mockDevelopers에서 산출해 전체 인원에 투영
+  const majorCountSample = mockDevelopers.filter((d) => d.isMajor).length
+  const totalSample = mockDevelopers.length || 1
+  const majorRatio = majorCountSample / totalSample
+  const majorTotal = Math.round(totalWaitingUsers * majorRatio)
+  const nonMajorTotal = totalWaitingUsers - majorTotal
+
+  // 전공/비전공 매칭 인원은 전체 매칭 인원을 동일 비율로 분배 (데모)
+  const matchedMajors = Math.min(majorTotal, Math.round(matchedUsers * majorRatio))
+  const matchedNonMajors = Math.max(0, matchedUsers - matchedMajors)
+  const majorMatchingRate = majorTotal ? (matchedMajors / majorTotal) * 100 : 0
+  const nonMajorMatchingRate = nonMajorTotal ? (matchedNonMajors / nonMajorTotal) * 100 : 0
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -76,6 +91,30 @@ export default function Dashboard() {
                       <span>{matchingRate.toFixed(1)}%</span>
                     </div>
                   </div>
+                  {/* 전공자 매칭 현황 */}
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>전공자 매칭</span>
+                      <span className="font-medium">{matchedMajors}명</span>
+                    </div>
+                    <Progress value={majorMatchingRate} className="h-3" />
+                    <div className="flex justify-between text-xs text-gray-500">
+                      <span>전공자 전체: {majorTotal}명</span>
+                      <span>{majorMatchingRate.toFixed(1)}%</span>
+                    </div>
+                  </div>
+                  {/* 비전공자 매칭 현황 */}
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>비전공자 매칭</span>
+                      <span className="font-medium">{matchedNonMajors}명</span>
+                    </div>
+                    <Progress value={nonMajorMatchingRate} className="h-3" />
+                    <div className="flex justify-between text-xs text-gray-500">
+                      <span>비전공자 전체: {nonMajorTotal}명</span>
+                      <span>{nonMajorMatchingRate.toFixed(1)}%</span>
+                    </div>
+                  </div>
                   <div className="grid grid-cols-2 gap-4 pt-4">
                     <div className="text-center">
                       <div className="text-2xl font-bold text-green-600">{matchedUsers}</div>
@@ -131,35 +170,35 @@ export default function Dashboard() {
             </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-              {/* 주 포지션 비율 - Pie Chart */}
+              {/* 포지션 비율 - Donut Chart (주/부 토글) */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Badge variant="secondary">Pie Chart</Badge>
-                    주 포지션 분포
+                    <Badge variant="secondary">Donut Chart</Badge>
+                    포지션 분포 (토글)
                   </CardTitle>
                   <CardDescription>
-                    대기자들의 주 포지션 선택 비율
+                    주/부 포지션을 선택하여 분포를 확인하세요
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <PositionPieChart type="primary" />
+                  <PositionDonutChart defaultView="primary" />
                 </CardContent>
               </Card>
 
-              {/* 부 포지션 비율 - Pie Chart */}
+              {/* 전공/비전공 비율 - Pie Chart */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Badge variant="secondary">Pie Chart</Badge>
-                    부 포지션 분포
+                    전공/비전공 비율
                   </CardTitle>
                   <CardDescription>
-                    대기자들의 부 포지션 선택 비율
+                    대기자들의 전공/비전공 구성 비율
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <PositionPieChart type="secondary" />
+                  <MajorMinorPieChart />
                 </CardContent>
               </Card>
 
