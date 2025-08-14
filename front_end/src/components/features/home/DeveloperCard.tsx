@@ -55,7 +55,7 @@ export default function DeveloperCard({
   onClick,
   className = ""
 }: DeveloperCardProps) {
-  // 기술스택을 문자열 배열로 변환 (숙련도 제거)
+  // 기술스택을 문자열 배열로 변환 (숙련도  제거)
   const techStackNames = developer.techStack?.map(tech => 
     typeof tech === 'string' ? tech : tech.name
   ) || []
