@@ -19,12 +19,16 @@ interface DeveloperSectionProps {
   developers: Developer[]
   onRegister?: () => void
   onViewAll?: () => void
+  onFilter?: () => void
+  onViewProfile?: (developerId: number) => void
 }
 
 export default function DeveloperSection({ 
   developers, 
   onRegister, 
-  onViewAll 
+  onViewAll,
+  onFilter,
+  onViewProfile,
 }: DeveloperSectionProps) {
   return (
     <section className="mb-12 sm:mb-16">
@@ -38,7 +42,7 @@ export default function DeveloperSection({
             <Plus className="mr-2 h-4 w-4" />
             등록
           </Button>
-          <Button variant="outline" className="w-full sm:w-auto">
+          <Button variant="outline" className="w-full sm:w-auto" onClick={onFilter}>
             <Filter className="mr-2 h-4 w-4" />
             필터
           </Button>
@@ -53,7 +57,7 @@ export default function DeveloperSection({
           <DeveloperCard 
             key={dev.id}
             developer={dev}
-            onClick={(developerId) => console.log('개발자 프로필 보기:', developerId)}
+            onClick={(developerId) => onViewProfile?.(developerId)}
           />
         ))}
       </div>

@@ -11,12 +11,14 @@ interface DevelopersModalProps {
   isOpen: boolean
   onClose: () => void
   developers: Developer[]
+  onViewProfile?: (developerId: number) => void
 }
 
 export default function DevelopersModal({ 
   isOpen, 
   onClose, 
-  developers 
+  developers,
+  onViewProfile,
 }: DevelopersModalProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedSkills, setSelectedSkills] = useState<string[]>([])
@@ -135,7 +137,7 @@ export default function DevelopersModal({
               <DeveloperCard 
                 key={dev.id}
                 developer={dev}
-                onClick={(developerId) => console.log('개발자 프로필 보기:', developerId)}
+                onClick={(developerId) => onViewProfile?.(developerId)}
               />
             ))}
           </div>
