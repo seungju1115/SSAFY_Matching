@@ -1,5 +1,5 @@
 // User 관련 커스텀 훅
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { userAPI, userHelpers } from '@/api/user'
 import type {
   UserProfileResponse,
@@ -8,13 +8,26 @@ import type {
   UserSearchResponse, UserStatus
 } from '@/types/user'
 import { useToast } from '@/hooks/use-toast'
+import { useEnumMapper } from '@/hooks/useEnumMapper'
 
 export const useUser = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const { toast } = useToast()
+  const { mapProjectGoalArray, mapProjectVibeArray, mapTechStackArray, mapPositionArray } = useEnumMapper()
 
   const clearError = () => setError(null)
+
+  // UserSearchResponse에서 Enum을 문자열로 변환하는 함수
+  const convertUserSearchEnums = useCallback((user: UserSearchResponse): UserSearchResponse => {
+    return {
+      ...user,
+      projectGoal: mapProjectGoalArray(user.projectGoal as any), // 이미 변환된 상태일 수도 있음
+      projectVive: mapProjectVibeArray(user.projectVive as any),
+      techStack: mapTechStackArray(user.techStack as any),
+      wantedPosition: mapPositionArray(user.wantedPosition as any)
+    }
+  }, [mapProjectGoalArray, mapProjectVibeArray, mapTechStackArray, mapPositionArray])
 
   // 내 프로필 조회
   const getMyProfile = async (): Promise<UserProfileResponse | null> => {
@@ -145,7 +158,11 @@ export const useUser = () => {
       clearError()
       
       const response = await userAPI.getWaitingUsers()
-      return response.data.data
+      
+      // Enum들을 문자열로 변환
+      const convertedUsers = response.data.data.map(convertUserSearchEnums)
+      
+      return convertedUsers
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || '대기중인 사용자를 불러오는데 실패했습니다'
       setError(errorMessage)
@@ -239,7 +256,8 @@ export const useUser = () => {
     
     // 유틸리티
     clearError,
-    mapEnumToDisplayValue: userHelpers.mapEnumToDisplayValue
+    mapEnumToDisplayValue: userHelpers.mapEnumToDisplayValue,
+    convertUserSearchEnums
   }
 }
 
