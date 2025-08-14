@@ -9,8 +9,8 @@ spring:
       client:
         registration:
           google:
-            client-id: 191095046109-t21kv1o2632n6rou7pdi26isfkvht1eb.apps.googleusercontent.com
-            client-secret: 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
+            client-id: 1071729903330-rj030egsas650um85iiu5i40dtl988bt.apps.googleusercontent.com
+            client-secret: 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
             redirect-uri: "{baseUrl}/login/oauth2/code/google"
             scope:
               - profile
