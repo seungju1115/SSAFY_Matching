@@ -1,5 +1,7 @@
 package com.example.demo.team.dao;
 
+import com.example.demo.dashboard.dto.TeamDomainCountDto;
+import com.example.demo.dashboard.dto.TechStackCountDto;
 import com.example.demo.team.entity.Team;
 import jakarta.persistence.MapKeyColumn;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,8 +20,12 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
     List<Team> findAllWithDetails();
 
     @Query(value = "select t.teamDomain, count(*) from Team t group by t.teamDomain")
-    @MapKeyColumn(name = "teamDomain")
     List<Object[]> countDomain();
+
+    @Query(value = "select new " +
+            "com.example.demo.dashboard.dto.TeamDomainCountDto(t.teamDomain, sum(t.backendCount), sum(t.frontendCount), sum(t.aiCount), sum(t.designCount), sum(t.pmCount)) from Team t group by t.teamDomain")
+    List<TeamDomainCountDto> countDomainPositions();
+
 
     @Query(value = "SELECT DISTINCT t FROM Team t " +
             "LEFT JOIN FETCH t.teamPreference " +

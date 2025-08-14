@@ -2,11 +2,14 @@ package com.example.demo.dashboard.service;
 
 import com.example.demo.ai.dto.CandidateDto;
 import com.example.demo.dashboard.dto.DashboardResponseDto;
+import com.example.demo.dashboard.dto.TeamDomainCountDto;
+import com.example.demo.dashboard.dto.TechStackCountDto;
 import com.example.demo.dashboard.dto.UserCountDto;
 import com.example.demo.team.dao.TeamRepository;
 import com.example.demo.user.Enum.PositionEnum;
 import com.example.demo.user.Enum.ProjectGoalEnum;
 import com.example.demo.user.Enum.ProjectViveEnum;
+import com.example.demo.user.Enum.TechEnum;
 import com.example.demo.user.dao.UserRepository;
 import com.example.demo.user.entity.User;
 import jakarta.persistence.EntityManager;
@@ -26,7 +29,7 @@ public class DashboardService {
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
 
-    private UserCountDto mapToUserCountDto (Object[] row) {
+    private UserCountDto mapToUserCountDto(Object[] row) {
         Long teamId = Optional.ofNullable(row[0])
                 .map(obj -> ((Number) obj).longValue())
                 .orElse(null);
@@ -58,9 +61,12 @@ public class DashboardService {
 
         DashboardResponseDto dashboardResponseDto = new DashboardResponseDto();
 
-        List<UserCountDto> users=userRepository.CountUsers().stream().map(this::mapToUserCountDto).collect(Collectors.toList());
-        int whole= users.size();
-        int matched_major=0; int matched_unmajor=0; int unmatched_major=0; int unmatched_unmajor=0;
+        List<UserCountDto> users = userRepository.CountUsers().stream().map(this::mapToUserCountDto).collect(Collectors.toList());
+        int whole = users.size();
+        int matched_major = 0;
+        int matched_unmajor = 0;
+        int unmatched_major = 0;
+        int unmatched_unmajor = 0;
 
         for (UserCountDto user : users) {
             boolean hasTeam = user.getTeamId() != null;
@@ -74,61 +80,93 @@ public class DashboardService {
         }
 
 
-        int matched_back = 0, matched_front = 0, matched_ai = 0, matched_design=0, matched_pm=0;
-        int unmatched_back = 0, unmatched_front = 0, unmatched_ai = 0, unmatched_design=0, unmatched_pm=0;
+        int back_main = 0, front_main = 0, ai_main = 0, design_main = 0, pm_main = 0;
+        int back_sub = 0, front_sub = 0, ai_sub = 0, design_sub = 0, pm_sub = 0;
 
         for (UserCountDto user : users) {
-            boolean hasTeam = user.getTeamId() != null;
-            for(PositionEnum position : user.getPosition()) {
-                switch (position) {
-                    case BACKEND:
-                        if (hasTeam) matched_back++;
-                        else unmatched_back++;
-                        break;
-                    case FRONTEND:
-                        if (hasTeam) matched_front++;
-                        else unmatched_front++;
-                        break;
-                    case AI:
-                        if (hasTeam) matched_ai++;
-                        else unmatched_ai++;
-                        break;
-                    case DESIGN:
-                        if (hasTeam) matched_design++;
-                        else unmatched_design++;
-                        break;
-                    case PM:
-                        if (hasTeam) matched_pm++;
-                        else unmatched_pm++;
-                        break;
-                }
+            PositionEnum position = user.getPosition().get(0);
+            switch (position) {
+                case BACKEND:
+                    back_main++;
+                    break;
+                case FRONTEND:
+                    front_main++;
+                    break;
+                case AI:
+                    ai_main++;
+                    break;
+                case DESIGN:
+                    design_main++;
+                    break;
+                case PM:
+                    pm_main++;
+                    break;
+            }
+
+            position = user.getPosition().get(1);
+            switch (position) {
+                case BACKEND:
+                    back_sub++;
+                    break;
+                case FRONTEND:
+                    front_sub++;
+                    break;
+                case AI:
+                    ai_sub++;
+                    break;
+                case DESIGN:
+                    design_sub++;
+                    break;
+                case PM:
+                    pm_sub++;
+                    break;
             }
         }
 
-        Map<String, Long> map = new HashMap<>();
+            Map<String, Long> map = new HashMap<>();
 
-        map=teamRepository.countDomain().stream().collect(Collectors.toMap(
-                row -> (String) row[0],
-                row -> (Long) row[1]
-        ));
+            map = teamRepository.countDomain().stream().collect(Collectors.toMap(
+                    row -> (String) row[0],
+                    row -> (Long) row[1]
+            ));
 
-        return DashboardResponseDto.builder()
-                .whole(whole)
-                .matchedMajor(matched_major)
-                .mathcedUnmajor(matched_unmajor)
-                .unmatchedMajor(unmatched_major)
-                .unmatchedUnmajor(unmatched_unmajor)
-                .matched_back(matched_back)
-                .matched_front(matched_front)
-                .matched_ai(matched_ai)
-                .matched_design(matched_design)
-                .matched_pm(matched_pm)
-                .unmatched_back(unmatched_back)
-                .unmatched_front(unmatched_front)
-                .unmatched_ai(unmatched_ai)
-                .unmatched_design(unmatched_design)
-                .unmatched_pm(unmatched_pm)
-                .domain(map)
-                .build();
+            List<TeamDomainCountDto> domains = teamRepository.countDomainPositions();
+            Map<String, List<Long>> domainMap = new HashMap<>();
+            for (TeamDomainCountDto domain : domains) {
+                List<Long> pos = new ArrayList<>();
+                pos.add(domain.getBack());
+                pos.add(domain.getFront());
+                pos.add(domain.getAi());
+                pos.add(domain.getDesign());
+                pos.add(domain.getPm());
+                domainMap.put(domain.getDomain(), pos);
+            }
+
+            List<TechStackCountDto> techStacks = userRepository.countTechStack();
+            Map<String, Long> techStackMap = new HashMap<>();
+            for (TechStackCountDto techStack : techStacks) {
+                techStackMap.put(techStack.getTechStack().name(), techStack.getCount());
+            }
+
+            return DashboardResponseDto.builder()
+                    .whole(whole)
+                    .matchedMajor(matched_major)
+                    .mathcedUnmajor(matched_unmajor)
+                    .unmatchedMajor(unmatched_major)
+                    .unmatchedUnmajor(unmatched_unmajor)
+                    .back_main(back_main)
+                    .front_main(front_main)
+                    .ai_main(ai_main)
+                    .design_main(design_main)
+                    .pm_main(pm_main)
+                    .back_sub(back_sub)
+                    .ai_sub(ai_sub)
+                    .design_sub(design_sub)
+                    .pm_sub(pm_sub)
+                    .front_sub(front_sub)
+                    .domain(map)
+                    .domainPos(domainMap)
+                    .techstacks(techStackMap)
+                    .build();
     }
 }
