@@ -12,8 +12,6 @@ interface DevelopersModalProps {
   onClose: () => void
   developers: Developer[]
   onViewProfile?: (developerId: number) => void
-  // 프로필(상세) 모달 열림 여부 (중첩 모달 시 ESC/바깥 클릭 무시용)
-  isProfileOpen?: boolean
 }
 
 export default function DevelopersModal({ 
@@ -21,7 +19,6 @@ export default function DevelopersModal({
   onClose, 
   developers,
   onViewProfile,
-  isProfileOpen = false,
 }: DevelopersModalProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedSkills, setSelectedSkills] = useState<string[]>([])
@@ -55,19 +52,8 @@ export default function DevelopersModal({
   }
 
   return (
-    <Dialog 
-      open={isOpen} 
-      modal={false}
-      onOpenChange={(open) => {
-        // 프로필 모달이 열려 있을 때는 DevelopersModal 닫힘을 무시
-        if (!open && isProfileOpen) return
-        if (!open) onClose()
-      }}
-    >
-      <DialogContent 
-        overlayClassName={isProfileOpen ? 'pointer-events-none' : undefined}
-        className="max-w-7xl max-h-[90vh] overflow-hidden flex flex-col"
-      >
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-7xl max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader className="flex-shrink-0">
           <div className="flex items-center justify-between">
             <DialogTitle className="text-2xl font-bold">대기자 전체보기</DialogTitle>

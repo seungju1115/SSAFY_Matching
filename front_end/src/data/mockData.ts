@@ -1,103 +1,94 @@
-import type { Team } from "@/components/features/home/TeamSection"
-import type { Developer } from "@/components/features/home/DeveloperSection"
-
-// 팀 더미 데이터
-export const mockTeams: Team[] = [
-  {
-    id: 1,
-    name: "React 프로젝트 팀",
-    description: "현대적인 웹 애플리케이션을 함께 만들어요!",
-    tech: ["React", "TypeScript", "Node.js"],
-    members: 3,
-    maxMembers: 5,
-    deadline: "2024-02-15",
-    roleDistribution: {
-      backend: 2,
-      frontend: 2,
-      ai: 0,
-      design: 1,
-      pm: 0
-    },
-    roleCurrent: {
-      backend: 1,
-      frontend: 1,
-      ai: 0,
-      design: 1,
-      pm: 0
-    },
-    leader: {
-      name: "김개발",
-      avatar: "",
-      role: "Frontend Developer"
-    },
-    domains: ["웹 서비스", "커머스"],
-    teamAtmosphere: ["자율", "꾸준함", "소통"],
-    introduction: "React/TS 기반으로 안정적인 웹 서비스를 함께 개발할 팀원을 찾습니다."
-  },
-  {
-    id: 2,
-    name: "AI 스타트업 프로젝트",
-    description: "머신러닝을 활용한 혁신적인 서비스 개발",
-    tech: ["Python", "TensorFlow", "FastAPI"],
-    members: 2,
-    maxMembers: 4,
-    deadline: "2024-03-01",
-    roleDistribution: {
-      backend: 1,
-      frontend: 0,
-      ai: 2,
-      design: 0,
-      pm: 1
-    },
-    roleCurrent: {
-      backend: 1,
-      frontend: 0,
-      ai: 1,
-      design: 0,
-      pm: 0
-    },
-    leader: {
-      name: "박AI",
-      avatar: "",
-      role: "ML Engineer"
-    },
-    domains: ["AI", "데이터 분석"],
-    teamAtmosphere: ["도전", "연구", "집중"],
-    introduction: "실험과 학습을 중시하는 분위기에서 프로토타입을 빠르게 만들어봅니다."
-  },
-  {
-    id: 3,
-    name: "모바일 앱 개발팀",
-    description: "크로스 플랫폼 모바일 앱 제작",
-    tech: ["Flutter", "Firebase", "Dart"],
-    members: 4,
-    maxMembers: 6,
-    deadline: "2024-02-28",
-    roleDistribution: {
-      backend: 2,
-      frontend: 2,
-      ai: 0,
-      design: 1,
-      pm: 1
-    },
-    roleCurrent: {
-      backend: 1,
-      frontend: 2,
-      ai: 0,
-      design: 1,
-      pm: 0
-    },
-    leader: {
-      name: "이모바일",
-      avatar: "",
-      role: "Mobile Developer"
-    },
-    domains: ["모바일", "유틸리티"],
-    teamAtmosphere: ["협업", "속도", "유연"],
-    introduction: "Flutter로 사용자 경험이 뛰어난 모바일 앱을 빠르게 출시합니다."
-  }
-]
-
+// import type { Team } from "@/components/features/home/TeamSection"
+// import type { Developer } from "@/components/features/home/DeveloperSection"
+//
+// // 팀 더미 데이터
+// export const mockTeams: Team[] = [
+//   {
+//     id: 1,
+//     name: "React 프로젝트 팀",
+//     description: "현대적인 웹 애플리케이션을 함께 만들어요!",
+//     tech: ["React", "TypeScript", "Node.js"],
+//     members: 3,
+//     maxMembers: 5,
+//     deadline: "2024-02-15",
+//     roleDistribution: {
+//       backend: 2,
+//       frontend: 2,
+//       ai: 0,
+//       design: 1,
+//       pm: 0
+//     },
+//     roleCurrent: {
+//       backend: 1,
+//       frontend: 1,
+//       ai: 0,
+//       design: 1,
+//       pm: 0
+//     },
+//     leader: {
+//       name: "김개발",
+//       avatar: "",
+//       role: "Frontend Developer"
+//     }
+//   },
+//   {
+//     id: 2,
+//     name: "AI 스타트업 프로젝트",
+//     description: "머신러닝을 활용한 혁신적인 서비스 개발",
+//     tech: ["Python", "TensorFlow", "FastAPI"],
+//     members: 2,
+//     maxMembers: 4,
+//     deadline: "2024-03-01",
+//     roleDistribution: {
+//       backend: 1,
+//       frontend: 0,
+//       ai: 2,
+//       design: 0,
+//       pm: 1
+//     },
+//     roleCurrent: {
+//       backend: 1,
+//       frontend: 0,
+//       ai: 1,
+//       design: 0,
+//       pm: 0
+//     },
+//     leader: {
+//       name: "박AI",
+//       avatar: "",
+//       role: "ML Engineer"
+//     }
+//   },
+//   {
+//     id: 3,
+//     name: "모바일 앱 개발팀",
+//     description: "크로스 플랫폼 모바일 앱 제작",
+//     tech: ["Flutter", "Firebase", "Dart"],
+//     members: 4,
+//     maxMembers: 6,
+//     deadline: "2024-02-28",
+//     roleDistribution: {
+//       backend: 2,
+//       frontend: 2,
+//       ai: 0,
+//       design: 1,
+//       pm: 1
+//     },
+//     roleCurrent: {
+//       backend: 1,
+//       frontend: 2,
+//       ai: 0,
+//       design: 1,
+//       pm: 0
+//     },
+//     leader: {
+//       name: "이모바일",
+//       avatar: "",
+//       role: "Mobile Developer"
+//     }
+//   }
+// ]
+//
 // 개발자 더미 데이터
 import type {Developer} from "@/components/features/home/DeveloperSection.tsx";
 

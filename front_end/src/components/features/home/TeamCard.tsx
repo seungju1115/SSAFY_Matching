@@ -37,7 +37,7 @@ export default function TeamCard({
               <span className="text-xs font-semibold text-gray-700">프로젝트 도메인</span>
             </div>
             <div className="text-sm font-medium text-gray-800">
-              {(team.domains && team.domains.length > 0) ? team.domains[0] : (team.domain || '웹 개발')}
+              {team.domain || '웹 개발'}
             </div>
           </div>
           

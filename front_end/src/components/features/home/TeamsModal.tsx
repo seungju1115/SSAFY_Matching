@@ -12,11 +12,12 @@ interface TeamsModalProps {
   isOpen: boolean
   onClose: () => void
   onViewTeam?: (teamId: number) => void
-  // 팀 상세 모달 열림 여부 (중첩 모달 시 ESC/바깥 클릭 무시용)
-  isDetailOpen?: boolean
 }
 
-export default function TeamsModal({ isOpen, onClose, teams, onViewTeam, isDetailOpen = false }: TeamsModalProps) {
+
+export default function TeamsModal({ isOpen, onClose, onViewTeam }: TeamsModalProps) {
+  const [teams, setTeams] = useState<Team[]>([])
+  const [isLoading, setIsLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedTech, setSelectedTech] = useState<string[]>([])
   const [isFilterOpen, setIsFilterOpen] = useState(false)
@@ -70,19 +71,8 @@ export default function TeamsModal({ isOpen, onClose, teams, onViewTeam, isDetai
   }
 
   return (
-    <Dialog
-      open={isOpen}
-      modal={false}
-      onOpenChange={(open) => {
-        // 상세 모달이 열려 있을 때는 TeamsModal 닫힘을 무시
-        if (!open && isDetailOpen) return
-        if (!open) onClose()
-      }}
-    >
-      <DialogContent
-        overlayClassName={isDetailOpen ? 'pointer-events-none' : undefined}
-        className="max-w-6xl max-h-[90vh] overflow-hidden flex flex-col"
-      >
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader className="flex-shrink-0">
           <DialogTitle className="text-2xl font-bold">팀 전체보기</DialogTitle>
         </DialogHeader>
@@ -132,42 +122,9 @@ export default function TeamsModal({ isOpen, onClose, teams, onViewTeam, isDetai
 
         {/* 팀 목록 */}
         <div className="flex-1 overflow-y-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-1">
-            {filteredTeams.map((team) => {
-              // TeamSection과 동일한 데모 역할 분배 적용 (없을 경우)
-              const demoDistribution = (() => {
-                if (team.roleDistribution) return team.roleDistribution
-                const order = ['frontend', 'backend', 'ai', 'design', 'pm'] as const
-                const dist: NonNullable<Team['roleDistribution']> = {
-                  backend: 0, frontend: 0, ai: 0, design: 0, pm: 0
-                }
-                for (let i = 0; i < Math.max(team.maxMembers, 1); i++) {
-                  const role = order[i % order.length]
-                  dist[role]++
-                }
-                return dist
-              })()
-
-              const withDemo: Team = {
-                ...team,
-                domain: team.domain ?? ((team.domains && team.domains.length > 0) ? team.domains[0] : '웹 서비스'),
-                projectPreferences: team.projectPreferences ?? ['포트폴리오', '실무경험'],
-                roleDistribution: demoDistribution,
-              }
-
-              return (
-                <TeamCard
-                  key={team.id}
-                  team={withDemo}
-                  onClick={(teamId) => onViewTeam?.(teamId)}
-                />
-              )
-            })}
-          </div>
-
-          {filteredTeams.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-gray-500">검색 조건에 맞는 팀이 없습니다.</p>
+          {isLoading ? (
+            <div className="flex justify-center items-center h-32">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
             </div>
           ) : (
             <>
