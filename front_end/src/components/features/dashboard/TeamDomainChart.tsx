@@ -1,36 +1,11 @@
-import { useMemo } from 'react'
+import { useState } from 'react'
 import Chart from 'react-apexcharts'
 import type { ApexOptions } from 'apexcharts'
 
-interface TeamDomainChartProps {
-  data?: Record<string, number>
-}
-
-const TeamDomainChart = ({ data }: TeamDomainChartProps) => {
-  const chartData = useMemo(() => {
-    if (!data) {
-      return {
-        series: [],
-        options: {
-          chart: {
-            type: 'polarArea' as const,
-            height: 350,
-            background: 'transparent',
-            toolbar: { show: false }
-          },
-          labels: [],
-          noData: {
-            text: '데이터를 불러오는 중...'
-          }
-        }
-      }
-    }
-    const labels = Object.keys(data)
-    const series = Object.values(data)
-    
-    return {
-      series,
-      options: {
+const TeamDomainChart = () => {
+  const [chartData] = useState({
+    series: [44, 55, 13, 43, 22],
+    options: {
       chart: {
         type: 'polarArea' as const,
         height: 350,
@@ -39,7 +14,7 @@ const TeamDomainChart = ({ data }: TeamDomainChartProps) => {
           show: false
         }
       },
-      labels,
+      labels: ['웹 개발', '모바일', 'AI/ML', '게임', 'IoT'],
       fill: {
         opacity: 0.8
       },
@@ -86,8 +61,7 @@ const TeamDomainChart = ({ data }: TeamDomainChartProps) => {
         }
       }]
     } as ApexOptions
-    }
-  }, [data])
+  })
 
   return (
     <div className="w-full">

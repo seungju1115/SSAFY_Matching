@@ -61,12 +61,12 @@ class DashboardServiceTest {
         assertThat(result.getUnmatchedUnmajor()).isEqualTo(1); // user5
 
         // Position별 매칭 상태 검증
-        assertThat(result.getBack_main()).isEqualTo(3);
-        assertThat(result.getBack_sub()).isEqualTo(0); // user4
-        assertThat(result.getFront_main()).isEqualTo(1); // user2
-        assertThat(result.getFront_sub()).isEqualTo(1); // user5
-        assertThat(result.getAi_main()).isEqualTo(1); // user2
-        assertThat(result.getAi_sub()).isEqualTo(0);
+        assertThat(result.getMatched_back()).isEqualTo(2); // user1, user3
+        assertThat(result.getUnmatched_back()).isEqualTo(1); // user4
+        assertThat(result.getMatched_front()).isEqualTo(1); // user2
+        assertThat(result.getUnmatched_front()).isEqualTo(1); // user5
+        assertThat(result.getMatched_ai()).isEqualTo(1); // user2
+        assertThat(result.getUnmatched_ai()).isEqualTo(0);
 
         // Domain 카운트 검증
         assertThat(result.getDomain()).hasSize(3);
@@ -96,8 +96,8 @@ class DashboardServiceTest {
         assertThat(result.getMathcedUnmajor()).isEqualTo(0);
         assertThat(result.getUnmatchedMajor()).isEqualTo(0);
         assertThat(result.getUnmatchedUnmajor()).isEqualTo(0);
-        assertThat(result.getBack_main()).isEqualTo(0);
-        assertThat(result.getBack_sub()).isEqualTo(0);
+        assertThat(result.getMatched_back()).isEqualTo(0);
+        assertThat(result.getUnmatched_back()).isEqualTo(0);
         assertThat(result.getDomain()).isEmpty();
     }
 
@@ -119,9 +119,9 @@ class DashboardServiceTest {
         assertThat(result.getMathcedUnmajor()).isEqualTo(1);
         assertThat(result.getUnmatchedMajor()).isEqualTo(0);
         assertThat(result.getUnmatchedUnmajor()).isEqualTo(0);
-        assertThat(result.getBack_main()).isEqualTo(1);
-        assertThat(result.getFront_main()).isEqualTo(1);
-        assertThat(result.getAi_main()).isEqualTo(1);
+        assertThat(result.getMatched_back()).isEqualTo(1);
+        assertThat(result.getMatched_front()).isEqualTo(1);
+        assertThat(result.getMatched_ai()).isEqualTo(1);
     }
 
     @Test
@@ -142,10 +142,31 @@ class DashboardServiceTest {
         assertThat(result.getMathcedUnmajor()).isEqualTo(0);
         assertThat(result.getUnmatchedMajor()).isEqualTo(1);
         assertThat(result.getUnmatchedUnmajor()).isEqualTo(1);
-        assertThat(result.getBack_sub()).isEqualTo(0);
-        assertThat(result.getFront_sub()).isEqualTo(0);
-        assertThat(result.getBack_main()).isEqualTo(1);
-        assertThat(result.getFront_main()).isEqualTo(1);
+        assertThat(result.getUnmatched_back()).isEqualTo(1);
+        assertThat(result.getUnmatched_front()).isEqualTo(1);
+        assertThat(result.getMatched_back()).isEqualTo(0);
+        assertThat(result.getMatched_front()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("다중 포지션을 가진 사용자에 대한 처리")
+    void getDashboard_UsersWithMultiplePositions_ShouldCountAllPositions() {
+        // Given
+        List<Object[]> multiPositionUsers = createMultiPositionUsers();
+
+        when(userRepository.CountUsers()).thenReturn(multiPositionUsers);
+        when(teamRepository.countDomain()).thenReturn(mockDomainCounts);
+
+        // When
+        DashboardResponseDto result = dashboardService.getDashboard();
+
+        // Then
+        assertThat(result.getWhole()).isEqualTo(1);
+        // 한 사용자가 BACKEND, FRONTEND, AI 포지션을 모두 가지고 있고 팀에 속해있음
+        assertThat(result.getMatched_back()).isEqualTo(1);
+        assertThat(result.getMatched_front()).isEqualTo(1);
+        assertThat(result.getMatched_ai()).isEqualTo(1);
+        assertThat(result.getMatchedMajor()).isEqualTo(1);
     }
 
     @Test

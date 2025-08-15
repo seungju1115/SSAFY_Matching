@@ -1,38 +1,5 @@
+import type { Team } from "@/components/features/home/TeamSection"
 import type { Developer } from "@/components/features/home/DeveloperSection"
-
-interface TeamMember {
-    name: string
-    avatar: string
-    role: string
-}
-
-interface Team {
-    id: number
-    name: string
-    description: string
-    tech: string[]
-    members: number
-    maxMembers: number
-    deadline: string
-    leader: TeamMember
-    domain?: string
-    projectPreferences?: string[]
-    roleDistribution?: {
-        backend: number
-        frontend: number
-        ai: number
-        design: number
-        pm: number
-    }
-    roleCurrent?: {
-        backend: number
-        frontend: number
-        ai: number
-        design: number
-        pm: number
-    }
-}
-
 
 // 팀 더미 데이터
 export const mockTeams: Team[] = [
@@ -62,7 +29,10 @@ export const mockTeams: Team[] = [
       name: "김개발",
       avatar: "",
       role: "Frontend Developer"
-    }
+    },
+    domains: ["웹 서비스", "커머스"],
+    teamAtmosphere: ["자율", "꾸준함", "소통"],
+    introduction: "React/TS 기반으로 안정적인 웹 서비스를 함께 개발할 팀원을 찾습니다."
   },
   {
     id: 2,
@@ -90,7 +60,10 @@ export const mockTeams: Team[] = [
       name: "박AI",
       avatar: "",
       role: "ML Engineer"
-    }
+    },
+    domains: ["AI", "데이터 분석"],
+    teamAtmosphere: ["도전", "연구", "집중"],
+    introduction: "실험과 학습을 중시하는 분위기에서 프로토타입을 빠르게 만들어봅니다."
   },
   {
     id: 3,
@@ -118,7 +91,10 @@ export const mockTeams: Team[] = [
       name: "이모바일",
       avatar: "",
       role: "Mobile Developer"
-    }
+    },
+    domains: ["모바일", "유틸리티"],
+    teamAtmosphere: ["협업", "속도", "유연"],
+    introduction: "Flutter로 사용자 경험이 뛰어난 모바일 앱을 빠르게 출시합니다."
   }
 ]
 

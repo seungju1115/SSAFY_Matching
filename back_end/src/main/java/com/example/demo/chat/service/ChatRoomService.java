@@ -11,8 +11,6 @@ import com.example.demo.team.entity.Team;
 import com.example.demo.user.dao.UserRepository;
 import com.example.demo.user.entity.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,13 +30,8 @@ public class ChatRoomService {
 
     @Transactional
     public ChatRoomResponse createPrivateChatRoom(ChatRoomRequest chatRoomRequest) {
-
         Long user1Id = chatRoomRequest.getUser1Id();
         Long user2Id = chatRoomRequest.getUser2Id();
-
-        if (user1Id.equals(user2Id)) {
-            throw new BusinessException(ErrorCode.INVALID_REQUEST);
-        }
 
         // chatRoomMembers를 미리 로딩
         User user1 = userRepository.findByIdWithChatRoomMembers(user1Id)

@@ -132,18 +132,9 @@ public class TeamMembershipRequestService {
         teamMembershipRequestRepository.save(request);
     }
 
-    public List<TeamMembershipResponse> getAllTeamRequest(Long teamId) {
+    public List<TeamMembershipResponse> getAllRequest(Long teamId) {
 
         List<TeamMembershipRequest> requests = teamMembershipRequestRepository.findAllByTeamId(teamId);
-
-        return requests.stream()
-                .map(TeamMembershipResponse::fromEntity)
-                .collect(Collectors.toList());
-    }
-
-    public List<TeamMembershipResponse> getAllUserRequest(Long userId) {
-
-        List<TeamMembershipRequest> requests = teamMembershipRequestRepository.findAllByUserId(userId);
 
         return requests.stream()
                 .map(TeamMembershipResponse::fromEntity)

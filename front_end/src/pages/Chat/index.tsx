@@ -3,12 +3,11 @@ import { userAPI } from '@/api/user';
 import type { UserSearchResponse } from '@/types/user';
 import PrivateChat from '@/components/features/privatechat';
 import { Button } from '@/components/ui/button';
-import useUserStore from '@/stores/userStore';
 
 export default function Chat() {
   const [users, setUsers] = useState<UserSearchResponse[]>([]);
   const [openChats, setOpenChats] = useState<Record<number, boolean>>({});
-  const myId = useUserStore(state => state.user?.id); // 내 ID
+
   // 🔹 렌더링 시 로그
   console.log('[Chat] Render', { usersLength: users.length, openChats });
 
@@ -32,7 +31,6 @@ export default function Chat() {
   }, []);
 
   const toggleChat = (userId: number) => {
-    if (userId === myId) return;
     console.log('[Chat] toggleChat called', { userId, prev: openChats[userId] });
     setOpenChats(prev => {
       const newState = { ...prev, [userId]: !prev[userId] };
@@ -46,9 +44,7 @@ export default function Chat() {
       <h1>Hello World</h1>
       <h2>Users without a team:</h2>
       <ul>
-        {users
-        .filter(user => user.id !== myId)
-        .map(user => (
+        {users.map(user => (
           <li key={user.id} style={{ marginBottom: '10px' }}>
             <div className="flex items-center gap-2">
               <span>{user.userName}</span>
@@ -57,7 +53,15 @@ export default function Chat() {
               </Button>
             </div>
 
-            {openChats[user.id] && <PrivateChat otherUserId={user.id} />}
+            {/* ✅ 재마운트 없이 토글, 디버깅 로그 */}
+            <div
+              style={{
+                display: openChats[user.id] ? 'block' : 'none',
+                marginTop: '10px',
+              }}
+            >
+              <PrivateChat otherUserId={user.id} />
+            </div>
           </li>
         ))}
       </ul>

@@ -1,17 +1,13 @@
 import { useMemo } from 'react'
 import Chart from 'react-apexcharts'
 import type { ApexOptions } from 'apexcharts'
+import { mockDevelopers } from '@/data/mockData'
 
-interface MajorMinorPieChartProps {
-  majorCount?: number
-  nonMajorCount?: number
-}
-
-const MajorMinorPieChart = ({ majorCount, nonMajorCount }: MajorMinorPieChartProps) => {
+const MajorMinorPieChart = () => {
   const { series, options } = useMemo(() => {
-    // API 데이터가 있으면 사용, 없으면 기본값 사용
-    const major = majorCount ?? 0
-    const nonMajor = nonMajorCount ?? 0
+    const major = mockDevelopers.filter(d => d.isMajor).length
+    const nonMajor = mockDevelopers.filter(d => !d.isMajor).length
+
     const data = [major, nonMajor]
 
     const opts: ApexOptions = {
@@ -55,26 +51,11 @@ const MajorMinorPieChart = ({ majorCount, nonMajorCount }: MajorMinorPieChartPro
     }
 
     return { series: data, options: opts }
-  }, [majorCount, nonMajorCount])
-
-  // 로딩 상태 표시
-  if (majorCount === undefined || nonMajorCount === undefined) {
-    return (
-      <div className="w-full h-[350px] flex items-center justify-center">
-        <div className="text-gray-500">데이터를 불러오는 중...</div>
-      </div>
-    )
-  }
+  }, [])
 
   return (
     <div className="w-full">
-      <Chart 
-        key={`major-minor-${majorCount}-${nonMajorCount}`}
-        options={options} 
-        series={series} 
-        type="pie" 
-        height={350} 
-      />
+      <Chart options={options} series={series} type="pie" height={350} />
     </div>
   )
 }

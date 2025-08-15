@@ -9,5 +9,4 @@ import java.util.List;
 @Repository
 public interface TeamMembershipRequestRepository extends JpaRepository<TeamMembershipRequest, Long> {
         List<TeamMembershipRequest> findAllByTeamId(Long teamId);
-        List<TeamMembershipRequest> findAllByUserId(Long userId);
 }

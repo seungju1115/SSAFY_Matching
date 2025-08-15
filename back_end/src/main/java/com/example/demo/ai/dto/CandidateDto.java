@@ -3,7 +3,6 @@ package com.example.demo.ai.dto;
 import com.example.demo.user.Enum.PositionEnum;
 import com.example.demo.user.Enum.ProjectGoalEnum;
 import com.example.demo.user.Enum.ProjectViveEnum;
-import com.example.demo.user.Enum.TechEnum;
 import com.example.demo.user.entity.User;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.*;
@@ -23,10 +22,8 @@ public class CandidateDto {
     private String userName;
     private String mainPos;
     private String subPos;
-    private String userProfile;
     private Set<ProjectGoalEnum> goals;
     private Set<ProjectViveEnum> vives;
-    private Set<TechEnum> techs;
 
     @QueryProjection
     public CandidateDto(Long userId, String userName) {
@@ -42,8 +39,6 @@ public class CandidateDto {
         dto.setVives(user.getProjectVive());
         dto.setMainPos(user.getWantedPosition().get(0).name());
         dto.setSubPos(user.getWantedPosition().get(1).name());
-        dto.setTechs(user.getTechStack());
-        dto.setUserProfile(user.getUserProfile());
         return dto;
     }
 }

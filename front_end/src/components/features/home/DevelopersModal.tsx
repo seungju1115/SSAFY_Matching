@@ -1,90 +1,73 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Search, Filter, ChevronDown } from 'lucide-react'
-import type { UserSearchResponse } from '@/types/user'
+import type { Developer } from './DeveloperSection'
 import DeveloperCard from './DeveloperCard'
-import { useUser } from '@/hooks/useUser'
 
 interface DevelopersModalProps {
   isOpen: boolean
   onClose: () => void
+  developers: Developer[]
   onViewProfile?: (developerId: number) => void
+  // 프로필(상세) 모달 열림 여부 (중첩 모달 시 ESC/바깥 클릭 무시용)
+  isProfileOpen?: boolean
 }
 
 export default function DevelopersModal({ 
   isOpen, 
   onClose, 
+  developers,
   onViewProfile,
+  isProfileOpen = false,
 }: DevelopersModalProps) {
-  const [developers, setDevelopers] = useState<UserSearchResponse[]>([])
-  const [isLoading, setIsLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedPositions, setSelectedPositions] = useState<string[]>([])
-  const [selectedTechs, setSelectedTechs] = useState<string[]>([])
+  const [selectedSkills, setSelectedSkills] = useState<string[]>([])
+  const [selectedRole, setSelectedRole] = useState<string>('')
   const [isFilterOpen, setIsFilterOpen] = useState(false)
-  const { getWaitingUsers } = useUser()
 
-  // 모달이 열릴 때 데이터 로드
-  useEffect(() => {
-    const loadDevelopers = async () => {
-      if (!isOpen) return
-
-      try {
-        setIsLoading(true)
-        const response = await getWaitingUsers()
-        setDevelopers(response)
-      } catch (error) {
-        console.error('대기중인 사용자 데이터 로딩 실패:', error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    loadDevelopers()
-  }, [isOpen])
-
-  // 모든 포지션과 기술스택 추출
-  const allPositions = Array.from(new Set(developers.flatMap(dev => dev.wantedPosition || [])))
-  const allTechs = Array.from(new Set(developers.flatMap(dev => dev.techStack || [])))
+  // 모든 포지션과 역할 추출
+  const allPositions = Array.from(new Set(developers.flatMap(dev => dev.positions || [dev.role])))
+  const allRoles = Array.from(new Set(developers.map(dev => dev.role)))
 
   // 필터링된 개발자 목록
   const filteredDevelopers = developers.filter(dev => {
-    const matchesSearch = dev.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (dev.wantedPosition?.[0]?.toLowerCase().includes(searchTerm.toLowerCase()) || false) ||
-                         (dev.wantedPosition?.some(pos => pos.toLowerCase().includes(searchTerm.toLowerCase())) || false) ||
-                         (dev.techStack?.some(tech => tech.toLowerCase().includes(searchTerm.toLowerCase())) || false)
+    const matchesSearch = dev.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         dev.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (dev.positions?.some(pos => pos.toLowerCase().includes(searchTerm.toLowerCase())) || false)
     
-    const matchesPositions = selectedPositions.length === 0 || 
-                           selectedPositions.some(position => dev.wantedPosition?.includes(position))
+    const matchesSkills = selectedSkills.length === 0 || 
+                         selectedSkills.some(skill => dev.positions?.includes(skill) || dev.role === skill)
     
-    const matchesTechs = selectedTechs.length === 0 || 
-                        selectedTechs.some(tech => dev.techStack?.includes(tech))
+    const matchesRole = !selectedRole || dev.role === selectedRole
     
-    return matchesSearch && matchesPositions && matchesTechs
+    return matchesSearch && matchesSkills && matchesRole
   })
 
-  const togglePosition = (position: string) => {
-    setSelectedPositions(prev => 
-      prev.includes(position) 
-        ? prev.filter(p => p !== position)
-        : [...prev, position]
-    )
-  }
-
-  const toggleTech = (tech: string) => {
-    setSelectedTechs(prev => 
-      prev.includes(tech) 
-        ? prev.filter(t => t !== tech)
-        : [...prev, tech]
+  const toggleSkill = (skill: string) => {
+    setSelectedSkills(prev => 
+      prev.includes(skill) 
+        ? prev.filter(s => s !== skill)
+        : [...prev, skill]
     )
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-7xl max-h-[90vh] overflow-hidden flex flex-col">
+    <Dialog 
+      open={isOpen} 
+      modal={false}
+      onOpenChange={(open) => {
+        // 프로필 모달이 열려 있을 때는 DevelopersModal 닫힘을 무시
+        if (!open && isProfileOpen) return
+        if (!open) onClose()
+      }}
+    >
+      <DialogContent 
+        overlayClassName={isProfileOpen ? 'pointer-events-none' : undefined}
+        className="max-w-7xl max-h-[90vh] overflow-hidden flex flex-col"
+      >
         <DialogHeader className="flex-shrink-0">
           <div className="flex items-center justify-between">
             <DialogTitle className="text-2xl font-bold">대기자 전체보기</DialogTitle>
@@ -117,35 +100,42 @@ export default function DevelopersModal({
           {/* 필터 옵션 */}
           {isFilterOpen && (
             <div className="space-y-4">
-              {/* 포지션 필터 */}
+              {/* 역할 필터 */}
               <div className="space-y-2">
-                <p className="text-sm font-medium text-gray-700">포지션</p>
+                <p className="text-sm font-medium text-gray-700">역할</p>
                 <div className="flex flex-wrap gap-2">
-                  {allPositions.slice(0, 10).map((position: string) => (
+                  <Badge
+                    variant={!selectedRole ? "default" : "outline"}
+                    className="cursor-pointer"
+                    onClick={() => setSelectedRole('')}
+                  >
+                    전체
+                  </Badge>
+                  {allRoles.map(role => (
                     <Badge
-                      key={position}
-                      variant={selectedPositions.includes(position) ? "default" : "outline"}
+                      key={role}
+                      variant={selectedRole === role ? "default" : "outline"}
                       className="cursor-pointer"
-                      onClick={() => togglePosition(position)}
+                      onClick={() => setSelectedRole(role)}
                     >
-                      {position}
+                      {role}
                     </Badge>
                   ))}
                 </div>
               </div>
 
-              {/* 기술스택 필터 */}
+              {/* 포지션 필터 */}
               <div className="space-y-2">
-                <p className="text-sm font-medium text-gray-700">기술 스택</p>
+                <p className="text-sm font-medium text-gray-700">포지션</p>
                 <div className="flex flex-wrap gap-2">
-                  {allTechs.slice(0, 15).map((tech: string) => (
+                  {allPositions.slice(0, 12).map((position: string) => (
                     <Badge
-                      key={tech}
-                      variant={selectedTechs.includes(tech) ? "default" : "outline"}
+                      key={position}
+                      variant={selectedSkills.includes(position) ? "default" : "outline"}
                       className="cursor-pointer"
-                      onClick={() => toggleTech(tech)}
+                      onClick={() => toggleSkill(position)}
                     >
-                      {tech}
+                      {position}
                     </Badge>
                   ))}
                 </div>
@@ -156,30 +146,20 @@ export default function DevelopersModal({
 
         {/* 개발자 목록 */}
         <div className="flex-1 overflow-y-auto">
-          {isLoading ? (
-            <div className="flex justify-center items-center h-32">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            </div>
-          ) : (
-            <>
-              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 p-1">
-                {filteredDevelopers.map((dev) => (
-                  <DeveloperCard 
-                    key={dev.id}
-                    developer={dev}
-                    onClick={(developerId) => onViewProfile?.(developerId)}
-                  />
-                ))}
-              </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 p-1">
+            {filteredDevelopers.map((dev) => (
+              <DeveloperCard 
+                key={dev.id}
+                developer={dev}
+                onClick={(developerId) => onViewProfile?.(developerId)}
+              />
+            ))}
+          </div>
 
-              {!isLoading && filteredDevelopers.length === 0 && (
-                <div className="text-center py-12">
-                  <p className="text-gray-500">
-                    {developers.length === 0 ? '대기중인 개발자가 없습니다.' : '검색 조건에 맞는 개발자가 없습니다.'}
-                  </p>
-                </div>
-              )}
-            </>
+          {filteredDevelopers.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-gray-500">검색 조건에 맞는 개발자가 없습니다.</p>
+            </div>
           )}
         </div>
 

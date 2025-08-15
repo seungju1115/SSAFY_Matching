@@ -142,12 +142,7 @@ public class GlobalExceptionHandler {
             }
         }
 
-        log.error("==================== UNHANDLED EXCEPTION ====================");
-        log.error("Request URI: {} {}", request.getMethod(), request.getRequestURI());
-        log.error("Exception Type: {}", ex.getClass().getName());
-        log.error("Exception Message: {}", ex.getMessage());
-//        log.error("Full Stack Trace: ", ex);
-        log.error("============================================================");
+        log.error("Full Stack Trace: ", ex);
 
         ErrorCode code = ErrorCode.INTERNAL_ERROR;
         return ResponseEntity
