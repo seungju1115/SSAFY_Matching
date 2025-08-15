@@ -18,7 +18,7 @@ const MajorMinorPieChart = () => {
         toolbar: { show: false }
       },
       labels: ['전공자', '비전공자'],
-      colors: ['#475569', '#10B981'], // slate-600, emerald-500
+      colors: ['#475569', '#10B981'], // slate-600, emerald-500_
       dataLabels: {
         enabled: true,
         formatter: (val: number) => `${Math.round(val)}%`,
