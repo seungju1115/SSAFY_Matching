@@ -37,8 +37,8 @@ public class CandidateDto {
         dto.setUserName(user.getUserName());
         dto.setGoals(user.getProjectGoal());
         dto.setVives(user.getProjectVive());
-        dto.setMainPos(user.getWantedPosition().get(0).name());
-        dto.setSubPos(user.getWantedPosition().get(1).name());
+        if(user.getWantedPosition().size()>0) dto.setMainPos(user.getWantedPosition().get(0).name());
+        if(user.getWantedPosition().size()>1) dto.setSubPos(user.getWantedPosition().get(1).name());
         return dto;
     }
 }
