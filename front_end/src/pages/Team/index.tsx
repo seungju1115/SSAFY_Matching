@@ -11,11 +11,12 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import Header from '@/components/layout/Header';
 import UserRecommendationModal from '@/components/features/team/SimpleUserModal';
-import { Crown, UserPlus, LogOut } from 'lucide-react';
+import { Crown, UserPlus, LogOut, Pencil } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ProjectGoalEnum, ProjectViveEnum } from '@/types/team';
 import type { UserDetailResponse } from '@/types/user';
 import TeamChat from '@/components/features/teamchat';
+import EditTeamModal from '@/components/features/team/EditTeamModal';
 
 // 기존 상수들은 그대로 유지합니다.
 const projectGoalLabels: Record<ProjectGoalEnum, string> = {
@@ -65,6 +66,7 @@ const TeamPage: React.FC = () => {
   const user = useUserStore((state) => state.user);
   const { leaveTeam } = useTeam();
   const [isRecommendModalOpen, setIsRecommendModalOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
 
   const handleSelectUser = (users: any[]) => {
     console.log('선택된 사용자:', users);
@@ -191,7 +193,15 @@ const TeamPage: React.FC = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">팀 소개</h3>
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-medium text-gray-700">팀 소개</h3>
+                    {user?.id === teamInfo.leader.id && (
+                      <Button variant="outline" size="sm" onClick={() => setIsEditOpen(true)}>
+                        <Pencil className="w-4 h-4 mr-1" />
+                        팀 정보 수정
+                      </Button>
+                    )}
+                  </div>
                   <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
                     {teamInfo.teamDescription}
                   </p>
@@ -294,6 +304,12 @@ const TeamPage: React.FC = () => {
         isOpen={isRecommendModalOpen}
         onClose={() => setIsRecommendModalOpen(false)}
         onSelectUser={handleSelectUser}
+      />
+      {/* 팀 정보 수정 모달 */}
+      <EditTeamModal
+        isOpen={isEditOpen}
+        onClose={() => setIsEditOpen(false)}
+        team={teamInfo}
       />
     </div>
   );
