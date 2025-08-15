@@ -32,8 +32,9 @@ apiClient.interceptors.request.use(
     //       2) 회원가입 프로필 생성 엔드포인트(POST /users/profile)
     const isPublicPath = (
       urlPath.includes('/users/login') ||
+      urlPath.includes('/chatroom') ||
       (method === 'POST' && urlPath.includes('/users/profile'))
-    )
+    );
     
     console.log('API Request:', {
       url: config.url,
