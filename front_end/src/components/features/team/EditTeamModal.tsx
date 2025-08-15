@@ -269,7 +269,8 @@ export default function EditTeamModal({ isOpen, onClose, team }: EditTeamModalPr
         </div>
 
         <DialogFooter className="px-6 py-4 flex gap-2">
-          <Button onClick={handleSave}>닫기</Button>
+          <Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700 text-white">수정</Button>
+          <Button variant="outline" onClick={onClose}>닫기</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
