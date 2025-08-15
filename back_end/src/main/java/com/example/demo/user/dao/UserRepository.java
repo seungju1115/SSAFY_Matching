@@ -32,7 +32,7 @@ public interface UserRepository extends JpaRepository<User,Long> {
         SELECT 
             u.team_id,
             u.major,
-            GROUP_CONCAT(DISTINCT up.wanted_position ORDER BY up.wanted_position SEPARATOR ',') as positions
+            STRING_AGG(DISTINCT up.wanted_position, ',' ORDER BY up.wanted_position) as positions
         FROM users u
         LEFT JOIN user_wanted_position up ON u.user_id = up.user_user_id
         GROUP BY u.user_id, u.user_name
@@ -70,9 +70,9 @@ public interface UserRepository extends JpaRepository<User,Long> {
         SELECT 
             u.user_id,
             u.user_name,
-            GROUP_CONCAT(DISTINCT up.wanted_position ORDER BY up.wanted_position SEPARATOR ',') as positions,
-            GROUP_CONCAT(DISTINCT upg.project_preference SEPARATOR ',') as goals,
-            GROUP_CONCAT(DISTINCT upv.personal_preference SEPARATOR ',') as vives
+            STRING_AGG(DISTINCT up.wanted_position, ',' ORDER BY up.wanted_position) as positions,
+            STRING_AGG(DISTINCT upg.project_preference, ',') as goals,
+            STRING_AGG(DISTINCT upv.personal_preference, ',') as vives
         FROM users u
         LEFT JOIN user_wanted_position up ON u.user_id = up.user_user_id
         LEFT JOIN user_project_goal upg ON u.user_id = upg.user_user_id  
