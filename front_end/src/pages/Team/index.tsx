@@ -63,7 +63,7 @@ const TeamPage: React.FC = () => {
   } = useTeamStore();
   const setUser = useUserStore((state) => state.setUser);
   const user = useUserStore((state) => state.user);
-  const { leaveTeam } = useTeam();
+  const { leaveTeam, deleteTeam } = useTeam();
   const [isRecommendModalOpen, setIsRecommendModalOpen] = useState(false);
 
   const handleSelectUser = (users: any[]) => {
@@ -103,18 +103,39 @@ const TeamPage: React.FC = () => {
   }, [teamId, getTeamDetailById, setTeamDetail, setLoading, setError]);
 
   const handleLeaveTeam = async () => {
-    if (user && user.id !== null && confirm('정말로 팀을 나가시겠습니까?')) {
-      try {
-        await leaveTeam(user.id);
-              // 기존 user를 복사하고 teamId, teamName만 null로 변경
-      setUser({
-        ...user,
-        teamId: null,
-        teamName: null,
-      });
-        navigate('/');
-      } catch (error) {
-        console.error("Failed to leave team:", error);
+    if (!user || !user.id || !teamInfo || !teamId) return;
+
+    const isLeader = user.id === teamInfo.leader.id;
+
+    if (isLeader) {
+      // 팀 리더인 경우: 팀 삭제
+      if (confirm('정말로 팀을 삭제하시겠습니까?')) {
+        try {
+          await deleteTeam(teamId);
+          setUser({
+            ...user,
+            teamId: null,
+            teamName: null,
+          });
+          navigate('/');
+        } catch (error) {
+          console.error("Failed to delete team:", error);
+        }
+      }
+    } else {
+      // 팀 멤버인 경우: 팀 나가기
+      if (confirm('정말로 팀을 나가시겠습니까?')) {
+        try {
+          await leaveTeam(user.id);
+          setUser({
+            ...user,
+            teamId: null,
+            teamName: null,
+          });
+          navigate('/');
+        } catch (error) {
+          console.error("Failed to leave team:", error);
+        }
       }
     }
   };
