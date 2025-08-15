@@ -1,13 +1,23 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { User, LogOut, Settings, ChevronDown, BarChart3 } from 'lucide-react'
+import { User, LogOut, Settings, ChevronDown, BarChart3, Bell } from 'lucide-react'
 import useUserStore from '@/stores/userStore'
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+} from '@/components/ui/alert-dialog'
 
 export default function Header() {
   const navigate = useNavigate()
   const { user, isLoggedIn, logout } = useUserStore()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [isNoTeamDialogOpen, setIsNoTeamDialogOpen] = useState(false)
 
   const handleLogout = () => {
     logout()
@@ -19,6 +29,14 @@ export default function Header() {
   const getUserInitial = (name: string | null) => {
     if (!name) return 'U'
     return name.charAt(0).toUpperCase()
+  }
+
+  const handleMyTeamClick = () => {
+    if (user?.teamId) {
+      navigate('/team')
+    } else {
+      setIsNoTeamDialogOpen(true)
+    }
   }
 
   return (
@@ -55,6 +73,19 @@ export default function Header() {
               className="text-gray-700 hover:text-blue-600 transition-colors"
             >
               팀 만들기
+            </button>
+            <button
+              onClick={handleMyTeamClick}
+              className="text-gray-700 hover:text-blue-600 transition-colors"
+            >
+              내 팀
+            </button>
+            <button
+              onClick={() => navigate('/team-invitation/1')}
+              className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 transition-colors"
+            >
+              <Bell className="h-4 w-4" />
+              <span>알림</span>
             </button>
           </nav>
 
@@ -133,6 +164,23 @@ export default function Header() {
           </div>
         </div>
       </div>
+
+      {/* 내 팀 없음 경고 다이얼로그 */}
+      <AlertDialog open={isNoTeamDialogOpen} onOpenChange={setIsNoTeamDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>가입된 팀이 없습니다</AlertDialogTitle>
+            <AlertDialogDescription>
+              새로운 팀을 만들거나 기존 팀에 참여해보세요.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setIsNoTeamDialogOpen(false)}>
+              확인
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </header>
   )
 }
