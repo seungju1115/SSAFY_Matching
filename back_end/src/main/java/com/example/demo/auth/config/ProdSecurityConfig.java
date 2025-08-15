@@ -52,7 +52,7 @@ public class ProdSecurityConfig {
                 c ->
                         c.requestMatchers("/error", "/users/login",
                                         "/login/oauth2/code/**", "/h2-console/**", "/ws-chat/**").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/team", "/team/search", "/users/profile", "/hello","/users/profile/waiting").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/team", "/team/search", "/users/profile", "/hello","/users/profile/waiting", "/cache/**", "/dashboard/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/users/profile","/users/profile/search").permitAll()
                                 .requestMatchers("/chatroom/**", "/ws-chat/**").authenticated()
                                 .anyRequest().authenticated());
