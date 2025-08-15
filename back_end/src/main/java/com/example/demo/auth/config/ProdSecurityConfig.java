@@ -41,7 +41,7 @@ public class ProdSecurityConfig {
 //        http.cors(c -> c.configurationSource(corsConfigurationSource));
         http.cors(cors -> cors.configurationSource(request -> {
             CorsConfiguration config = new CorsConfiguration();
-            config.setAllowedOrigins(List.of("https://i13a307.p.ssafy.io")); // 프론트엔드 Origin 명시적 허용
+            config.setAllowedOrigins(List.of(frontUrl)); // 프론트엔드 Origin 명시적 허용
             config.setAllowedMethods(List.of("*"));
             config.setAllowedHeaders(List.of("*"));
             config.setAllowCredentials(true);
