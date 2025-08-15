@@ -315,6 +315,7 @@ const TeamPage: React.FC = () => {
         isOpen={isRecommendModalOpen}
         onClose={() => setIsRecommendModalOpen(false)}
         onSelectUser={handleSelectUser}
+        teamId={teamId}
       />
     </div>
   );
