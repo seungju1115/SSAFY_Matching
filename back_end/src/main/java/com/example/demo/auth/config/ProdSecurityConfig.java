@@ -51,10 +51,9 @@ public class ProdSecurityConfig {
         http.authorizeHttpRequests(
                 c ->
                         c.requestMatchers("/error", "/users/login",
-                                        "/login/oauth2/code/**", "/h2-console/**", "/ws-chat/**").permitAll()
+                                        "/login/oauth2/code/**", "/h2-console/**", "/ws-chat/**", "/cache/**", "/dashboard/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/team", "/team/search", "/users/profile", "/hello","/users/profile/waiting").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/users/profile","/users/profile/search").permitAll()
-                                .requestMatchers(HttpMethod.DELETE, "/cache/**").permitAll()
                                 .requestMatchers("/chatroom/**", "/ws-chat/**").authenticated()
                                 .anyRequest().authenticated());
 
