@@ -146,7 +146,7 @@ public class GlobalExceptionHandler {
         log.error("Request URI: {} {}", request.getMethod(), request.getRequestURI());
         log.error("Exception Type: {}", ex.getClass().getName());
         log.error("Exception Message: {}", ex.getMessage());
-        log.error("Full Stack Trace: ", ex);
+//        log.error("Full Stack Trace: ", ex);
         log.error("============================================================");
 
         ErrorCode code = ErrorCode.INTERNAL_ERROR;
