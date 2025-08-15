@@ -2,13 +2,26 @@ import { useMemo, useState } from 'react'
 import Chart from 'react-apexcharts'
 import type { ApexOptions } from 'apexcharts'
 import { Button } from '@/components/ui/button'
-import { mockDevelopers } from '@/data/mockData'
 
 interface PositionDonutChartProps {
   defaultView?: 'primary' | 'secondary'
+  mainPositions?: {
+    ai: number
+    backend: number
+    frontend: number
+    design: number
+    pm: number
+  }
+  subPositions?: {
+    ai: number
+    backend: number
+    frontend: number
+    design: number
+    pm: number
+  }
 }
 
-const PositionDonutChart = ({ defaultView = 'primary' }: PositionDonutChartProps) => {
+const PositionDonutChart = ({ defaultView = 'primary', mainPositions, subPositions }: PositionDonutChartProps) => {
   const [view, setView] = useState<'primary' | 'secondary'>(defaultView)
 
   const { series, options } = useMemo(() => {
@@ -16,25 +29,22 @@ const PositionDonutChart = ({ defaultView = 'primary' }: PositionDonutChartProps
     const labels = ['백엔드', '프론트엔드', 'AI', '디자인', 'PM']
     const colors = ['#7986CB', '#64B5F6', '#81C784', '#4DB6AC', '#90CAF9']
 
-    // 주 포지션(Primary): developer.role 기준 집계
-    const primaryMap = new Map(labels.map(l => [l, 0])) as Map<string, number>
-    mockDevelopers.forEach(dev => {
-      if (labels.includes(dev.role)) {
-        primaryMap.set(dev.role, (primaryMap.get(dev.role) || 0) + 1)
-      }
-    })
-    const primaryData = labels.map(l => primaryMap.get(l) || 0)
-
-    // 부 포지션(Secondary): positions 중 role과 다른 첫 번째 포지션 집계
-    const secondaryMap = new Map(labels.map(l => [l, 0])) as Map<string, number>
-    mockDevelopers.forEach(dev => {
-      const subs = (dev.positions || []).filter(p => p && p !== dev.role)
-      const first = subs.find(p => labels.includes(p))
-      if (first) {
-        secondaryMap.set(first, (secondaryMap.get(first) || 0) + 1)
-      }
-    })
-    const secondaryData = labels.map(l => secondaryMap.get(l) || 0)
+    // API 데이터가 없으면 기본값 사용
+    const primaryData = mainPositions ? [
+      mainPositions.backend,
+      mainPositions.frontend,
+      mainPositions.ai,
+      mainPositions.design,
+      mainPositions.pm
+    ] : [0, 0, 0, 0, 0]
+    
+    const secondaryData = subPositions ? [
+      subPositions.backend,
+      subPositions.frontend,
+      subPositions.ai,
+      subPositions.design,
+      subPositions.pm
+    ] : [0, 0, 0, 0, 0]
 
     const opts: ApexOptions = {
       chart: {
@@ -101,7 +111,38 @@ const PositionDonutChart = ({ defaultView = 'primary' }: PositionDonutChartProps
       series: view === 'primary' ? primaryData : secondaryData,
       options: opts
     }
-  }, [view])
+  }, [view, mainPositions, subPositions])
+
+  // API 데이터가 없으면 로딩 상태 표시
+  if (!mainPositions || !subPositions) {
+    return (
+      <div className="w-full">
+        <div className="flex items-center justify-end gap-2 mb-2">
+          <Button
+            type="button"
+            size="sm"
+            variant={view === 'primary' ? 'default' : 'outline'}
+            className="h-8 px-3 text-xs"
+            disabled
+          >
+            주 포지션
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant={view === 'secondary' ? 'default' : 'outline'}
+            className="h-8 px-3 text-xs"
+            disabled
+          >
+            부 포지션
+          </Button>
+        </div>
+        <div className="w-full h-[350px] flex items-center justify-center">
+          <div className="text-gray-500">데이터를 불러오는 중...</div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="w-full">

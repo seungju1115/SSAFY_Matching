@@ -1,8 +1,18 @@
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Plus, Filter } from "lucide-react"
 import DeveloperCard from "./DeveloperCard"
+import { useUser } from "@/hooks/useUser"
+import type { UserSearchResponse } from "@/types/user"
 
-interface Developer {
+interface DeveloperSectionProps {
+  onRegister?: () => void
+  onViewAll?: () => void
+  onFilter?: () => void
+  onViewProfile?: (developerId: number) => void
+}
+
+export interface Developer {
   id: number
   name: string
   role: string
@@ -15,21 +25,45 @@ interface Developer {
   techStack?: { name: string; level: number }[]
 }
 
-interface DeveloperSectionProps {
-  developers: Developer[]
-  onRegister?: () => void
-  onViewAll?: () => void
-  onFilter?: () => void
-  onViewProfile?: (developerId: number) => void
-}
-
 export default function DeveloperSection({ 
-  developers, 
   onRegister, 
   onViewAll,
   onFilter,
   onViewProfile,
 }: DeveloperSectionProps) {
+  const [developers, setDevelopers] = useState<UserSearchResponse[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const { getWaitingUsers } = useUser()
+
+  useEffect(() => {
+    const loadDevelopers = async () => {
+      try {
+        setIsLoading(true)
+        const response = await getWaitingUsers()
+        
+        // 최대 6명으로 제한 (TeamSection과 유사하게)
+        const waitingUsers = response.slice(0, 6)
+        setDevelopers(waitingUsers)
+      } catch (error) {
+        console.error('대기중인 사용자 데이터 로딩 실패:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadDevelopers()
+  }, [])
+
+  if (isLoading) {
+    return (
+      <section className="mb-12 sm:mb-16">
+        <div className="flex justify-center items-center h-32">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        </div>
+      </section>
+    )
+  }
+
   return (
     <section className="mb-12 sm:mb-16">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8 gap-4">
@@ -66,4 +100,4 @@ export default function DeveloperSection({
 }
 
 // 타입 export
-export type { Developer, DeveloperSectionProps }
+export type { DeveloperSectionProps }

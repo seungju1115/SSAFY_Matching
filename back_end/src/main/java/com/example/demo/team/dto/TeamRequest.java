@@ -51,6 +51,12 @@ public class TeamRequest {
     private Set<ProjectViveEnum> teamVive;
 
     @Schema(
+            description = "팀 내 필요 포지션",
+            example = "[\"FRONTEND\", \"BACKEND\"]"
+    )
+    private String memberWanted;
+
+    @Schema(
             description = "팀 목표/선호사항 (Enum Set)",
             example = "[\"PORTFOLIO\", \"COMMERCIALIZATION\"]",
             requiredMode = Schema.RequiredMode.REQUIRED
