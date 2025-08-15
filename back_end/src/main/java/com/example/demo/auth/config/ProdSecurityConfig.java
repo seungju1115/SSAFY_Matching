@@ -39,7 +39,7 @@ public class ProdSecurityConfig {
                                         "/login/oauth2/code/**", "/h2-console/**", "/ws-chat/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/team", "/team/search", "/users/profile", "/hello","/users/profile/waiting").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/users/profile","/users/profile/search").permitAll()
-                                .requestMatchers("/chatroom/**", "/ws-chat/**").permitAll()
+                                .requestMatchers("/chatroom/**", "/ws-chat/**").authenticated()
                                 .anyRequest().authenticated());
 
         http.oauth2Login(oauth2 -> oauth2
