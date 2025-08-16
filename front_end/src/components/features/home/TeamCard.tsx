@@ -16,8 +16,7 @@ export default function TeamCard({
   className = ""
 }: TeamCardProps) {
   return (
-    <Card className={`hover:shadow-md transition-shadow duration-200 cursor-pointer bg-white border border-gray-100 rounded-lg h-full flex flex-col ${className}`} 
-          onClick={() => onClick?.(team.id)}>
+    <Card className={`hover:shadow-md transition-shadow duration-200 bg-white border border-gray-100 rounded-lg h-full flex flex-col ${className}`}>
       <CardHeader className="pb-3">
         <div className="flex items-start gap-3">
           <div className="flex-1">

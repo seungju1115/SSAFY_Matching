@@ -34,43 +34,6 @@ interface SimpleUserModalProps {
   teamId?: number // AI 추천을 위한 팀 ID
 }
 
-// 모의 데이터
-const mockRecommendedUsers: User[] = [
-  {
-    id: '1',
-    name: '김개발',
-    mainPosition: '프론트엔드',
-    subPosition: 'UI/UX',
-    domain: '웹 개발',
-    techStack: ['React', 'TypeScript', 'Tailwind CSS', 'Next.js'],
-    projectPreferences: ['혁신적인', '사용자 중심', '빠른 개발'],
-    personalPreferences: ['소통 활발', '책임감 강함', '학습 열정'],
-    introduction: '사용자 경험을 최우선으로 생각하는 프론트엔드 개발자입니다. 새로운 기술 학습을 즐기며, 팀원들과의 활발한 소통을 통해 더 나은 결과를 만들어내고 싶습니다.'
-  },
-  {
-    id: '2',
-    name: '이백엔드',
-    mainPosition: '백엔드',
-    subPosition: 'DevOps',
-    domain: '서버 개발',
-    techStack: ['Node.js', 'Python', 'Docker', 'AWS', 'MongoDB'],
-    projectPreferences: ['확장 가능한', '안정적인', '성능 최적화'],
-    personalPreferences: ['체계적 사고', '문제 해결', '꼼꼼함'],
-    introduction: '안정적이고 확장 가능한 서버 아키텍처 구축에 전문성을 가지고 있습니다. 복잡한 문제를 체계적으로 분석하고 해결하는 것을 좋아합니다.'
-  },
-  {
-    id: '3',
-    name: '박풀스택',
-    mainPosition: '풀스택',
-    subPosition: '기획',
-    domain: '웹/앱 개발',
-    techStack: ['Vue.js', 'Spring Boot', 'MySQL', 'Flutter'],
-    projectPreferences: ['창의적인', '실용적인', '완성도 높은'],
-    personalPreferences: ['균형감각', '적응력', '리더십'],
-    introduction: '프론트엔드부터 백엔드까지 전체적인 개발 프로세스를 이해하고 있으며, 기획 단계부터 참여하여 사용자 관점에서 생각하는 개발자입니다.'
-  }
-]
-
 const SimpleUserModal = ({ 
   isOpen, 
   onClose, 
@@ -98,10 +61,10 @@ const SimpleUserModal = ({
     introduction: candidate.userProfile || '자기소개 정보가 없습니다.'
   })
 
-  // AI 추천 데이터가 있으면 사용, 없으면 mock 데이터 사용
+  // AI 추천 데이터가 있으면 사용, 없으면 빈 배열 반환
   const recommendedUsers: User[] = candidatesDisplay.length > 0 
     ? candidatesDisplay.map(convertCandidateToUser)
-    : mockRecommendedUsers
+    : []
   
   // 팀 ID가 있을 때 AI 추천 요청
   useEffect(() => {

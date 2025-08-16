@@ -59,9 +59,9 @@ export default function DeveloperCard({
   const techStackNames = developer.techStack || []
 
   return (
-    <Card className={`hover:shadow-lg transition-all duration-300 cursor-pointer bg-gradient-to-br from-white to-slate-50/50 border-l-4 h-full flex flex-col ${
+    <Card className={`hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-white to-slate-50/50 border-l-4 h-full flex flex-col ${
       developer.major ? 'border-l-slate-400' : 'border-l-emerald-400'
-    } ${className}`} onClick={() => onClick?.(developer.id)}>
+    } ${className}`}>
       <CardHeader className="pb-3 relative">
         <div className="absolute top-3 right-3">
           <div className={`p-1.5 rounded-full ${

@@ -12,10 +12,12 @@ interface TeamsModalProps {
   isOpen: boolean
   onClose: () => void
   onViewTeam?: (teamId: number) => void
+  // 팀 상세 모달 열림 여부 (중첩 모달 시 ESC/바깥 클릭 무시용)
+  isDetailOpen?: boolean
 }
 
 
-export default function TeamsModal({ isOpen, onClose, onViewTeam }: TeamsModalProps) {
+export default function TeamsModal({ isOpen, onClose, onViewTeam, isDetailOpen = false }: TeamsModalProps) {
   const [teams, setTeams] = useState<Team[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
@@ -71,10 +73,16 @@ export default function TeamsModal({ isOpen, onClose, onViewTeam }: TeamsModalPr
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
+    <Dialog open={isOpen} onOpenChange={(open: boolean) => {
+      if (!open && isDetailOpen) return
+      onClose()
+    }} modal={false}>
+      <DialogContent overlayClassName={isDetailOpen ? 'pointer-events-none' : undefined} className={`max-w-7xl h-[90vh] flex flex-col`}>
+        <div className="flex flex-col h-full min-h-0 overflow-hidden pointer-events-auto">
         <DialogHeader className="flex-shrink-0">
-          <DialogTitle className="text-2xl font-bold">팀 전체보기</DialogTitle>
+          <div className="flex items-center justify-between">
+            <DialogTitle className="text-2xl font-bold">팀 전체보기</DialogTitle>
+          </div>
         </DialogHeader>
 
         {/* 검색 및 필터 */}
@@ -121,14 +129,14 @@ export default function TeamsModal({ isOpen, onClose, onViewTeam }: TeamsModalPr
         </div>
 
         {/* 팀 목록 */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 min-h-0 overflow-y-auto">
           {isLoading ? (
             <div className="flex justify-center items-center h-32">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-1">
+              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 p-1">
                 {filteredTeams.map((team) => (
                   <TeamCard
                     key={team.id}
@@ -154,6 +162,7 @@ export default function TeamsModal({ isOpen, onClose, onViewTeam }: TeamsModalPr
           <p className="text-sm text-gray-600 text-center">
             총 {filteredTeams.length}개의 팀이 있습니다.
           </p>
+        </div>
         </div>
       </DialogContent>
     </Dialog>

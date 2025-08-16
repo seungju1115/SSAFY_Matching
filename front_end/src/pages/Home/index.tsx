@@ -7,12 +7,94 @@ import TeamSection from "@/components/features/home/TeamSection"
 import DeveloperSection from "@/components/features/home/DeveloperSection"
 import TeamsModal from "@/components/features/home/TeamsModal"
 import DevelopersModal from "@/components/features/home/DevelopersModal"
+import TeamDetailModal from "@/components/features/home/TeamDetailModal"
+import UserProfileModal from "@/components/features/home/UserProfileModal"
+import { useTeam, type Team } from "@/hooks/useTeam"
+import { useUser } from "@/hooks/useUser"
+import type { UserSearchResponse } from "@/types/user"
 
 // Home 페이지 (메인페이지)
 export default function Home() {
   const navigate = useNavigate();
   const [isTeamsModalOpen, setIsTeamsModalOpen] = useState(false)
   const [isDevelopersModalOpen, setIsDevelopersModalOpen] = useState(false)
+  const [isTeamDetailModalOpen, setIsTeamDetailModalOpen] = useState(false)
+  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null)
+  
+  // 중첩 모달 상태 관리
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
+  const [isTeamDetailFromModalOpen, setIsTeamDetailFromModalOpen] = useState(false)
+  
+  // 프로필 모달 상태
+  const [selectedUser, setSelectedUser] = useState<UserSearchResponse | null>(null)
+  
+  const { requestJoinTeam, inviteToTeam, fetchTeamDetail, convertTeamDetailToTeam } = useTeam()
+  const { getUserProfile } = useUser()
+
+  // 팀 상세보기 핸들러
+  const handleViewTeam = async (teamId: number) => {
+    try {
+      console.log('팀 보기:', teamId)
+      const teamDetail = await fetchTeamDetail(teamId)
+      
+      if (teamDetail) {
+        const convertedTeam = convertTeamDetailToTeam(teamDetail)
+        setSelectedTeam(convertedTeam)
+        setIsTeamDetailModalOpen(true)
+        setIsTeamDetailFromModalOpen(true)
+      }
+    } catch (error) {
+      console.error('팀 상세 정보 로딩 실패:', error)
+    }
+  }
+
+  // 프로필 보기 핸들러
+  const handleViewProfile = async (developerId: number) => {
+    try {
+      console.log('프로필 보기:', developerId)
+      const userProfile = await getUserProfile(developerId)
+      
+      if (userProfile) {
+        const userSearchResponse: UserSearchResponse = {
+          id: userProfile.id,
+          userName: userProfile.userName,
+          userProfile: userProfile.userProfile,
+          major: userProfile.major,
+          lastClass: userProfile.lastClass,
+          wantedPosition: userProfile.wantedPosition,
+          techStack: userProfile.techStack,
+          projectGoal: userProfile.projectGoal,
+          projectVive: userProfile.projectVive,
+          projectExp: userProfile.projectExp,
+          qualification: userProfile.qualification
+        }
+        setSelectedUser(userSearchResponse)
+        setIsProfileModalOpen(true)
+      }
+    } catch (error) {
+      console.error('사용자 프로필 로딩 실패:', error)
+    }
+  }
+
+  // 팀 가입 신청 핸들러
+  const handleJoinTeam = async (teamId: number) => {
+    try {
+      // 임시로 userId는 1로 설정 (실제로는 현재 사용자 ID를 사용해야 함)
+      await requestJoinTeam(teamId, 1, "팀에 참여하고 싶습니다.")
+    } catch (error) {
+      console.error('팀 가입 신청 실패:', error)
+    }
+  }
+
+  // 사용자 초대 핸들러
+  const handleInviteUser = async (userId: number) => {
+    try {
+      // 임시로 teamId는 1로 설정 (실제로는 현재 사용자의 팀 ID를 사용해야 함)
+      await inviteToTeam(1, userId, "저희 팀에 참여해주세요.")
+    } catch (error) {
+      console.error('사용자 초대 실패:', error)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -47,7 +129,7 @@ export default function Home() {
         <TeamSection 
           onCreateTeam={() => navigate('/make-team') }
           onViewAll={() => setIsTeamsModalOpen(true)}
-          onViewTeam={(teamId) => console.log('팀 보기 클릭:', teamId)}
+          onViewTeam={handleViewTeam}
         />
 
         {/* Developer Section */}
@@ -55,7 +137,7 @@ export default function Home() {
           onRegister={() => navigate('/profile-setup')}
           onFilter={() => console.log('필터 클릭')}
           onViewAll={() => setIsDevelopersModalOpen(true)}
-          onViewProfile={(developerId) => console.log('프로필 보기 클릭:', developerId)}
+          onViewProfile={handleViewProfile}
         />
       </div>
 
@@ -63,19 +145,34 @@ export default function Home() {
       <TeamsModal
         isOpen={isTeamsModalOpen}
         onClose={() => setIsTeamsModalOpen(false)}
-        onViewTeam={(teamId) => {
-          console.log('팀 보기 클릭:', teamId)
-          setIsTeamsModalOpen(false)
-        }}
+        onViewTeam={handleViewTeam}
+        isDetailOpen={isTeamDetailFromModalOpen}
       />
 
       <DevelopersModal
         isOpen={isDevelopersModalOpen}
         onClose={() => setIsDevelopersModalOpen(false)}
-        onViewProfile={(developerId) => {
-          console.log('프로필 보기 클릭:', developerId)
-          setIsDevelopersModalOpen(false)
+        onViewProfile={handleViewProfile}
+        isProfileOpen={isProfileModalOpen}
+      />
+
+      {/* 팀 상세보기 모달 */}
+      <TeamDetailModal
+        isOpen={isTeamDetailModalOpen}
+        onClose={() => {
+          setIsTeamDetailModalOpen(false)
+          setIsTeamDetailFromModalOpen(false)
         }}
+        team={selectedTeam}
+        onJoinRequest={handleJoinTeam}
+      />
+
+      {/* 사용자 프로필 모달 */}
+      <UserProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+        user={selectedUser}
+        onInvite={handleInviteUser}
       />
     </div>
   )

@@ -12,12 +12,15 @@ interface DevelopersModalProps {
   isOpen: boolean
   onClose: () => void
   onViewProfile?: (developerId: number) => void
+  // 프로필 모달 열림 여부 (중첩 모달 시 ESC/바깥 클릭 무시용)
+  isProfileOpen?: boolean
 }
 
 export default function DevelopersModal({ 
   isOpen, 
   onClose, 
   onViewProfile,
+  isProfileOpen = false
 }: DevelopersModalProps) {
   const [developers, setDevelopers] = useState<UserSearchResponse[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -83,8 +86,13 @@ export default function DevelopersModal({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-7xl max-h-[90vh] overflow-hidden flex flex-col">
+    <Dialog open={isOpen} onOpenChange={(open: boolean) => {
+      // 프로필 모달이 열려있을 때는 DevelopersModal을 닫지 않음
+      if (!open && isProfileOpen) return
+      onClose()
+    }} modal={false}>
+      <DialogContent overlayClassName={isProfileOpen ? 'pointer-events-none' : undefined} className={`max-w-7xl h-[90vh] flex flex-col`}>
+        <div className="flex flex-col h-full min-h-0 overflow-hidden pointer-events-auto">
         <DialogHeader className="flex-shrink-0">
           <div className="flex items-center justify-between">
             <DialogTitle className="text-2xl font-bold">대기자 전체보기</DialogTitle>
@@ -155,7 +163,7 @@ export default function DevelopersModal({
         </div>
 
         {/* 개발자 목록 */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 min-h-0 overflow-y-auto">
           {isLoading ? (
             <div className="flex justify-center items-center h-32">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -188,6 +196,7 @@ export default function DevelopersModal({
           <p className="text-sm text-gray-600 text-center">
             총 {filteredDevelopers.length}명의 개발자가 있습니다.
           </p>
+        </div>
         </div>
       </DialogContent>
     </Dialog>
