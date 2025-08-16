@@ -1,33 +1,39 @@
-import { useMemo } from 'react'
+import { useState } from 'react'
 import Chart from 'react-apexcharts'
 import type { ApexOptions } from 'apexcharts'
 
-interface TechStackTreemapProps {
-  data?: Record<string, number>
-}
-
-const TechStackTreemap = ({ data }: TechStackTreemapProps) => {
-  const chartData = useMemo(() => {
-    if (!data) {
-      return {
-        series: [{ data: [] }],
-        options: {
-          chart: {
-            type: 'treemap' as const,
-            height: 350,
-            background: 'transparent',
-            toolbar: { show: false }
-          },
-          noData: {
-            text: '데이터를 불러오는 중...'
-          }
-        }
+const TechStackTreemap = () => {
+  const [chartData] = useState({
+    series: [
+      {
+        data: [
+          { x: 'React', y: 218 },
+          { x: 'Vue.js', y: 149 },
+          { x: 'Angular', y: 184 },
+          { x: 'Node.js', y: 155 },
+          { x: 'Spring Boot', y: 112 },
+          { x: 'Django', y: 108 },
+          { x: 'FastAPI', y: 89 },
+          { x: 'Express.js', y: 95 },
+          { x: 'Python', y: 165 },
+          { x: 'JavaScript', y: 201 },
+          { x: 'TypeScript', y: 178 },
+          { x: 'Java', y: 142 },
+          { x: 'C++', y: 98 },
+          { x: 'Go', y: 67 },
+          { x: 'Rust', y: 45 },
+          { x: 'MySQL', y: 134 },
+          { x: 'PostgreSQL', y: 98 },
+          { x: 'MongoDB', y: 87 },
+          { x: 'Redis', y: 76 },
+          { x: 'Docker', y: 156 },
+          { x: 'Kubernetes', y: 89 },
+          { x: 'AWS', y: 123 },
+          { x: 'GCP', y: 78 },
+          { x: 'Azure', y: 65 }
+        ]
       }
-    }
-    const techStackData = Object.entries(data).map(([tech, count]) => ({ x: tech, y: count }))
-
-    return {
-      series: [{ data: techStackData }],
+    ],
     options: {
       chart: {
         type: 'treemap' as const,
@@ -88,8 +94,7 @@ const TechStackTreemap = ({ data }: TechStackTreemapProps) => {
         }
       }]
     } as ApexOptions
-    }
-  }, [data])
+  })
 
   return (
     <div className="w-full">

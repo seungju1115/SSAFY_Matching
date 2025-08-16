@@ -1,6 +1,4 @@
-import { useState, useEffect } from 'react'
-import { useAI } from '@/hooks/useAI'
-import type { CandidateDtoDisplay } from '@/types/ai'
+import { useState } from 'react'
 
 // 스크롤바 숨김 스타일
 const scrollbarHideStyle = `
@@ -13,7 +11,7 @@ const scrollbarHideStyle = `
   }
 `
 
-// 사용자 타입 정의 (기존 interface 유지하되 AI 데이터와 매핑)
+// 사용자 타입 정의
 interface User {
   id: string
   name: string
@@ -31,16 +29,15 @@ interface SimpleUserModalProps {
   isOpen: boolean
   onClose: () => void
   onSelectUser: (users: User[]) => void
-  teamId?: number // AI 추천을 위한 팀 ID
 }
 
 const SimpleUserModal = ({ 
   isOpen, 
   onClose, 
-  onSelectUser,
-  teamId 
+  onSelectUser 
 }: SimpleUserModalProps) => {
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([])
+<<<<<<< HEAD
   const { 
     candidatesDisplay, 
     isLoadingCandidates, 
@@ -79,6 +76,8 @@ const SimpleUserModal = ({
       setSelectedUserIds([])
     }
   }, [isOpen])
+=======
+>>>>>>> 17624ac520ee6095d1a53ac9d2979b51dc366ac0
   
   // 사용자 선택 처리 함수
   const handleUserSelect = (userId: string) => {
@@ -104,12 +103,8 @@ const SimpleUserModal = ({
         {/* 헤더 */}
         <div className="flex items-center justify-between p-4 md:p-6 border-b border-white/20">
           <div className="flex-1">
-            <h2 className="text-xl md:text-2xl font-semibold text-white mb-1">
-              팀원 추천 {teamId ? '(AI 추천)' : ''}
-            </h2>
-            <p className="text-sm text-white/70">
-              {isLoadingCandidates ? '추천 후보자를 불러오는 중...' : '함께할 팀원을 선택하세요'}
-            </p>
+            <h2 className="text-xl md:text-2xl font-semibold text-white mb-1">팀원 추천</h2>
+            <p className="text-sm text-white/70">함께할 팀원을 선택하세요</p>
           </div>
           <button
             onClick={onClose}
@@ -124,24 +119,9 @@ const SimpleUserModal = ({
         {/* 카드 스크롤 영역 */}
         <div className="flex-1 overflow-hidden">
           <div className="h-full flex items-center">
-            {isLoadingCandidates ? (
-              <div className="w-full flex items-center justify-center">
-                <div className="text-white/70 text-center">
-                  <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-2"></div>
-                  <p>AI가 최적의 팀원을 찾고 있습니다...</p>
-                </div>
-              </div>
-            ) : candidatesError ? (
-              <div className="w-full flex items-center justify-center">
-                <div className="text-red-300 text-center">
-                  <p>추천 데이터를 불러올 수 없습니다.</p>
-                  <p className="text-sm text-white/50 mt-1">{candidatesError}</p>
-                </div>
-              </div>
-            ) : (
-              <div className="w-full overflow-x-auto scrollbar-hide">
-                <div className="flex gap-4 md:gap-6 p-4 md:p-6 min-w-max md:justify-center">
-                  {recommendedUsers.map((user) => (
+            <div className="w-full overflow-x-auto scrollbar-hide">
+              <div className="flex gap-4 md:gap-6 p-4 md:p-6 min-w-max md:justify-center">
+                {mockRecommendedUsers.map((user) => (
                   <div
                     key={user.id}
                     onClick={() => handleUserSelect(user.id)}
@@ -173,9 +153,7 @@ const SimpleUserModal = ({
                             <span className="text-slate-400 mx-1">•</span>
                             <span>{user.subPosition}</span>
                           </div>
-                          {user.domain && (
-                            <div className="text-sm text-slate-500 mt-1">{user.domain}</div>
-                          )}
+                          <div className="text-sm text-slate-500 mt-1">{user.domain}</div>
                         </div>
                       </div>
 
@@ -245,10 +223,9 @@ const SimpleUserModal = ({
                       </div>
                     </div>
                   </div>
-                  ))}
-                </div>
+                ))}
               </div>
-            )}
+            </div>
           </div>
         </div>
 
@@ -264,7 +241,7 @@ const SimpleUserModal = ({
             <button
               onClick={() => {
                 if (selectedUserIds.length > 0) {
-                  const selectedUsers = recommendedUsers.filter(u => selectedUserIds.includes(u.id))
+                  const selectedUsers = mockRecommendedUsers.filter(u => selectedUserIds.includes(u.id))
                   if (selectedUsers.length > 0) {
                     onSelectUser(selectedUsers)
                     onClose()

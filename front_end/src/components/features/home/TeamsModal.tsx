@@ -1,56 +1,32 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Search, Filter, ChevronDown } from 'lucide-react'
-import type { Team } from '@/hooks/useTeam'
+import type { Team } from './TeamSection'
 import TeamCard from './TeamCard'
-import { useTeam } from '@/hooks/useTeam'
 
 interface TeamsModalProps {
   isOpen: boolean
   onClose: () => void
+  teams: Team[]
   onViewTeam?: (teamId: number) => void
   // 팀 상세 모달 열림 여부 (중첩 모달 시 ESC/바깥 클릭 무시용)
   isDetailOpen?: boolean
 }
 
+<<<<<<< HEAD
 
 export default function TeamsModal({ isOpen, onClose, onViewTeam, isDetailOpen = false }: TeamsModalProps) {
   const [teams, setTeams] = useState<Team[]>([])
   const [isLoading, setIsLoading] = useState(false)
+=======
+export default function TeamsModal({ isOpen, onClose, teams, onViewTeam, isDetailOpen = false }: TeamsModalProps) {
+>>>>>>> 17624ac520ee6095d1a53ac9d2979b51dc366ac0
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedTech, setSelectedTech] = useState<string[]>([])
   const [isFilterOpen, setIsFilterOpen] = useState(false)
-  const { fetchAllTeams, convertTeamDetailToTeam } = useTeam()
-
-  // 모달이 열릴 때 팀 데이터 로드
-  useEffect(() => {
-    const loadTeams = async () => {
-      if (!isOpen) return
-
-      try {
-        setIsLoading(true)
-        const response = await fetchAllTeams()
-        
-        if (response && Array.isArray(response)) {
-          // UNLOCKED 상태 팀만 필터링 (전체보기이므로 개수 제한 없음)
-          const unlockedTeams = response
-            .filter(team => team.teamStatus === 'UNLOCKED')
-            .map(convertTeamDetailToTeam)
-          
-          setTeams(unlockedTeams)
-        }
-      } catch (error) {
-        console.error('팀 데이터 로딩 실패:', error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    loadTeams()
-  }, [isOpen])
 
   // 모든 기술 스택 추출
   const allTech = Array.from(new Set(teams.flatMap(team => team.tech)))
@@ -73,12 +49,28 @@ export default function TeamsModal({ isOpen, onClose, onViewTeam, isDetailOpen =
   }
 
   return (
+<<<<<<< HEAD
     <Dialog open={isOpen} onOpenChange={(open: boolean) => {
       if (!open && isDetailOpen) return
       onClose()
     }} modal={false}>
       <DialogContent overlayClassName={isDetailOpen ? 'pointer-events-none' : undefined} className={`max-w-7xl h-[90vh] flex flex-col`}>
         <div className="flex flex-col h-full min-h-0 overflow-hidden pointer-events-auto">
+=======
+    <Dialog
+      open={isOpen}
+      modal={false}
+      onOpenChange={(open) => {
+        // 상세 모달이 열려 있을 때는 TeamsModal 닫힘을 무시
+        if (!open && isDetailOpen) return
+        if (!open) onClose()
+      }}
+    >
+      <DialogContent
+        overlayClassName={isDetailOpen ? 'pointer-events-none' : undefined}
+        className="max-w-6xl max-h-[90vh] overflow-hidden flex flex-col"
+      >
+>>>>>>> 17624ac520ee6095d1a53ac9d2979b51dc366ac0
         <DialogHeader className="flex-shrink-0">
           <div className="flex items-center justify-between">
             <DialogTitle className="text-2xl font-bold">팀 전체보기</DialogTitle>
@@ -129,6 +121,7 @@ export default function TeamsModal({ isOpen, onClose, onViewTeam, isDetailOpen =
         </div>
 
         {/* 팀 목록 */}
+<<<<<<< HEAD
         <div className="flex-1 min-h-0 overflow-y-auto">
           {isLoading ? (
             <div className="flex justify-center items-center h-32">
@@ -145,15 +138,46 @@ export default function TeamsModal({ isOpen, onClose, onViewTeam, isDetailOpen =
                   />
                 ))}
               </div>
+=======
+        <div className="flex-1 overflow-y-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-1">
+            {filteredTeams.map((team) => {
+              // TeamSection과 동일한 데모 역할 분배 적용 (없을 경우)
+              const demoDistribution = (() => {
+                if (team.roleDistribution) return team.roleDistribution
+                const order = ['frontend', 'backend', 'ai', 'design', 'pm'] as const
+                const dist: NonNullable<Team['roleDistribution']> = {
+                  backend: 0, frontend: 0, ai: 0, design: 0, pm: 0
+                }
+                for (let i = 0; i < Math.max(team.maxMembers, 1); i++) {
+                  const role = order[i % order.length]
+                  dist[role]++
+                }
+                return dist
+              })()
+>>>>>>> 17624ac520ee6095d1a53ac9d2979b51dc366ac0
 
-              {!isLoading && filteredTeams.length === 0 && (
-                <div className="text-center py-12">
-                  <p className="text-gray-500">
-                    {teams.length === 0 ? '팀이 없습니다.' : '검색 조건에 맞는 팀이 없습니다.'}
-                  </p>
-                </div>
-              )}
-            </>
+              const withDemo: Team = {
+                ...team,
+                domain: team.domain ?? ((team.domains && team.domains.length > 0) ? team.domains[0] : '웹 서비스'),
+                projectPreferences: team.projectPreferences ?? ['포트폴리오', '실무경험'],
+                roleDistribution: demoDistribution,
+              }
+
+              return (
+                <TeamCard
+                  key={team.id}
+                  team={withDemo}
+                  onClick={(teamId) => onViewTeam?.(teamId)}
+                />
+              )
+            })}
+          </div>
+
+          {filteredTeams.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-gray-500">검색 조건에 맞는 팀이 없습니다.</p>
+            </div>
           )}
         </div>
 

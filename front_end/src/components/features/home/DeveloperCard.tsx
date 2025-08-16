@@ -3,10 +3,10 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Code2, User, Sparkles } from "lucide-react"
-import type { UserSearchResponse } from "@/types/user"
+import type { Developer } from "./DeveloperSection"
 
 interface DeveloperCardProps {
-  developer: UserSearchResponse
+  developer: Developer
   onClick?: (developerId: number) => void
   className?: string
 }
@@ -55,51 +55,59 @@ export default function DeveloperCard({
   onClick,
   className = ""
 }: DeveloperCardProps) {
-  // UserSearchResponse.techStack은 이미 string[] 타입
-  const techStackNames = developer.techStack || []
+  // 기술스택을 문자열 배열로 변환 (숙련도  제거)
+  const techStackNames = developer.techStack?.map(tech => 
+    typeof tech === 'string' ? tech : tech.name
+  ) || []
 
   return (
+<<<<<<< HEAD
     <Card className={`hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-white to-slate-50/50 border-l-4 h-full flex flex-col ${
       developer.major ? 'border-l-slate-400' : 'border-l-emerald-400'
     } ${className}`}>
+=======
+    <Card className={`hover:shadow-lg transition-all duration-300 cursor-pointer bg-gradient-to-br from-white to-slate-50/50 border-l-4 h-full flex flex-col ${
+      developer.isMajor ? 'border-l-slate-400' : 'border-l-emerald-400'
+    } ${className}`} onClick={() => onClick?.(developer.id)}>
+>>>>>>> 17624ac520ee6095d1a53ac9d2979b51dc366ac0
       <CardHeader className="pb-3 relative">
         <div className="absolute top-3 right-3">
           <div className={`p-1.5 rounded-full ${
-            developer.major ? 'bg-slate-100' : 'bg-emerald-50'
+            developer.isMajor ? 'bg-slate-100' : 'bg-emerald-50'
           }`}>
             <Code2 className={`h-3 w-3 ${
-              developer.major ? 'text-slate-600' : 'text-emerald-600'
+              developer.isMajor ? 'text-slate-600' : 'text-emerald-600'
             }`} />
           </div>
         </div>
         <div className="flex items-start gap-3 pr-10">
           <div className="relative">
             <Avatar className="h-10 w-10 ring-2 ring-white shadow-sm">
-              <AvatarImage src="" />
+              <AvatarImage src={developer.avatar} />
               <AvatarFallback className={`text-sm font-semibold ${
-                developer.major ? 'bg-slate-500 text-white' : 'bg-emerald-500 text-white'
+                developer.isMajor ? 'bg-slate-500 text-white' : 'bg-emerald-500 text-white'
               }`}>
-                {developer.userName[0]}
+                {developer.name[0]}
               </AvatarFallback>
             </Avatar>
             <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${
-              developer.major ? 'bg-slate-500' : 'bg-emerald-500'
+              developer.isMajor ? 'bg-slate-500' : 'bg-emerald-500'
             } flex items-center justify-center`}>
               <Sparkles className="h-2 w-2 text-white" />
             </div>
           </div>
           <div className="flex-1">
-            <CardTitle className="text-lg leading-tight font-bold">{developer.userName}</CardTitle>
+            <CardTitle className="text-lg leading-tight font-bold">{developer.name}</CardTitle>
             <div className="flex items-center gap-1 mt-1">
               <User className="h-3 w-3 text-gray-400" />
               <p className="text-xs text-gray-500">
-                {developer.wantedPosition?.[0] || '개발자'}
+                {developer.positions?.[0] || developer.role || '프론트엔드'}
               </p>
             </div>
             <Badge variant="secondary" className={`text-xs mt-2 ${
-              developer.major ? 'bg-slate-100 text-slate-700' : 'bg-emerald-50 text-emerald-700'
+              developer.isMajor ? 'bg-slate-100 text-slate-700' : 'bg-emerald-50 text-emerald-700'
             }`}>
-              {developer.major ? '💻 전공자' : '🚀 비전공자'}
+              {developer.isMajor ? '💻 전공자' : '🚀 비전공자'}
             </Badge>
           </div>
         </div>
@@ -135,13 +143,13 @@ export default function DeveloperCard({
             <div className="bg-white rounded-lg p-2 border border-gray-100">
               <div className="text-gray-500 mb-1">주 포지션</div>
               <div className="font-medium text-gray-800">
-                {developer.wantedPosition?.[0] || '개발자'}
+                {developer.positions?.[0] || developer.role || '프론트엔드'}
               </div>
             </div>
             <div className="bg-white rounded-lg p-2 border border-gray-100">
               <div className="text-gray-500 mb-1">부포지션</div>
               <div className="font-medium text-gray-800">
-                {developer.wantedPosition?.[1] || '-'}
+                {developer.positions?.[1] || '-'}
               </div>
             </div>
           </div>
@@ -150,13 +158,13 @@ export default function DeveloperCard({
         <div className="mt-auto pt-3 border-t border-gray-100 flex items-center justify-between">
           <div className="flex flex-wrap gap-1.5">
             <span className="text-xs text-gray-500 mr-1">💡</span>
-            {developer.projectGoal && developer.projectGoal.length > 0 ? (
-              developer.projectGoal.slice(0, 2).map((pref) => (
+            {developer.projectPreferences && developer.projectPreferences.length > 0 ? (
+              developer.projectPreferences.slice(0, 2).map((pref) => (
                 <Badge
                   key={pref}
                   variant="secondary"
                   className={`text-xs font-medium ${
-                    developer.major ? 'bg-slate-50 text-slate-700' : 'bg-emerald-50 text-emerald-700'
+                    developer.isMajor ? 'bg-slate-50 text-slate-700' : 'bg-emerald-50 text-emerald-700'
                   }`}
                 >
                   {pref}
@@ -165,12 +173,12 @@ export default function DeveloperCard({
             ) : (
               <>
                 <Badge variant="secondary" className={`text-xs font-medium ${
-                  developer.major ? 'bg-slate-50 text-slate-700' : 'bg-emerald-50 text-emerald-700'
+                  developer.isMajor ? 'bg-slate-50 text-slate-700' : 'bg-emerald-50 text-emerald-700'
                 }`}>
                   취업중심
                 </Badge>
                 <Badge variant="secondary" className={`text-xs font-medium ${
-                  developer.major ? 'bg-slate-50 text-slate-700' : 'bg-emerald-50 text-emerald-700'
+                  developer.isMajor ? 'bg-slate-50 text-slate-700' : 'bg-emerald-50 text-emerald-700'
                 }`}>
                   학습열정
                 </Badge>
@@ -180,7 +188,7 @@ export default function DeveloperCard({
           <Button 
             size="sm" 
             className={`text-xs px-4 h-8 ${
-              developer.major 
+              developer.isMajor 
                 ? 'bg-slate-600 hover:bg-slate-700' 
                 : 'bg-emerald-600 hover:bg-emerald-700'
             }`}

@@ -1,6 +1,5 @@
 package com.example.demo.user.dao;
 
-import com.example.demo.dashboard.dto.TechStackCountDto;
 import com.example.demo.user.Enum.PositionEnum;
 import com.example.demo.user.Enum.ProjectGoalEnum;
 import com.example.demo.user.Enum.ProjectViveEnum;
@@ -32,7 +31,7 @@ public interface UserRepository extends JpaRepository<User,Long> {
         SELECT 
             u.team_id,
             u.major,
-            STRING_AGG(DISTINCT up.wanted_position, ',' ORDER BY up.wanted_position) as positions
+            GROUP_CONCAT(DISTINCT up.wanted_position ORDER BY up.wanted_position SEPARATOR ',') as positions
         FROM users u
         LEFT JOIN user_wanted_position up ON u.user_id = up.user_user_id
         GROUP BY u.user_id, u.user_name
@@ -41,10 +40,6 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
     @Query("SELECT u FROM User u WHERE u.team IS NULL")
     List<User> findUsersWithoutTeam();
-
-    @Query(value = "select new com.example.demo.dashboard.dto.TechStackCountDto(t,count(u)) from User u join u.techStack t "
-            + "group by t")
-    List<TechStackCountDto> countTechStack();
 
     @Query("SELECT DISTINCT u FROM User u " +
             "LEFT JOIN u.wantedPosition wp " +
@@ -70,9 +65,9 @@ public interface UserRepository extends JpaRepository<User,Long> {
         SELECT 
             u.user_id,
             u.user_name,
-            STRING_AGG(DISTINCT up.wanted_position, ',' ORDER BY up.wanted_position) as positions,
-            STRING_AGG(DISTINCT upg.project_preference, ',') as goals,
-            STRING_AGG(DISTINCT upv.personal_preference, ',') as vives
+            GROUP_CONCAT(DISTINCT up.wanted_position ORDER BY up.wanted_position SEPARATOR ',') as positions,
+            GROUP_CONCAT(DISTINCT upg.project_preference SEPARATOR ',') as goals,
+            GROUP_CONCAT(DISTINCT upv.personal_preference SEPARATOR ',') as vives
         FROM users u
         LEFT JOIN user_wanted_position up ON u.user_id = up.user_user_id
         LEFT JOIN user_project_goal upg ON u.user_id = upg.user_user_id  

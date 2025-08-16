@@ -1,43 +1,9 @@
 // Team 관련 커스텀 훅 - 새로운 teamStore와 연동
-import { useCallback } from 'react'
 import { useTeamStore } from '@/stores/teamStore'
 import { teamAPI, teamHelpers } from '@/api/team'
 import type { TeamRequest, TeamDetailResponse, ApiResponse } from '@/types/team'
 import { useToast } from '@/hooks/use-toast'
-import useUserStore from '@/stores/userStore'
-import { useEnumMapper } from '@/hooks/useEnumMapper'
-
-// TeamCard에서 사용하는 Team 타입 (TeamSection과 동일)
-export interface Team {
-  id: number
-  name: string
-  description: string
-  tech: string[]
-  members: number
-  maxMembers: number
-  deadline: string
-  leader: {
-    name: string
-    avatar: string
-    role: string
-  }
-  domain?: string
-  projectPreferences?: string[]
-  roleDistribution?: {
-    BACKEND: number
-    FRONTEND: number
-    AI: number
-    PM: number
-    DESIGN: number
-  }
-  roleCurrent?: {
-    BACKEND: number
-    FRONTEND: number
-    AI: number
-    PM: number
-    DESIGN: number
-  }
-}
+import useUserStore from '@/stores/userStore';
 
 export const useTeam = () => {
   const {
@@ -56,61 +22,7 @@ export const useTeam = () => {
   } = useTeamStore()
 
   const { toast } = useToast()
-  const { user, setUser } = useUserStore()
-  const { mapProjectGoalArray } = useEnumMapper()
-
-  // TeamDetailResponse를 Team interface로 변환하는 함수
-  const convertTeamDetailToTeam = useCallback((teamDetail: TeamDetailResponse): Team => {
-    const totalMembers = teamDetail.members?.length || 0
-    const maxMembers = (teamDetail.backendCount || 0) +
-                      (teamDetail.frontendCount || 0) +
-                      (teamDetail.aiCount || 0) +
-                      (teamDetail.pmCount || 0) +
-                      (teamDetail.designCount || 0)
-
-    return {
-      id: teamDetail.teamId || 0,
-      name: teamDetail.teamName || '팀 이름 없음',
-      description: teamDetail.teamDescription || '팀 설명 없음',
-      tech: [], // TeamDetailResponse에는 개별 기술스택 정보가 없음
-      members: totalMembers,
-      maxMembers: Math.max(maxMembers, 1),
-      deadline: '2024-12-31', // 백엔드에 deadline 필드가 없어서 임시값
-      leader: {
-        name: teamDetail.leader?.userName || '리더',
-        avatar: '',
-        role: teamDetail.leader?.wantedPosition?.[0] || 'leader'
-      },
-      domain: teamDetail.teamDomain,
-      projectPreferences: mapProjectGoalArray(teamDetail.teamPreference),
-      roleDistribution: {
-        BACKEND: teamDetail.backendCount || 0,
-        FRONTEND: teamDetail.frontendCount || 0,
-        AI: teamDetail.aiCount || 0,
-        DESIGN: teamDetail.designCount || 0,
-        PM: teamDetail.pmCount || 0
-      },
-      roleCurrent: (() => {
-        const roleCurrent = {
-          BACKEND: 0,
-          FRONTEND: 0,
-          AI: 0,
-          DESIGN: 0,
-          PM: 0
-        }
-
-        // 멤버들의 주 포지션으로 현재 인원 계산
-        teamDetail.members?.forEach(member => {
-          const position = member.wantedPosition?.[0]
-          if (position && position in roleCurrent) {
-            roleCurrent[position as keyof typeof roleCurrent]++
-          }
-        })
-
-        return roleCurrent
-      })()
-    }
-  }, [mapProjectGoalArray])
+  const { user, setUser } = useUserStore();
 
   // 팀 상세 정보 조회 (캐시 고려)
   const fetchTeamDetail = async (teamId: number, forceRefresh = false) => {
@@ -390,7 +302,6 @@ export const useTeam = () => {
     // 유틸리티
     clearError,
     reset,
-    convertTeamDetailToTeam,
   }
 }
 

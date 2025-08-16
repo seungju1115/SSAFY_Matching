@@ -1,20 +1,26 @@
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Users } from "lucide-react"
-import type { Team } from "./TeamSection"
+import { Users, Check, X } from "lucide-react"
+import type { Team } from "../home/TeamSection"
 
-interface TeamCardProps {
+interface InvitationTeamCardProps {
   team: Team
-  onClick?: (teamId: number) => void
+  onAccept: (teamId: number) => void
+  onReject: (teamId: number) => void
+  isLoading?: boolean
+  onViewTeam?: (teamId: number) => void
   className?: string
 }
 
-export default function TeamCard({ 
+export default function InvitationTeamCard({ 
   team, 
-  onClick,
+  onAccept,
+  onReject,
+  isLoading = false,
+  onViewTeam,
   className = ""
-}: TeamCardProps) {
+}: InvitationTeamCardProps) {
   return (
     <Card className={`hover:shadow-md transition-shadow duration-200 bg-white border border-gray-100 rounded-lg h-full flex flex-col ${className}`}>
       <CardHeader className="pb-3">
@@ -24,6 +30,35 @@ export default function TeamCard({
             <Badge variant="secondary" className="text-xs mt-2">
               {team.members}/{team.maxMembers}명 모집
             </Badge>
+          </div>
+          
+          {/* 수락/거절 버튼 */}
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={(e) => {
+                e.stopPropagation()
+                onReject(team.id)
+              }}
+              disabled={isLoading}
+              className="text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300"
+            >
+              <X className="h-3 w-3 mr-1" />
+              거절
+            </Button>
+            <Button
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation()
+                onAccept(team.id)
+              }}
+              disabled={isLoading}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              <Check className="h-3 w-3 mr-1" />
+              수락
+            </Button>
           </div>
         </div>
       </CardHeader>
@@ -191,8 +226,9 @@ export default function TeamCard({
             className="text-xs px-4 h-8"
             onClick={(e) => {
               e.stopPropagation()
-              onClick?.(team.id)
+              onViewTeam?.(team.id)
             }}
+            disabled={isLoading}
           >
             팀 보기
           </Button>

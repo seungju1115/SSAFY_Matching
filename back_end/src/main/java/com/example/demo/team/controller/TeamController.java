@@ -85,13 +85,8 @@ public class TeamController {
     }
 
     @GetMapping("/{teamId}/request")
-    public ResponseEntity<ApiResponse<List<TeamMembershipResponse>>> getAllTeamRequest(@PathVariable Long teamId) {
-        return ResponseEntity.ok(ApiResponse.ok(teamMembershipRequestService.getAllTeamRequest(teamId)));
-    }
-
-    @GetMapping("/{userID}/request/user")
-    public ResponseEntity<ApiResponse<List<TeamMembershipResponse>>> getAllUserRequest(@PathVariable Long userId) {
-        return ResponseEntity.ok(ApiResponse.ok(teamMembershipRequestService.getAllTeamRequest(userId)));
+    public ResponseEntity<ApiResponse<List<TeamMembershipResponse>>> getAllRequest(@PathVariable Long teamId) {
+        return ResponseEntity.ok(ApiResponse.ok(teamMembershipRequestService.getAllRequest(teamId)));
     }
 
     @PostMapping("/{teamId}/lock")

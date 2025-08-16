@@ -5,30 +5,33 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { Button } from "@/components/ui/button"
-import { RefreshCw } from "lucide-react"
 import TeamDomainChart from "@/components/features/dashboard/TeamDomainChart"
 import TeamPositionChart from "@/components/features/dashboard/TeamPositionChart"
 import PositionDonutChart from "@/components/features/dashboard/PositionDonutChart"
 import MajorMinorPieChart from "@/components/features/dashboard/MajorMinorPieChart"
 import TechStackTreemap from "@/components/features/dashboard/TechStackTreemap"
-import { useDashboard } from "@/hooks/useDashboard"
+import { mockDevelopers } from "@/data/mockData"
 
 export default function Dashboard() {
   const [selectedDomain, setSelectedDomain] = useState<string>("all")
-  const { data, stats, isLoading, error, refresh } = useDashboard()
+  
+  // 모든 대기자 수와 매칭된 인원 수 (예시 데이터)
+  const totalWaitingUsers = 1250
+  const matchedUsers = 875
+  const matchingRate = (matchedUsers / totalWaitingUsers) * 100
 
-  // API 데이터가 로딩 중이거나 없으면 기본값 사용
-  const totalWaitingUsers = stats?.totalUsers || 0
-  const matchedUsers = stats?.matchedUsers || 0
-  const matchingRate = stats?.matchingRate || 0
+  // 전공/비전공 비율을 mockDevelopers에서 산출해 전체 인원에 투영
+  const majorCountSample = mockDevelopers.filter((d) => d.isMajor).length
+  const totalSample = mockDevelopers.length || 1
+  const majorRatio = majorCountSample / totalSample
+  const majorTotal = Math.round(totalWaitingUsers * majorRatio)
+  const nonMajorTotal = totalWaitingUsers - majorTotal
 
-  const majorTotal = stats?.majorStats?.total || 0
-  const nonMajorTotal = stats?.nonMajorStats?.total || 0
-  const matchedMajors = stats?.majorStats?.matched || 0
-  const matchedNonMajors = stats?.nonMajorStats?.matched || 0
-  const majorMatchingRate = stats?.majorStats?.matchingRate || 0
-  const nonMajorMatchingRate = stats?.nonMajorStats?.matchingRate || 0
+  // 전공/비전공 매칭 인원은 전체 매칭 인원을 동일 비율로 분배 (데모)
+  const matchedMajors = Math.min(majorTotal, Math.round(matchedUsers * majorRatio))
+  const matchedNonMajors = Math.max(0, matchedUsers - matchedMajors)
+  const majorMatchingRate = majorTotal ? (matchedMajors / majorTotal) * 100 : 0
+  const nonMajorMatchingRate = nonMajorTotal ? (matchedNonMajors / nonMajorTotal) * 100 : 0
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -36,25 +39,8 @@ export default function Dashboard() {
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">대시보드</h1>
-              <p className="text-gray-600">팀 매칭 현황과 사용자 통계를 한눈에 확인하세요</p>
-            </div>
-            <Button 
-              onClick={refresh} 
-              disabled={isLoading}
-              className="flex items-center gap-2"
-            >
-              <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-              새로고침
-            </Button>
-          </div>
-          {error && (
-            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
-              <p className="text-red-600 text-sm">{error}</p>
-            </div>
-          )}
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">대시보드</h1>
+          <p className="text-gray-600">팀 매칭 현황과 사용자 통계를 한눈에 확인하세요</p>
         </div>
 
         <div className="space-y-8">
@@ -78,7 +64,7 @@ export default function Dashboard() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <TeamDomainChart data={data?.domain} />
+                  <TeamDomainChart />
                 </CardContent>
               </Card>
 
@@ -158,25 +144,16 @@ export default function Dashboard() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">전체 도메인</SelectItem>
-                      <SelectItem value="웹기술">웹기술</SelectItem>
-                      <SelectItem value="웹디자인">웹디자인</SelectItem>
-                      <SelectItem value="AI/IoT">AI/IoT</SelectItem>
-                      <SelectItem value="모바일">모바일</SelectItem>
-                      <SelectItem value="게임개발">게임개발</SelectItem>
-                      <SelectItem value="블록체인">블록체인</SelectItem>
-                      <SelectItem value="핀테크">핀테크</SelectItem>
-                      <SelectItem value="헬스케어">헬스케어</SelectItem>
-                      <SelectItem value="교육">교육</SelectItem>
-                      <SelectItem value="커머스">커머스</SelectItem>
-                      <SelectItem value="소셜미디어">소셜미디어</SelectItem>
-                      <SelectItem value="데이터분석">데이터분석</SelectItem>
-                      <SelectItem value="보안">보안</SelectItem>
-                      <SelectItem value="클라우드">클라우드</SelectItem>
+                      <SelectItem value="web">웹 개발</SelectItem>
+                      <SelectItem value="mobile">모바일</SelectItem>
+                      <SelectItem value="ai">AI/ML</SelectItem>
+                      <SelectItem value="game">게임</SelectItem>
+                      <SelectItem value="iot">IoT</SelectItem>
                     </SelectContent>
                   </Select>
                 </CardHeader>
                 <CardContent>
-                  <TeamPositionChart selectedDomain={selectedDomain} data={data?.domainPos} />
+                  <TeamPositionChart selectedDomain={selectedDomain} />
                 </CardContent>
               </Card>
             </div>
@@ -205,11 +182,7 @@ export default function Dashboard() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <PositionDonutChart 
-                    defaultView="primary" 
-                    mainPositions={stats?.positionStats?.main}
-                    subPositions={stats?.positionStats?.sub}
-                  />
+                  <PositionDonutChart defaultView="primary" />
                 </CardContent>
               </Card>
 
@@ -225,10 +198,7 @@ export default function Dashboard() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <MajorMinorPieChart 
-                    majorCount={majorTotal}
-                    nonMajorCount={nonMajorTotal}
-                  />
+                  <MajorMinorPieChart />
                 </CardContent>
               </Card>
 
@@ -244,7 +214,7 @@ export default function Dashboard() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <TechStackTreemap data={data?.techstacks} />
+                  <TechStackTreemap />
                 </CardContent>
               </Card>
             </div>

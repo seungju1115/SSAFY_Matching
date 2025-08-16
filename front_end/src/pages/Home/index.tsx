@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+<<<<<<< HEAD
 import { Button } from "@/components/ui/button"
 import { Users, Search } from "lucide-react"
 import Header from "@/components/layout/Header"
@@ -12,12 +13,53 @@ import UserProfileModal from "@/components/features/home/UserProfileModal"
 import { useTeam, type Team } from "@/hooks/useTeam"
 import { useUser } from "@/hooks/useUser"
 import type { UserSearchResponse } from "@/types/user"
+=======
+import { Button } from '@/components/ui/button'
+import { Users, Search } from 'lucide-react'
+import Header from '@/components/layout/Header'
+import TeamSection from '@/components/features/home/TeamSection'
+import DeveloperSection from '@/components/features/home/DeveloperSection'
+import TeamsModal from '@/components/features/home/TeamsModal'
+import DevelopersModal from '@/components/features/home/DevelopersModal'
+import UserProfileModal from '@/components/features/home/UserProfileModal'
+import TeamDetailModal from '@/components/features/home/TeamDetailModal'
+import { mockTeams, mockDevelopers } from '@/data/mockData'
+import type { Developer } from '@/components/features/home/DeveloperSection'
+import type { Team } from '@/components/features/home/TeamSection'
+
+// Developer를 User 타입으로 변환하는 함수
+const convertDeveloperToUser = (developer: Developer) => ({
+  id: developer.id.toString(),
+  name: developer.name,
+  mainPosition: developer.role,
+  subPosition: developer.positions?.[0] || '개발자',
+  domain: developer.domain || '웹 개발',
+  techStack: developer.techStack?.map(tech => tech.name) || [],
+  projectPreferences: developer.projectPreferences || ['혁신적인', '사용자 중심'],
+  personalPreferences: developer.personalPreferences || ['소통 활발', '책임감 강함'],
+  introduction: '함께 성장할 수 있는 프로젝트에 참여하고 싶습니다. 새로운 기술을 배우는 것을 좋아하며, 팀원들과의 협업을 통해 더 나은 결과를 만들어내고 싶습니다.'
+})
+
+// User 타입 정의 (UserProfileModal과 동일)
+interface User {
+  id: string
+  name: string
+  mainPosition: string
+  subPosition: string
+  domain: string
+  techStack: string[]
+  projectPreferences: string[]
+  personalPreferences: string[]
+  introduction: string
+}
+>>>>>>> 17624ac520ee6095d1a53ac9d2979b51dc366ac0
 
 // Home 페이지 (메인페이지)
 export default function Home() {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
   const [isTeamsModalOpen, setIsTeamsModalOpen] = useState(false)
   const [isDevelopersModalOpen, setIsDevelopersModalOpen] = useState(false)
+<<<<<<< HEAD
   const [isTeamDetailModalOpen, setIsTeamDetailModalOpen] = useState(false)
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null)
   
@@ -95,6 +137,12 @@ export default function Home() {
       console.error('사용자 초대 실패:', error)
     }
   }
+=======
+  const [isUserProfileModalOpen, setIsUserProfileModalOpen] = useState(false)
+  const [isTeamDetailModalOpen, setIsTeamDetailModalOpen] = useState(false)
+  const [selectedUser, setSelectedUser] = useState<User | null>(null)
+  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null)
+>>>>>>> 17624ac520ee6095d1a53ac9d2979b51dc366ac0
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -127,17 +175,39 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-20">
         {/* Team Section */}
         <TeamSection 
+          teams={mockTeams}
           onCreateTeam={() => navigate('/make-team') }
           onViewAll={() => setIsTeamsModalOpen(true)}
+<<<<<<< HEAD
           onViewTeam={handleViewTeam}
+=======
+          onViewTeam={(teamId) => {
+            const team = mockTeams.find(t => t.id === teamId)
+            if (team) {
+              setSelectedTeam(team)
+              setIsTeamDetailModalOpen(true)
+            }
+          }}
+>>>>>>> 17624ac520ee6095d1a53ac9d2979b51dc366ac0
         />
 
         {/* Developer Section */}
         <DeveloperSection 
+          developers={mockDevelopers}
           onRegister={() => navigate('/profile-setup')}
           onFilter={() => console.log('필터 클릭')}
           onViewAll={() => setIsDevelopersModalOpen(true)}
+<<<<<<< HEAD
           onViewProfile={handleViewProfile}
+=======
+          onViewProfile={(developerId) => {
+            const developer = mockDevelopers.find(dev => dev.id === developerId)
+            if (developer) {
+              setSelectedUser(convertDeveloperToUser(developer))
+              setIsUserProfileModalOpen(true)
+            }
+          }}
+>>>>>>> 17624ac520ee6095d1a53ac9d2979b51dc366ac0
         />
       </div>
 
@@ -145,13 +215,28 @@ export default function Home() {
       <TeamsModal
         isOpen={isTeamsModalOpen}
         onClose={() => setIsTeamsModalOpen(false)}
+<<<<<<< HEAD
         onViewTeam={handleViewTeam}
         isDetailOpen={isTeamDetailFromModalOpen}
+=======
+        teams={mockTeams}
+        isDetailOpen={isTeamDetailModalOpen}
+        onViewTeam={(teamId) => {
+          const team = mockTeams.find(t => t.id === teamId)
+          if (team) {
+            setSelectedTeam(team)
+            setIsTeamDetailModalOpen(true)
+            // 중첩 모달 처리를 위해 전체보기 모달을 닫지 않음
+            // setIsTeamsModalOpen(false)
+          }
+        }}
+>>>>>>> 17624ac520ee6095d1a53ac9d2979b51dc366ac0
       />
 
       <DevelopersModal
         isOpen={isDevelopersModalOpen}
         onClose={() => setIsDevelopersModalOpen(false)}
+<<<<<<< HEAD
         onViewProfile={handleViewProfile}
         isProfileOpen={isProfileModalOpen}
       />
@@ -162,6 +247,36 @@ export default function Home() {
         onClose={() => {
           setIsTeamDetailModalOpen(false)
           setIsTeamDetailFromModalOpen(false)
+=======
+        developers={mockDevelopers}
+        isProfileOpen={isUserProfileModalOpen}
+        onViewProfile={(developerId) => {
+          const developer = mockDevelopers.find(dev => dev.id === developerId)
+          if (developer) {
+            setSelectedUser(convertDeveloperToUser(developer))
+            setIsUserProfileModalOpen(true)
+          }
+        }}
+      />
+
+      <UserProfileModal
+        isOpen={isUserProfileModalOpen}
+        onClose={() => setIsUserProfileModalOpen(false)}
+        user={selectedUser}
+        onInvite={(userId) => {
+          console.log('초대하기 클릭:', userId)
+          // 여기에 초대 로직 구현
+        }}
+      />
+
+      <TeamDetailModal
+        isOpen={isTeamDetailModalOpen}
+        onClose={() => setIsTeamDetailModalOpen(false)}
+        team={selectedTeam}
+        onJoinRequest={(teamId) => {
+          console.log('참여 신청 클릭:', teamId)
+          // 여기에 참여 신청 로직 구현
+>>>>>>> 17624ac520ee6095d1a53ac9d2979b51dc366ac0
         }}
         team={selectedTeam}
         onJoinRequest={handleJoinTeam}
