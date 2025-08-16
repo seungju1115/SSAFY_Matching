@@ -24,6 +24,7 @@ export default function TeamsModal({ isOpen, onClose, onViewTeam, isDetailOpen =
   const [isLoading, setIsLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedTech, setSelectedTech] = useState<string[]>([])
+  const [selectedDomains, setSelectedDomains] = useState<string[]>([])
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const { mapTechStackArray, mapProjectGoalArray } = useEnumMapper()
 
@@ -40,7 +41,7 @@ export default function TeamsModal({ isOpen, onClose, onViewTeam, isDetailOpen =
         // TeamDetailResponse[]를 Team[]로 변환
         const convertedTeams: Team[] = teamData.map((team: TeamDetailResponse) => ({
           id: team.teamId,
-          name: team.teamName,
+          name: team.teamName || '',
           description: team.teamDescription || '',
           // 팀원들의 기술스택을 합쳐 팀 기술스택으로 사용
           tech: Array.from(new Set((team.members || []).flatMap((m: any) => mapTechStackArray(m.techStack as any)))),
@@ -85,13 +86,30 @@ export default function TeamsModal({ isOpen, onClose, onViewTeam, isDetailOpen =
   // 모든 기술 스택 추출
   const allTech: string[] = Array.from(new Set(teams.flatMap(team => team.tech)))
 
+  // 모든 도메인 추출 (domains 우선, 없으면 domain)
+  const allDomains: string[] = Array.from(
+    new Set(
+      teams.flatMap(team => {
+        if (team.domains && team.domains.length > 0) return team.domains
+        return team.domain ? [team.domain] : []
+      })
+    )
+  )
+
   // 필터링된 팀 목록
   const filteredTeams = teams.filter(team => {
-    const matchesSearch = team.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         team.description.toLowerCase().includes(searchTerm.toLowerCase())
+    const nameLc = (team.name || '').toLowerCase()
+    const descLc = (team.description || '').toLowerCase()
+    const termLc = (searchTerm || '').toLowerCase()
+    const matchesSearch = nameLc.includes(termLc) || descLc.includes(termLc)
     const matchesTech = selectedTech.length === 0 || 
                        selectedTech.some(tech => team.tech.includes(tech))
-    return matchesSearch && matchesTech
+    const teamDomains = team.domains && team.domains.length > 0
+      ? team.domains
+      : (team.domain ? [team.domain] : [])
+    const matchesDomain = selectedDomains.length === 0 ||
+      selectedDomains.some(d => teamDomains.includes(d))
+    return matchesSearch && matchesTech && matchesDomain
   })
 
   const toggleTech = (tech: string) => {
@@ -102,12 +120,20 @@ export default function TeamsModal({ isOpen, onClose, onViewTeam, isDetailOpen =
     )
   }
 
+  const toggleDomain = (domain: string) => {
+    setSelectedDomains(prev =>
+      prev.includes(domain)
+        ? prev.filter(d => d !== domain)
+        : [...prev, domain]
+    )
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={(open: boolean) => {
       if (!open && isDetailOpen) return
       onClose()
     }} modal={false}>
-      <DialogContent overlayClassName={isDetailOpen ? 'pointer-events-none' : undefined} className={`max-w-7xl h-[90vh] flex flex-col`}>
+      <DialogContent aria-describedby={undefined} overlayClassName={isDetailOpen ? 'pointer-events-none' : undefined} className={`max-w-7xl h-[90vh] flex flex-col`}>
         <div className="flex flex-col h-full min-h-0 overflow-hidden pointer-events-auto">
         <DialogHeader className="flex-shrink-0">
           <div className="flex items-center justify-between">
@@ -151,6 +177,25 @@ export default function TeamsModal({ isOpen, onClose, onViewTeam, isDetailOpen =
                     onClick={() => toggleTech(tech)}
                   >
                     {tech}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 도메인 필터 */}
+          {isFilterOpen && allDomains.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-gray-700">도메인</p>
+              <div className="flex flex-wrap gap-2">
+                {allDomains.map((domain: string) => (
+                  <Badge
+                    key={domain}
+                    variant={selectedDomains.includes(domain) ? "default" : "outline"}
+                    className="cursor-pointer"
+                    onClick={() => toggleDomain(domain)}
+                  >
+                    {domain}
                   </Badge>
                 ))}
               </div>

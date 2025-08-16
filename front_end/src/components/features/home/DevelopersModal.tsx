@@ -29,6 +29,8 @@ export default function DevelopersModal({
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedSkills, setSelectedSkills] = useState<string[]>([])
   const [selectedRole, setSelectedRole] = useState<string>('')
+  // 전공/비전공 필터: all | major | non-major
+  const [selectedMajor, setSelectedMajor] = useState<'all' | 'major' | 'non-major'>('all')
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const { mapTechStackArray, mapPositionArray, mapProjectGoalArray } = useEnumMapper()
 
@@ -69,22 +71,31 @@ export default function DevelopersModal({
     loadWaitingUsers()
   }, [isOpen]) // 매핑 함수는 안정적이므로 의존성에서 제거
 
-  // 모든 포지션과 역할 추출
-  const allPositions = Array.from(new Set(developers.flatMap(dev => dev.positions || [dev.role])))
-  const allRoles = Array.from(new Set(developers.map(dev => dev.role)))
+  // 모든 포지션과 역할 추출 (falsy 제거)
+  const allPositions = Array.from(new Set(
+    developers.flatMap(dev => (dev.positions && dev.positions.length > 0) ? dev.positions : [dev.role]).filter(Boolean)
+  ))
+  const allRoles = Array.from(new Set(developers.map(dev => dev.role).filter(Boolean)))
 
   // 필터링된 개발자 목록
   const filteredDevelopers = developers.filter(dev => {
-    const matchesSearch = dev.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         dev.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (dev.positions?.some(pos => pos.toLowerCase().includes(searchTerm.toLowerCase())) || false)
-    
+    const termLc = (searchTerm || '').toLowerCase()
+    const nameLc = (dev.name || '').toLowerCase()
+    const roleLc = (dev.role || '').toLowerCase()
+    const positionsLc = (dev.positions || []).map(p => (p || '').toLowerCase())
+
+    const matchesSearch = nameLc.includes(termLc) || roleLc.includes(termLc) || positionsLc.some(p => p.includes(termLc))
+
     const matchesSkills = selectedSkills.length === 0 || 
-                         selectedSkills.some(skill => dev.positions?.includes(skill) || dev.role === skill)
-    
+                         selectedSkills.some(skill => (dev.positions || []).includes(skill) || dev.role === skill)
+
     const matchesRole = !selectedRole || dev.role === selectedRole
-    
-    return matchesSearch && matchesSkills && matchesRole
+
+    // 전공 여부 필터: user.major(Boolean | undefined)를 기준으로 필터링
+    const isMajor = !!dev.isMajor
+    const matchesMajor = selectedMajor === 'all' || (selectedMajor === 'major' ? isMajor : !isMajor)
+
+    return matchesSearch && matchesSkills && matchesRole && matchesMajor
   })
 
   const toggleSkill = (skill: string) => {
@@ -101,7 +112,7 @@ export default function DevelopersModal({
       if (!open && isProfileOpen) return
       onClose()
     }} modal={false}>
-      <DialogContent overlayClassName={isProfileOpen ? 'pointer-events-none' : undefined} className={`max-w-7xl h-[90vh] flex flex-col`}>
+      <DialogContent aria-describedby={undefined} overlayClassName={isProfileOpen ? 'pointer-events-none' : undefined} className={`max-w-7xl h-[90vh] flex flex-col`}>
         <div className="flex flex-col h-full min-h-0 overflow-hidden pointer-events-auto">
         <DialogHeader className="flex-shrink-0">
           <div className="flex items-center justify-between">
@@ -156,6 +167,34 @@ export default function DevelopersModal({
                       {role}
                     </Badge>
                   ))}
+                </div>
+              </div>
+
+              {/* 전공 여부 필터 */}
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-gray-700">전공 여부</p>
+                <div className="flex flex-wrap gap-2">
+                  <Badge
+                    variant={selectedMajor === 'all' ? 'default' : 'outline'}
+                    className="cursor-pointer"
+                    onClick={() => setSelectedMajor('all')}
+                  >
+                    전체
+                  </Badge>
+                  <Badge
+                    variant={selectedMajor === 'major' ? 'default' : 'outline'}
+                    className="cursor-pointer"
+                    onClick={() => setSelectedMajor('major')}
+                  >
+                    전공
+                  </Badge>
+                  <Badge
+                    variant={selectedMajor === 'non-major' ? 'default' : 'outline'}
+                    className="cursor-pointer"
+                    onClick={() => setSelectedMajor('non-major')}
+                  >
+                    비전공
+                  </Badge>
                 </div>
               </div>
 

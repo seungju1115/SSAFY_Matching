@@ -17,6 +17,17 @@ import { useEnumMapper } from '@/hooks/useEnumMapper'
 import type { UserSearchResponse, UserDetailResponse } from "@/types/user"
 import type { Team } from "@/components/features/home/TeamSection"
 import type { Developer } from "@/components/features/home/DeveloperSection"
+import useUserStore from '@/stores/userStore'
+import { 
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog"
 
 // Home 페이지 (메인페이지)
 export default function Home() {
@@ -29,6 +40,7 @@ export default function Home() {
   // 중첩 모달 상태 관리
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
   const [isTeamDetailFromModalOpen, setIsTeamDetailFromModalOpen] = useState(false)
+  const [isLoginAlertOpen, setIsLoginAlertOpen] = useState(false)
   
   // 프로필 모달 상태
   const [selectedUser, setSelectedUser] = useState<UserSearchResponse | null>(null)
@@ -40,6 +52,7 @@ export default function Home() {
   const { requestJoinTeam, inviteToTeam, fetchTeamDetail } = useTeam()
   const { getUserProfile } = useUser()
   const { mapTechStackArray, mapPositionArray, mapProjectGoalArray } = useEnumMapper()
+  const { isLoggedIn } = useUserStore()
 
   // 팀 목록 로드
   useEffect(() => {
@@ -221,6 +234,24 @@ export default function Home() {
     }
   }
 
+  // 팀 생성 버튼 클릭 시 로그인 확인
+  const handleCreateTeamClick = () => {
+    if (!isLoggedIn) {
+      setIsLoginAlertOpen(true)
+      return
+    }
+    navigate('/make-team')
+  }
+
+  // 대기자 등록 버튼 클릭 시 로그인 확인
+  const handleRegisterClick = () => {
+    if (!isLoggedIn) {
+      setIsLoginAlertOpen(true)
+      return
+    }
+    navigate('/profile-setup')
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* 분리된 Header 컴포넌트 사용 */}
@@ -237,7 +268,7 @@ export default function Home() {
             Match SSAFY에서 최고의 개발자들과 연결되어보세요.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
-            <Button size="lg" className="text-base sm:text-lg px-6 sm:px-8 py-3 w-full sm:w-auto">
+            <Button size="lg" className="text-base sm:text-lg px-6 sm:px-8 py-3 w-full sm:w-auto" onClick={handleCreateTeamClick}>
               <Users className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
               팀 만들기
             </Button>
@@ -253,7 +284,7 @@ export default function Home() {
         {/* Team Section */}
         <TeamSection 
           teams={teams}
-          onCreateTeam={() => navigate('/make-team') }
+          onCreateTeam={handleCreateTeamClick}
           onViewAll={() => setIsTeamsModalOpen(true)}
           onViewTeam={handleViewTeam}
         />
@@ -261,7 +292,7 @@ export default function Home() {
         {/* Developer Section */}
         <DeveloperSection 
           developers={developers}
-          onRegister={() => navigate('/profile-setup')}
+          onRegister={handleRegisterClick}
           onFilter={() => console.log('필터 클릭')}
           onViewAll={() => setIsDevelopersModalOpen(true)}
           onViewProfile={handleViewProfile}
@@ -302,6 +333,22 @@ export default function Home() {
         user={selectedUser}
         onInvite={handleInviteUser}
       />
-    </div>
-  )
+
+      {/* 로그인 안내 팝업 */}
+      <AlertDialog open={isLoginAlertOpen} onOpenChange={setIsLoginAlertOpen}>
+        <AlertDialogContent aria-describedby={undefined}>
+          <AlertDialogHeader>
+            <AlertDialogTitle>로그인이 필요합니다</AlertDialogTitle>
+            <AlertDialogDescription>
+              이 기능은 로그인이 필요합니다. 먼저 로그인해 주세요.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>닫기</AlertDialogCancel>
+            <AlertDialogAction onClick={() => navigate('/login')}>로그인하러 가기</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+</div>
+)
 }
