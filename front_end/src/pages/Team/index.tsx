@@ -11,11 +11,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import Header from '@/components/layout/Header';
 import UserRecommendationModal from '@/components/features/team/SimpleUserModal';
-import { Crown, UserPlus, LogOut } from 'lucide-react';
+import { Crown, UserPlus, LogOut, Pencil } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ProjectGoalEnum, ProjectViveEnum } from '@/types/team';
-import type { UserDetailResponse } from '@/types/user';
 import TeamChat from '@/components/features/teamchat';
+import EditTeamModal from '@/components/features/team/EditTeamModal';
 
 // 기존 상수들은 그대로 유지합니다.
 const projectGoalLabels: Record<ProjectGoalEnum, string> = {
@@ -60,11 +60,13 @@ const TeamPage: React.FC = () => {
     setTeamDetail,
     setLoading,
     setError,
+    clearError,
   } = useTeamStore();
   const setUser = useUserStore((state) => state.setUser);
   const user = useUserStore((state) => state.user);
   const { leaveTeam, deleteTeam } = useTeam();
   const [isRecommendModalOpen, setIsRecommendModalOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
 
   const handleSelectUser = (users: any[]) => {
     console.log('선택된 사용자:', users);
@@ -75,14 +77,13 @@ const TeamPage: React.FC = () => {
   const teamId = user.teamId;
 
   const teamInfo = teamId ? getTeamDetailById(teamId) : null;
-  // The store now holds the members, let's get them from there.
-  const teamMembers: UserDetailResponse[] = teamInfo?.members || [];
 
   useEffect(() => {
     const fetchTeamData = async () => {
       if (!teamId) return;
       if (getTeamDetailById(teamId)) return;
       
+      clearError();
       setLoading(true);
       try {
         const response = await teamAPI.getTeamDetail(teamId);
@@ -100,7 +101,7 @@ const TeamPage: React.FC = () => {
     };
 
     fetchTeamData();
-  }, [teamId, getTeamDetailById, setTeamDetail, setLoading, setError]);
+  }, [teamId, getTeamDetailById, setTeamDetail, setLoading, setError, clearError]);
 
   const handleLeaveTeam = async () => {
     if (!user || !user.id || !teamInfo || !teamId) return;
@@ -212,7 +213,15 @@ const TeamPage: React.FC = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">팀 소개</h3>
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-medium text-gray-700">팀 소개</h3>
+                    {user?.id === teamInfo.leader.id && (
+                      <Button variant="outline" size="sm" onClick={() => setIsEditOpen(true)}>
+                        <Pencil className="w-4 h-4 mr-1" />
+                        팀 정보 수정
+                      </Button>
+                    )}
+                  </div>
                   <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
                     {teamInfo.teamDescription}
                   </p>
@@ -269,28 +278,30 @@ const TeamPage: React.FC = () => {
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-3">
                 <div className="space-y-3">
-                  {teamMembers.map((member) => (
-                    <div key={member.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50">
-                      <Avatar className="w-8 h-8">
-                        <AvatarImage src={undefined} />
-                        <AvatarFallback className="bg-gray-200 text-gray-600 text-sm">
-                          {member.userName.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-gray-900 truncate">
-                            {member.userName}
-                          </span>
-                          {member.id === teamInfo.leader.id && (
-                            <Crown className="w-3 h-3 text-amber-500 flex-shrink-0" />
-                          )}
+                  {[teamInfo.leader, ...teamInfo.members].map((member) => (
+                    <div key={member.id} className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Avatar className="w-8 h-8">
+                          <AvatarImage src={undefined} />
+                          <AvatarFallback className="bg-gray-200 text-gray-600 text-sm">
+                            {member.userName?.charAt(0) ?? '?'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-gray-900">{member.userName}</span>
+                            {member.id === teamInfo.leader.id && (
+                              <Crown className="w-3 h-3 text-amber-500 flex-shrink-0" />
+                            )}
+                          </div>
+                          <Badge variant="outline" className={cn("text-xs mt-1",
+                            roleColors[(member.role?.toLowerCase?.() as keyof typeof roleColors) ?? 'backend']
+                          )}>
+                            {member.role ?? 'UNKNOWN'}
+                          </Badge>
                         </div>
-                        <Badge variant="outline" className={cn("text-xs mt-1", roleColors[member.role.toLowerCase() as keyof typeof roleColors])}>
-                          {member.role}
-                        </Badge>
                       </div>
                     </div>
                   ))}
@@ -316,6 +327,12 @@ const TeamPage: React.FC = () => {
         onClose={() => setIsRecommendModalOpen(false)}
         onSelectUser={handleSelectUser}
         teamId={teamId}
+      />
+      {/* 팀 정보 수정 모달 */}
+      <EditTeamModal
+        isOpen={isEditOpen}
+        onClose={() => setIsEditOpen(false)}
+        team={teamInfo}
       />
     </div>
   );
