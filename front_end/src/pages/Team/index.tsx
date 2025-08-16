@@ -312,12 +312,6 @@ const TeamPage: React.FC = () => {
         onClose={() => setIsEditOpen(false)}
         team={teamInfo}
       />
-      {/* 팀 정보 수정 모달 */}
-      <EditTeamModal
-        isOpen={isEditOpen}
-        onClose={() => setIsEditOpen(false)}
-        team={teamInfo}
-      />
     </div>
   );
 };

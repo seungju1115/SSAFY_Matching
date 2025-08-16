@@ -110,7 +110,6 @@ export interface TeamRequest {
   teamName?: string
   leaderId: number
   teamDomain: string
-  wantedPosition: string[]
   teamVive?: ProjectViveEnum[]
   teamPreference?: ProjectGoalEnum[]
   backendCount: number
