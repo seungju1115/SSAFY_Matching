@@ -54,7 +54,7 @@ public class TeamRequest {
             description = "팀 내 필요 포지션",
             example = "[\"FRONTEND\", \"BACKEND\"]"
     )
-    private String memberWanted;
+    private String[] wantedPosition;
 
     @Schema(
             description = "팀 목표/선호사항 (Enum Set)",
