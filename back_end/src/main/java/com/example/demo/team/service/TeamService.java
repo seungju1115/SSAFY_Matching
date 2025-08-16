@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -226,6 +227,12 @@ public class TeamService {
         team.setTeamDomain(teamRequest.getTeamDomain());
         team.setTeamVive(new HashSet<>(teamRequest.getTeamVive()));
         team.setTeamPreference(new HashSet<>(teamRequest.getTeamPreference()));
+        String[] wantedPositions = teamRequest.getWantedPosition();
+        if (wantedPositions != null && wantedPositions.length > 0) {
+            team.setMemberWanted(String.join(",", wantedPositions));
+        } else {
+            team.setMemberWanted(""); // 또는 null
+        }
         team.setBackendCount(teamRequest.getBackendCount());
         team.setFrontendCount(teamRequest.getFrontendCount());
         team.setAiCount(teamRequest.getAiCount());
