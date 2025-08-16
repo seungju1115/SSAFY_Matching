@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import type { Team } from '@/hooks/useTeam'
-=======
 import type { Team } from './TeamSection'
->>>>>>> 17624ac520ee6095d1a53ac9d2979b51dc366ac0
 import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 
@@ -76,24 +72,17 @@ const TeamDetailModal = ({
 
   if (!isOpen || !team) return null
 
-<<<<<<< HEAD
   // 역할별 정보 매핑 (tmp_dev API 구조에 맞게 수정)
-  const roleInfo = [
-    { key: 'BACKEND', label: '백엔드', color: 'bg-blue-400', current: team.roleCurrent?.BACKEND || 0, target: team.roleDistribution?.BACKEND || 0 },
-    { key: 'FRONTEND', label: '프론트엔드', color: 'bg-green-400', current: team.roleCurrent?.FRONTEND || 0, target: team.roleDistribution?.FRONTEND || 0 },
-    { key: 'AI', label: 'AI', color: 'bg-purple-400', current: team.roleCurrent?.AI || 0, target: team.roleDistribution?.AI || 0 },
-    { key: 'DESIGN', label: '디자인', color: 'bg-pink-400', current: team.roleCurrent?.DESIGN || 0, target: team.roleDistribution?.DESIGN || 0 },
-    { key: 'PM', label: 'PM', color: 'bg-orange-400', current: team.roleCurrent?.PM || 0, target: team.roleDistribution?.PM || 0 }
-=======
-  // 역할별 정보 매핑
   const roleInfo = [
     { key: 'backend', label: '백엔드', color: 'bg-blue-400', current: team.roleCurrent?.backend || 0, target: team.roleDistribution?.backend || 0 },
     { key: 'frontend', label: '프론트엔드', color: 'bg-green-400', current: team.roleCurrent?.frontend || 0, target: team.roleDistribution?.frontend || 0 },
     { key: 'ai', label: 'AI', color: 'bg-purple-400', current: team.roleCurrent?.ai || 0, target: team.roleDistribution?.ai || 0 },
     { key: 'design', label: '디자인', color: 'bg-pink-400', current: team.roleCurrent?.design || 0, target: team.roleDistribution?.design || 0 },
     { key: 'pm', label: 'PM', color: 'bg-orange-400', current: team.roleCurrent?.pm || 0, target: team.roleDistribution?.pm || 0 }
->>>>>>> 17624ac520ee6095d1a53ac9d2979b51dc366ac0
   ].filter(role => role.target > 0)
+
+  // 도메인 표시 통일: domains[0] 우선 사용, 없으면 domain 사용
+  const displayedDomain = (team.domains && team.domains.length > 0) ? team.domains[0] : team.domain
 
   return createPortal(
     <div
@@ -118,15 +107,9 @@ const TeamDetailModal = ({
         </div>
 
         {/* 카드 스크롤 영역 */}
-<<<<<<< HEAD
         <div className="flex-1 overflow-y-auto">
           <div className="h-full flex items-center">
             <div className="w-full overflow-x-auto overflow-y-auto scrollbar-hide">
-=======
-        <div className="flex-1 overflow-hidden">
-          <div className="h-full flex items-center">
-            <div className="w-full overflow-x-auto scrollbar-hide">
->>>>>>> 17624ac520ee6095d1a53ac9d2979b51dc366ac0
               <div className="flex gap-4 md:gap-6 p-4 md:p-6 min-w-max md:justify-center">
                 <div className="relative bg-white rounded-2xl shadow-xl w-72 md:w-80 flex-shrink-0 overflow-hidden">
                   <div className="p-6">
@@ -140,11 +123,7 @@ const TeamDetailModal = ({
                         <div className="text-sm text-slate-600">
                           <span className="font-medium text-blue-600">{team.members}/{team.maxMembers}명</span>
                           <span className="text-slate-400 mx-1">•</span>
-<<<<<<< HEAD
-                          <span>{team.domain || '도메인 미정'}</span>
-=======
-                          <span>{(team.domains && team.domains.length > 0) ? team.domains[0] : (team.domain || '도메인 미정')}</span>
->>>>>>> 17624ac520ee6095d1a53ac9d2979b51dc366ac0
+                          <span>{displayedDomain || '도메인 미정'}</span>
                         </div>
                       </div>
                     </div>
@@ -156,22 +135,9 @@ const TeamDetailModal = ({
                         프로젝트 도메인
                       </h4>
                       <div className="flex flex-wrap gap-2">
-<<<<<<< HEAD
-                        {team.domain ? (
-=======
-                        {team.domains && team.domains.length > 0 ? (
-                          team.domains.slice(0, 4).map((d, index) => (
-                            <span
-                              key={index}
-                              className="px-3 py-1 bg-emerald-50 text-emerald-700 text-xs rounded-full font-medium border border-emerald-100"
-                            >
-                              {d}
-                            </span>
-                          ))
-                        ) : team.domain ? (
->>>>>>> 17624ac520ee6095d1a53ac9d2979b51dc366ac0
+                        {displayedDomain ? (
                           <span className="px-3 py-1 bg-emerald-50 text-emerald-700 text-xs rounded-full font-medium border border-emerald-100">
-                            {team.domain}
+                            {displayedDomain}
                           </span>
                         ) : (
                           <span className="text-xs text-slate-400">미정</span>
@@ -179,11 +145,6 @@ const TeamDetailModal = ({
                       </div>
                     </div>
 
-<<<<<<< HEAD
-=======
-
-
->>>>>>> 17624ac520ee6095d1a53ac9d2979b51dc366ac0
                     {/* 역할 비율 */}
                     <div className="mb-4">
                       <h4 className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
@@ -218,7 +179,7 @@ const TeamDetailModal = ({
                         프로젝트 성향
                       </h4>
                       <div className="flex flex-wrap gap-2">
-                        {team.projectPreferences && team.projectPreferences.slice(0, 3).map((pref, index) => (
+                        {team.projectPreferences && team.projectPreferences.slice(0, 3).map((pref: string, index: number) => (
                           <span
                             key={index}
                             className="px-3 py-1 bg-green-50 text-green-700 text-xs rounded-full font-medium border border-green-100"
@@ -229,29 +190,6 @@ const TeamDetailModal = ({
                       </div>
                     </div>
 
-<<<<<<< HEAD
-=======
-                    {/* 팀 분위기 */}
-                    {team.teamAtmosphere && team.teamAtmosphere.length > 0 && (
-                      <div className="mb-4">
-                        <h4 className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
-                          <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                          팀 분위기
-                        </h4>
-                        <div className="flex flex-wrap gap-2">
-                          {team.teamAtmosphere.slice(0, 4).map((atm, index) => (
-                            <span
-                              key={index}
-                              className="px-3 py-1 bg-orange-50 text-orange-700 text-xs rounded-full font-medium border border-orange-100"
-                            >
-                              {atm}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
->>>>>>> 17624ac520ee6095d1a53ac9d2979b51dc366ac0
                     {/* 팀 한줄 소개 */}
                     <div>
                       <h4 className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
@@ -259,11 +197,7 @@ const TeamDetailModal = ({
                         팀 한줄 소개
                       </h4>
                       <p className="text-sm text-slate-600 leading-relaxed line-clamp-3">
-<<<<<<< HEAD
                         {team.description || '함께 성장하며 혁신적인 프로젝트를 만들어갈 팀입니다.'}
-=======
-                        {team.introduction || team.description || '함께 성장하며 혁신적인 프로젝트를 만들어갈 팀입니다.'}
->>>>>>> 17624ac520ee6095d1a53ac9d2979b51dc366ac0
                       </p>
                     </div>
                   </div>

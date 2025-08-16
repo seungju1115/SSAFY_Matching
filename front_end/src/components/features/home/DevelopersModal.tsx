@@ -1,40 +1,73 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Search, Filter, ChevronDown } from 'lucide-react'
 import type { Developer } from './DeveloperSection'
+import type { UserSearchResponse } from '@/types/user'
+import { userAPI } from '@/api/user'
+import { useEnumMapper } from '@/hooks/useEnumMapper'
 import DeveloperCard from './DeveloperCard'
 
 interface DevelopersModalProps {
   isOpen: boolean
   onClose: () => void
-  developers: Developer[]
   onViewProfile?: (developerId: number) => void
-<<<<<<< HEAD
   // 프로필 모달 열림 여부 (중첩 모달 시 ESC/바깥 클릭 무시용)
-=======
-  // 프로필(상세) 모달 열림 여부 (중첩 모달 시 ESC/바깥 클릭 무시용)
->>>>>>> 17624ac520ee6095d1a53ac9d2979b51dc366ac0
   isProfileOpen?: boolean
 }
 
 export default function DevelopersModal({ 
   isOpen, 
   onClose, 
-  developers,
   onViewProfile,
-<<<<<<< HEAD
   isProfileOpen = false
-=======
-  isProfileOpen = false,
->>>>>>> 17624ac520ee6095d1a53ac9d2979b51dc366ac0
 }: DevelopersModalProps) {
+  const [developers, setDevelopers] = useState<Developer[]>([])
+  const [isLoading, setIsLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedSkills, setSelectedSkills] = useState<string[]>([])
   const [selectedRole, setSelectedRole] = useState<string>('')
   const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const { mapTechStackArray, mapPositionArray, mapProjectGoalArray } = useEnumMapper()
+
+  // 대기중인 사용자 목록 로드
+  useEffect(() => {
+    const loadWaitingUsers = async () => {
+      if (!isOpen) return
+      
+      setIsLoading(true)
+      try {
+        const response = await userAPI.getWaitingUsers()
+        const userData = response.data.data
+        
+        // UserSearchResponse[]를 Developer[]로 변환
+        const convertedDevelopers: Developer[] = userData.map((user: UserSearchResponse) => ({
+          id: user.id,
+          name: user.userName,
+          role: user.wantedPosition?.[0] ? mapPositionArray(user.wantedPosition as any)[0] : '미정',
+          positions: mapPositionArray(user.wantedPosition as any),
+          // 카드 컴포넌트에서 기대하는 형태({ name, level })로 변환
+          techStack: mapTechStackArray(user.techStack as any).map((name: string) => ({ name, level: 3 })),
+          // 카드 하단 배지와 기본값(취업중심/학습열정)에 맞춰 ProjectGoal을 표시
+          projectPreferences: mapProjectGoalArray(user.projectGoal as any),
+          experience: user.projectExp || 0,
+          isMajor: user.major,
+          avatar: '' // 아바타 정보가 없으므로 빈 문자열
+        }))
+        
+        setDevelopers(convertedDevelopers)
+      } catch (error) {
+        console.error('대기중인 사용자 목록 로드 실패:', error)
+        setDevelopers([]) // 오류 시 빈 배열로 설정
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadWaitingUsers()
+  }, [isOpen]) // 매핑 함수는 안정적이므로 의존성에서 제거
 
   // 모든 포지션과 역할 추출
   const allPositions = Array.from(new Set(developers.flatMap(dev => dev.positions || [dev.role])))
@@ -63,7 +96,6 @@ export default function DevelopersModal({
   }
 
   return (
-<<<<<<< HEAD
     <Dialog open={isOpen} onOpenChange={(open: boolean) => {
       // 프로필 모달이 열려있을 때는 DevelopersModal을 닫지 않음
       if (!open && isProfileOpen) return
@@ -71,21 +103,6 @@ export default function DevelopersModal({
     }} modal={false}>
       <DialogContent overlayClassName={isProfileOpen ? 'pointer-events-none' : undefined} className={`max-w-7xl h-[90vh] flex flex-col`}>
         <div className="flex flex-col h-full min-h-0 overflow-hidden pointer-events-auto">
-=======
-    <Dialog 
-      open={isOpen} 
-      modal={false}
-      onOpenChange={(open) => {
-        // 프로필 모달이 열려 있을 때는 DevelopersModal 닫힘을 무시
-        if (!open && isProfileOpen) return
-        if (!open) onClose()
-      }}
-    >
-      <DialogContent 
-        overlayClassName={isProfileOpen ? 'pointer-events-none' : undefined}
-        className="max-w-7xl max-h-[90vh] overflow-hidden flex flex-col"
-      >
->>>>>>> 17624ac520ee6095d1a53ac9d2979b51dc366ac0
         <DialogHeader className="flex-shrink-0">
           <div className="flex items-center justify-between">
             <DialogTitle className="text-2xl font-bold">대기자 전체보기</DialogTitle>
@@ -163,7 +180,6 @@ export default function DevelopersModal({
         </div>
 
         {/* 개발자 목록 */}
-<<<<<<< HEAD
         <div className="flex-1 min-h-0 overflow-y-auto">
           {isLoading ? (
             <div className="flex justify-center items-center h-32">
@@ -180,23 +196,13 @@ export default function DevelopersModal({
                   />
                 ))}
               </div>
-=======
-        <div className="flex-1 overflow-y-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 p-1">
-            {filteredDevelopers.map((dev) => (
-              <DeveloperCard 
-                key={dev.id}
-                developer={dev}
-                onClick={(developerId) => onViewProfile?.(developerId)}
-              />
-            ))}
-          </div>
->>>>>>> 17624ac520ee6095d1a53ac9d2979b51dc366ac0
 
-          {filteredDevelopers.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-gray-500">검색 조건에 맞는 개발자가 없습니다.</p>
-            </div>
+              {filteredDevelopers.length === 0 && (
+                <div className="text-center py-12">
+                  <p className="text-gray-500">검색 조건에 맞는 개발자가 없습니다.</p>
+                </div>
+              )}
+            </>
           )}
         </div>
 

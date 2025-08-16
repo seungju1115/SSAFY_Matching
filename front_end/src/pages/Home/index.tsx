@@ -1,6 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-<<<<<<< HEAD
 import { Button } from "@/components/ui/button"
 import { Users, Search } from "lucide-react"
 import Header from "@/components/layout/Header"
@@ -10,56 +9,20 @@ import TeamsModal from "@/components/features/home/TeamsModal"
 import DevelopersModal from "@/components/features/home/DevelopersModal"
 import TeamDetailModal from "@/components/features/home/TeamDetailModal"
 import UserProfileModal from "@/components/features/home/UserProfileModal"
-import { useTeam, type Team } from "@/hooks/useTeam"
+import { useTeam } from "@/hooks/useTeam"
 import { useUser } from "@/hooks/useUser"
-import type { UserSearchResponse } from "@/types/user"
-=======
-import { Button } from '@/components/ui/button'
-import { Users, Search } from 'lucide-react'
-import Header from '@/components/layout/Header'
-import TeamSection from '@/components/features/home/TeamSection'
-import DeveloperSection from '@/components/features/home/DeveloperSection'
-import TeamsModal from '@/components/features/home/TeamsModal'
-import DevelopersModal from '@/components/features/home/DevelopersModal'
-import UserProfileModal from '@/components/features/home/UserProfileModal'
-import TeamDetailModal from '@/components/features/home/TeamDetailModal'
-import { mockTeams, mockDevelopers } from '@/data/mockData'
-import type { Developer } from '@/components/features/home/DeveloperSection'
-import type { Team } from '@/components/features/home/TeamSection'
-
-// Developer를 User 타입으로 변환하는 함수
-const convertDeveloperToUser = (developer: Developer) => ({
-  id: developer.id.toString(),
-  name: developer.name,
-  mainPosition: developer.role,
-  subPosition: developer.positions?.[0] || '개발자',
-  domain: developer.domain || '웹 개발',
-  techStack: developer.techStack?.map(tech => tech.name) || [],
-  projectPreferences: developer.projectPreferences || ['혁신적인', '사용자 중심'],
-  personalPreferences: developer.personalPreferences || ['소통 활발', '책임감 강함'],
-  introduction: '함께 성장할 수 있는 프로젝트에 참여하고 싶습니다. 새로운 기술을 배우는 것을 좋아하며, 팀원들과의 협업을 통해 더 나은 결과를 만들어내고 싶습니다.'
-})
-
-// User 타입 정의 (UserProfileModal과 동일)
-interface User {
-  id: string
-  name: string
-  mainPosition: string
-  subPosition: string
-  domain: string
-  techStack: string[]
-  projectPreferences: string[]
-  personalPreferences: string[]
-  introduction: string
-}
->>>>>>> 17624ac520ee6095d1a53ac9d2979b51dc366ac0
+import { teamAPI } from '@/api/team'
+import { userAPI } from '@/api/user'
+import { useEnumMapper } from '@/hooks/useEnumMapper'
+import type { UserSearchResponse, UserDetailResponse } from "@/types/user"
+import type { Team } from "@/components/features/home/TeamSection"
+import type { Developer } from "@/components/features/home/DeveloperSection"
 
 // Home 페이지 (메인페이지)
 export default function Home() {
   const navigate = useNavigate()
   const [isTeamsModalOpen, setIsTeamsModalOpen] = useState(false)
   const [isDevelopersModalOpen, setIsDevelopersModalOpen] = useState(false)
-<<<<<<< HEAD
   const [isTeamDetailModalOpen, setIsTeamDetailModalOpen] = useState(false)
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null)
   
@@ -70,8 +33,95 @@ export default function Home() {
   // 프로필 모달 상태
   const [selectedUser, setSelectedUser] = useState<UserSearchResponse | null>(null)
   
-  const { requestJoinTeam, inviteToTeam, fetchTeamDetail, convertTeamDetailToTeam } = useTeam()
+  // 데이터 상태
+  const [teams, setTeams] = useState<Team[]>([])
+  const [developers, setDevelopers] = useState<Developer[]>([])
+  
+  const { requestJoinTeam, inviteToTeam, fetchTeamDetail } = useTeam()
   const { getUserProfile } = useUser()
+  const { mapTechStackArray, mapPositionArray, mapProjectGoalArray } = useEnumMapper()
+
+  // 팀 목록 로드
+  useEffect(() => {
+    const loadTeams = async () => {
+      try {
+        const response = await teamAPI.getAllTeams()
+        const teamData = response.data.data
+        
+        // TeamDetailResponse[]를 Team[]로 변환
+        const convertedTeams: Team[] = teamData.slice(0, 6).map((team: any) => ({
+          id: team.teamId,
+          name: team.teamName,
+          description: team.teamDescription || '',
+          // 팀원들의 기술스택을 합쳐 팀 기술스택으로 사용
+          tech: Array.from(new Set((team.members || []).flatMap((m: any) => mapTechStackArray(m.techStack as any)))) ,
+          members: team.members.length,
+          maxMembers: team.backendCount + team.frontendCount + team.aiCount + team.designCount + team.pmCount,
+          deadline: '', // 마감일 정보가 없으므로 빈 문자열
+          domain: team.teamDomain,
+          // 팀 목표(선호도) 표시는 ProjectGoal 기준으로 매핑
+          projectPreferences: mapProjectGoalArray(team.teamPreference as any) || [],
+          leader: {
+            name: team.leader.userName,
+            avatar: '',
+            role: team.leader.wantedPosition?.[0] || ''
+          },
+          roleDistribution: {
+            backend: team.backendCount || 0,
+            frontend: team.frontendCount || 0,
+            ai: team.aiCount || 0,
+            design: team.designCount || 0,
+            pm: team.pmCount || 0
+          },
+          roleCurrent: {
+            backend: team.members.filter((m: any) => m.wantedPosition?.includes('BACKEND')).length,
+            frontend: team.members.filter((m: any) => m.wantedPosition?.includes('FRONTEND')).length,
+            ai: team.members.filter((m: any) => m.wantedPosition?.includes('AI')).length,
+            design: team.members.filter((m: any) => m.wantedPosition?.includes('DESIGN')).length,
+            pm: team.members.filter((m: any) => m.wantedPosition?.includes('PM')).length
+          }
+        }))
+        
+        setTeams(convertedTeams)
+      } catch (error) {
+        console.error('팀 목록 로드 실패:', error)
+        setTeams([]) // 오류 시 빈 배열
+      }
+    }
+
+    loadTeams()
+  }, []) // 컴포넌트 마운트 시 한 번만 호출
+
+  // 대기중인 사용자 목록 로드
+  useEffect(() => {
+    const loadDevelopers = async () => {
+      try {
+        const response = await userAPI.getWaitingUsers()
+        const userData = response.data.data
+        
+        // UserSearchResponse[]를 Developer[]로 변환 (처음 8명만)
+        const convertedDevelopers: Developer[] = userData.slice(0, 8).map((user: any) => ({
+          id: user.id,
+          name: user.userName,
+          role: user.wantedPosition?.[0] ? mapPositionArray(user.wantedPosition as any)[0] : '미정',
+          positions: mapPositionArray(user.wantedPosition as any),
+          // 카드 컴포넌트에서 기대하는 형태({ name, level })로 변환
+          techStack: mapTechStackArray(user.techStack as any).map((name: string) => ({ name, level: 3 })),
+          // 카드 하단 배지와 기본값(취업중심/학습열정)에 맞춰 ProjectGoal을 표시
+          projectPreferences: mapProjectGoalArray(user.projectGoal as any),
+          isMajor: user.major,
+          avatar: '' // 아바타 정보가 없으므로 빈 문자열
+        }))
+        
+        setDevelopers(convertedDevelopers)
+      } catch (error) {
+        console.error('대기중인 사용자 목록 로드 실패:', error)
+        setDevelopers([]) // 오류 시 빈 배열
+      }
+    }
+
+    loadDevelopers()
+  }, []) // 컴포넌트 마운트 시 한 번만 호출, 매핑 함수는 안정적이므로 의존성에서 제거
 
   // 팀 상세보기 핸들러
   const handleViewTeam = async (teamId: number) => {
@@ -80,7 +130,40 @@ export default function Home() {
       const teamDetail = await fetchTeamDetail(teamId)
       
       if (teamDetail) {
-        const convertedTeam = convertTeamDetailToTeam(teamDetail)
+        // TeamDetailResponse를 Team 타입으로 변환
+        const convertedTeam: Team = {
+          id: teamDetail.teamId,
+          name: teamDetail.teamName,
+          description: teamDetail.teamDescription || '',
+          // 상세에서도 팀원들의 기술스택을 집계
+          tech: Array.from(new Set((teamDetail.members || []).flatMap((m: UserDetailResponse) => mapTechStackArray(m.techStack as any)))),
+          members: teamDetail.members.length,
+          maxMembers: teamDetail.backendCount + teamDetail.frontendCount + teamDetail.aiCount + teamDetail.designCount + teamDetail.pmCount,
+          deadline: '', // 마감일 정보가 없으므로 빈 문자열
+          roleDistribution: {
+            backend: teamDetail.backendCount,
+            frontend: teamDetail.frontendCount,
+            ai: teamDetail.aiCount,
+            design: teamDetail.designCount,
+            pm: teamDetail.pmCount
+          },
+          roleCurrent: {
+            backend: teamDetail.members.filter((m: UserDetailResponse) => m.wantedPosition?.includes('BACKEND')).length,
+            frontend: teamDetail.members.filter((m: UserDetailResponse) => m.wantedPosition?.includes('FRONTEND')).length,
+            ai: teamDetail.members.filter((m: UserDetailResponse) => m.wantedPosition?.includes('AI')).length,
+            design: teamDetail.members.filter((m: UserDetailResponse) => m.wantedPosition?.includes('DESIGN')).length,
+            pm: teamDetail.members.filter((m: UserDetailResponse) => m.wantedPosition?.includes('PM')).length
+          },
+          leader: {
+            name: teamDetail.leader.userName,
+            avatar: '',
+            role: teamDetail.leader.wantedPosition?.[0] || ''
+          },
+          domains: [teamDetail.teamDomain],
+          teamAtmosphere: teamDetail.teamVive || [],
+          projectPreferences: mapProjectGoalArray(teamDetail.teamPreference as any) || [],
+          introduction: teamDetail.teamDescription || ''
+        }
         setSelectedTeam(convertedTeam)
         setIsTeamDetailModalOpen(true)
         setIsTeamDetailFromModalOpen(true)
@@ -137,12 +220,6 @@ export default function Home() {
       console.error('사용자 초대 실패:', error)
     }
   }
-=======
-  const [isUserProfileModalOpen, setIsUserProfileModalOpen] = useState(false)
-  const [isTeamDetailModalOpen, setIsTeamDetailModalOpen] = useState(false)
-  const [selectedUser, setSelectedUser] = useState<User | null>(null)
-  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null)
->>>>>>> 17624ac520ee6095d1a53ac9d2979b51dc366ac0
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -175,39 +252,19 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-20">
         {/* Team Section */}
         <TeamSection 
-          teams={mockTeams}
+          teams={teams}
           onCreateTeam={() => navigate('/make-team') }
           onViewAll={() => setIsTeamsModalOpen(true)}
-<<<<<<< HEAD
           onViewTeam={handleViewTeam}
-=======
-          onViewTeam={(teamId) => {
-            const team = mockTeams.find(t => t.id === teamId)
-            if (team) {
-              setSelectedTeam(team)
-              setIsTeamDetailModalOpen(true)
-            }
-          }}
->>>>>>> 17624ac520ee6095d1a53ac9d2979b51dc366ac0
         />
 
         {/* Developer Section */}
         <DeveloperSection 
-          developers={mockDevelopers}
+          developers={developers}
           onRegister={() => navigate('/profile-setup')}
           onFilter={() => console.log('필터 클릭')}
           onViewAll={() => setIsDevelopersModalOpen(true)}
-<<<<<<< HEAD
           onViewProfile={handleViewProfile}
-=======
-          onViewProfile={(developerId) => {
-            const developer = mockDevelopers.find(dev => dev.id === developerId)
-            if (developer) {
-              setSelectedUser(convertDeveloperToUser(developer))
-              setIsUserProfileModalOpen(true)
-            }
-          }}
->>>>>>> 17624ac520ee6095d1a53ac9d2979b51dc366ac0
         />
       </div>
 
@@ -215,28 +272,14 @@ export default function Home() {
       <TeamsModal
         isOpen={isTeamsModalOpen}
         onClose={() => setIsTeamsModalOpen(false)}
-<<<<<<< HEAD
         onViewTeam={handleViewTeam}
         isDetailOpen={isTeamDetailFromModalOpen}
-=======
-        teams={mockTeams}
-        isDetailOpen={isTeamDetailModalOpen}
-        onViewTeam={(teamId) => {
-          const team = mockTeams.find(t => t.id === teamId)
-          if (team) {
-            setSelectedTeam(team)
-            setIsTeamDetailModalOpen(true)
-            // 중첩 모달 처리를 위해 전체보기 모달을 닫지 않음
-            // setIsTeamsModalOpen(false)
-          }
-        }}
->>>>>>> 17624ac520ee6095d1a53ac9d2979b51dc366ac0
       />
 
+      {/* 대기자 전체보기 모달 */}
       <DevelopersModal
         isOpen={isDevelopersModalOpen}
         onClose={() => setIsDevelopersModalOpen(false)}
-<<<<<<< HEAD
         onViewProfile={handleViewProfile}
         isProfileOpen={isProfileModalOpen}
       />
@@ -247,36 +290,6 @@ export default function Home() {
         onClose={() => {
           setIsTeamDetailModalOpen(false)
           setIsTeamDetailFromModalOpen(false)
-=======
-        developers={mockDevelopers}
-        isProfileOpen={isUserProfileModalOpen}
-        onViewProfile={(developerId) => {
-          const developer = mockDevelopers.find(dev => dev.id === developerId)
-          if (developer) {
-            setSelectedUser(convertDeveloperToUser(developer))
-            setIsUserProfileModalOpen(true)
-          }
-        }}
-      />
-
-      <UserProfileModal
-        isOpen={isUserProfileModalOpen}
-        onClose={() => setIsUserProfileModalOpen(false)}
-        user={selectedUser}
-        onInvite={(userId) => {
-          console.log('초대하기 클릭:', userId)
-          // 여기에 초대 로직 구현
-        }}
-      />
-
-      <TeamDetailModal
-        isOpen={isTeamDetailModalOpen}
-        onClose={() => setIsTeamDetailModalOpen(false)}
-        team={selectedTeam}
-        onJoinRequest={(teamId) => {
-          console.log('참여 신청 클릭:', teamId)
-          // 여기에 참여 신청 로직 구현
->>>>>>> 17624ac520ee6095d1a53ac9d2979b51dc366ac0
         }}
         team={selectedTeam}
         onJoinRequest={handleJoinTeam}

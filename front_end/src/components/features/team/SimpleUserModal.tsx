@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 // 스크롤바 숨김 스타일
 const scrollbarHideStyle = `
@@ -37,38 +37,44 @@ const SimpleUserModal = ({
   onSelectUser 
 }: SimpleUserModalProps) => {
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([])
-<<<<<<< HEAD
-  const { 
-    candidatesDisplay, 
-    isLoadingCandidates, 
-    candidatesError, 
-    getBasicRecommendations 
-  } = useAI()
-
-  // CandidateDtoDisplay를 User 타입으로 변환
-  const convertCandidateToUser = (candidate: CandidateDtoDisplay): User => ({
-    id: candidate.userId.toString(),
-    name: candidate.userName,
-    mainPosition: candidate.mainPos,
-    subPosition: candidate.subPos,
-    domain: '', // 빈 문자열로 설정
-    techStack: candidate.techs,
-    projectPreferences: candidate.goals,
-    personalPreferences: candidate.vives,
-    introduction: candidate.userProfile || '자기소개 정보가 없습니다.'
-  })
-
-  // AI 추천 데이터가 있으면 사용, 없으면 빈 배열 반환
-  const recommendedUsers: User[] = candidatesDisplay.length > 0 
-    ? candidatesDisplay.map(convertCandidateToUser)
-    : []
   
-  // 팀 ID가 있을 때 AI 추천 요청
-  useEffect(() => {
-    if (isOpen && teamId) {
-      getBasicRecommendations(teamId)
+
+  // 임시 추천 사용자 데이터 (실제로는 AI 추천 API 사용)
+  const mockRecommendedUsers: User[] = [
+    {
+      id: '1',
+      name: '김개발',
+      mainPosition: '백엔드',
+      subPosition: '프론트엔드',
+      domain: '웹 서비스',
+      techStack: ['Java', 'Spring', 'React', 'MySQL'],
+      projectPreferences: ['취업우선', '수상목표'],
+      personalPreferences: ['꾸준함', '소통', '자율'],
+      introduction: '안정적인 백엔드 시스템 구축에 관심이 많고, 팀워크를 중시합니다.'
+    },
+    {
+      id: '2',
+      name: '이프론트',
+      mainPosition: '프론트엔드',
+      subPosition: 'AI',
+      domain: 'AI 서비스',
+      techStack: ['React', 'TypeScript', 'Python', 'TensorFlow'],
+      projectPreferences: ['학습중심', '포트폴리오중심'],
+      personalPreferences: ['도전', '연구', '집중'],
+      introduction: '사용자 경험을 중시하는 프론트엔드 개발자입니다. AI에도 관심이 많습니다.'
+    },
+    {
+      id: '3',
+      name: '박디자인',
+      mainPosition: '디자인',
+      subPosition: 'PM',
+      domain: '모바일',
+      techStack: ['Figma', 'Photoshop', 'Sketch', 'Notion'],
+      projectPreferences: ['완성도추구', '빠른개발'],
+      personalPreferences: ['협업', '속도', '유연'],
+      introduction: '사용자 중심의 디자인을 추구하며, 프로젝트 관리 경험도 있습니다.'
     }
-  }, [isOpen, teamId, getBasicRecommendations])
+  ]
 
   // 선택 초기화 (모달이 열릴 때마다)
   useEffect(() => {
@@ -76,8 +82,6 @@ const SimpleUserModal = ({
       setSelectedUserIds([])
     }
   }, [isOpen])
-=======
->>>>>>> 17624ac520ee6095d1a53ac9d2979b51dc366ac0
   
   // 사용자 선택 처리 함수
   const handleUserSelect = (userId: string) => {
@@ -121,7 +125,7 @@ const SimpleUserModal = ({
           <div className="h-full flex items-center">
             <div className="w-full overflow-x-auto scrollbar-hide">
               <div className="flex gap-4 md:gap-6 p-4 md:p-6 min-w-max md:justify-center">
-                {mockRecommendedUsers.map((user) => (
+                {mockRecommendedUsers.map((user: User) => (
                   <div
                     key={user.id}
                     onClick={() => handleUserSelect(user.id)}
@@ -164,7 +168,7 @@ const SimpleUserModal = ({
                           기술 스택
                         </h4>
                         <div className="flex flex-wrap gap-2">
-                          {user.techStack.slice(0, 4).map((tech, index) => (
+                          {user.techStack.slice(0, 4).map((tech: string, index: number) => (
                             <span
                               key={index}
                               className="px-3 py-1 bg-blue-50 text-blue-700 text-xs rounded-full font-medium border border-blue-100"
@@ -182,7 +186,7 @@ const SimpleUserModal = ({
                           프로젝트 선호도
                         </h4>
                         <div className="flex flex-wrap gap-2">
-                          {user.projectPreferences.slice(0, 3).map((pref, index) => (
+                          {user.projectPreferences.slice(0, 3).map((pref: string, index: number) => (
                             <span
                               key={index}
                               className="px-3 py-1 bg-green-50 text-green-700 text-xs rounded-full font-medium border border-green-100"
@@ -200,7 +204,7 @@ const SimpleUserModal = ({
                           개인 성향
                         </h4>
                         <div className="flex flex-wrap gap-2">
-                          {user.personalPreferences.slice(0, 3).map((pref, index) => (
+                          {user.personalPreferences.slice(0, 3).map((pref: string, index: number) => (
                             <span
                               key={index}
                               className="px-3 py-1 bg-purple-50 text-purple-700 text-xs rounded-full font-medium border border-purple-100"
@@ -241,7 +245,7 @@ const SimpleUserModal = ({
             <button
               onClick={() => {
                 if (selectedUserIds.length > 0) {
-                  const selectedUsers = mockRecommendedUsers.filter(u => selectedUserIds.includes(u.id))
+                  const selectedUsers = mockRecommendedUsers.filter((u: User) => selectedUserIds.includes(u.id))
                   if (selectedUsers.length > 0) {
                     onSelectUser(selectedUsers)
                     onClose()
