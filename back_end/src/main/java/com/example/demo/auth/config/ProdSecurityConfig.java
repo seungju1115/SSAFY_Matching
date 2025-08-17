@@ -51,7 +51,7 @@ public class ProdSecurityConfig {
         http.authorizeHttpRequests(
                 c ->
                         c.requestMatchers("/error", "/users/login",
-                                        "/login/oauth2/code/**", "/h2-console/**", "/ws-chat/**", "/cache/**", "/dashboard/**").permitAll()
+                                        "/login/oauth2/code/**", "/h2-console/**", "/ws-chat/**", "/cache/**", "/dashboard/**", "/ai/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/team", "/team/**" , "/team/search", "/users/profile/**","/users/profile" , "/hello","/users/profile/waiting").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/users/profile","/users/profile/search").permitAll()
                                 .requestMatchers(HttpMethod.DELETE, "/users/profile/**","/team/**").permitAll()
