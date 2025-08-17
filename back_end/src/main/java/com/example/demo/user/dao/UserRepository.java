@@ -77,7 +77,7 @@ public interface UserRepository extends JpaRepository<User,Long> {
         LEFT JOIN user_wanted_position up ON u.user_id = up.user_user_id
         LEFT JOIN user_project_goal upg ON u.user_id = upg.user_user_id  
         LEFT JOIN user_project_vive upv ON u.user_id = upv.user_user_id
-        WHERE u.team_id IS NULL
+        WHERE u.user_status = 'WAITING'
         GROUP BY u.user_id, u.user_name
         """, nativeQuery = true)
     List<Object[]> findAllCandidates ();
