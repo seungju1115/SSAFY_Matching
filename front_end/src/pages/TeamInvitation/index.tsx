@@ -71,9 +71,9 @@ export default function TeamInvitation() {
       setIsLoading(true)
       try {
         const response = await teamAPI.getUserRequests(user.id)
-        // INVITE 타입이고 PENDING 상태가 아닌 요청들만 필터링
+        // INVITE 타입이고 PENDING 상태인 요청들만 필터링
         const inviteRequests = response.data.data.filter(
-          request => request.requestType === 'INVITE'
+          request => request.requestType === 'INVITE' && request.status === 'PENDING'
         )
         
         setMembershipResponses(inviteRequests)
