@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTeam } from '@/hooks/useTeam'
 import useUserStore from '@/stores/userStore'
-import type { TeamRequest, ProjectGoalEnum, ProjectViveEnum } from '@/types/team'
+import type { ProjectGoalEnum, ProjectViveEnum } from '@/types/team'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -27,12 +27,13 @@ interface TeamData {
   domains: string[]
   projectPreferences: string[]
   teamAtmosphere: string[]
+  wantedPosition: string[]
   roleDistribution: {
-    backend: number
-    frontend: number
-    ai: number
-    design: number
-    pm: number
+    BACKEND: number
+    FRONTEND: number
+    AI: number
+    DESIGN: number
+    PM: number
   }
   introduction: string
 }
@@ -45,12 +46,13 @@ export default function MakeTeam() {
     domains: [],
     projectPreferences: [],
     teamAtmosphere: [],
+    wantedPosition: [],
     roleDistribution: {
-      backend: 1,
-      frontend: 1,
-      ai: 0,
-      design: 0,
-      pm: 0
+      BACKEND: 0,
+      FRONTEND: 0,
+      AI: 0,
+      DESIGN: 0,
+      PM: 0
     },
     introduction: ''
   })
@@ -108,18 +110,72 @@ export default function MakeTeam() {
   }
 
   // 역할 인원 조정
+  const [roleIncrements, setRoleIncrements] = useState<Record<string, number>>({
+    BACKEND: 0,
+    FRONTEND: 0,
+    AI: 0,
+    DESIGN: 0,
+    PM: 0
+  });
+
   const adjustRole = (role: keyof typeof teamData.roleDistribution, increment: boolean) => {
-    setTeamData(prev => ({
-      ...prev,
-      roleDistribution: {
-        ...prev.roleDistribution,
-        [role]: Math.max(0, Math.min(10, prev.roleDistribution[role] + (increment ? 1 : -1)))
+    if (increment) {
+      // 현재 총 증가량 계산
+      const totalIncrements = Object.values(roleIncrements).reduce((sum, count) => sum + count, 0);
+
+      // 최대 2개까지만 증가 허용
+      if (totalIncrements >= 2) {
+        return;
       }
-    }))
-  }
+
+      setTeamData(prev => ({
+        ...prev,
+        roleDistribution: {
+          ...prev.roleDistribution,
+          [role]: Math.max(0, Math.min(10, prev.roleDistribution[role] + 1))
+        }
+      }));
+
+      // 해당 역할의 증가 횟수 업데이트
+      setRoleIncrements(prev => ({
+        ...prev,
+        [role]: (prev[role] || 0) + 1
+      }));
+
+    } else {
+      // 해당 역할이 증가된 적이 있는 경우에만 감소 허용
+      if (roleIncrements[role] > 0) {
+        setTeamData(prev => ({
+          ...prev,
+          roleDistribution: {
+            ...prev.roleDistribution,
+            [role]: Math.max(0, Math.min(10, prev.roleDistribution[role] - 1))
+          }
+        }));
+
+        setRoleIncrements(prev => ({
+          ...prev,
+          [role]: prev[role] - 1
+        }));
+      }
+    }
+  };
+
 
   // TeamData를 TeamRequest로 매핑
-  const mapTeamDataToRequest = (data: TeamData): TeamRequest => {
+  const mapTeamDataToRequest = (data: TeamData): {
+    leaderId: number;
+    teamDomain: string;
+    teamDescription: string;
+    teamPreference: ("JOB" | "AWARD" | "PORTFOLIO" | "STUDY" | "IDEA" | "PROFESSIONAL" | "QUICK" | "QUALITY")[];
+    teamVive: ("CASUAL" | "FORMAL" | "COMFY" | "RULE" | "LEADER" | "DEMOCRACY" | "BRANDNEW" | "STABLE" | "AGILE" | "WATERFALL")[];
+    wantedPosition: string[];
+    backendCount: number;
+    frontendCount: number;
+    aiCount: number;
+    pmCount: number;
+    designCount: number
+  } => {
     // enum으로 매핑
     const mappedPreferences = data.projectPreferences
       .map(pref => projectPreferenceToEnumMapping[pref])
@@ -129,17 +185,30 @@ export default function MakeTeam() {
       .map(atm => atmosphereToEnumMapping[atm])
       .filter(Boolean)
 
+    // 증가된 역할들을 문자열 배열로 가져오는 헬퍼 함수
+    const getAddedRolesArray = (): string[] => {
+      const result: string[] = [];
+      Object.entries(roleIncrements).forEach(([role, count]) => {
+        for (let i = 0; i < count; i++) {
+          result.push(role);
+        }
+      });
+      return result;
+    };
+    console.log(getAddedRolesArray());
     return {
+
       leaderId: user.id || 0,
       teamDomain: data.domains.join(', '), // 도메인들을 문자열로 결합
       teamDescription: data.introduction,
       teamPreference: mappedPreferences,
       teamVive: mappedAtmosphere,
-      backendCount: data.roleDistribution.backend,
-      frontendCount: data.roleDistribution.frontend,
-      aiCount: data.roleDistribution.ai,
-      pmCount: data.roleDistribution.pm,
-      designCount: data.roleDistribution.design
+      wantedPosition: getAddedRolesArray(),
+      backendCount: data.roleDistribution.BACKEND,
+      frontendCount: data.roleDistribution.FRONTEND,
+      aiCount: data.roleDistribution.AI,
+      pmCount: data.roleDistribution.PM,
+      designCount: data.roleDistribution.DESIGN
     }
   }
 
@@ -293,11 +362,11 @@ export default function MakeTeam() {
               <CardContent className="pt-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {[
-                    { key: 'backend', label: '백엔드', icon: Code, color: 'bg-blue-100 text-blue-800' },
-                    { key: 'frontend', label: '프론트엔드', icon: Globe, color: 'bg-green-100 text-green-800' },
-                    { key: 'ai', label: 'AI', icon: Sparkles, color: 'bg-purple-100 text-purple-800' },
-                    { key: 'design', label: '디자인', icon: Heart, color: 'bg-pink-100 text-pink-800' },
-                    { key: 'pm', label: 'PM', icon: Users, color: 'bg-orange-100 text-orange-800' }
+                    { key: 'BACKEND', label: '백엔드', icon: Code, color: 'bg-blue-100 text-blue-800' },
+                    { key: 'FRONTEND', label: '프론트엔드', icon: Globe, color: 'bg-green-100 text-green-800' },
+                    { key: 'AI', label: 'AI', icon: Sparkles, color: 'bg-purple-100 text-purple-800' },
+                    { key: 'DESIGN', label: '디자인', icon: Heart, color: 'bg-pink-100 text-pink-800' },
+                    { key: 'PM', label: 'PM', icon: Users, color: 'bg-orange-100 text-orange-800' }
                   ].map(({ key, label, icon: Icon, color }) => (
                     <div key={key} className="flex items-center justify-between p-4 bg-white/50 rounded-lg border">
                       <div className="flex items-center space-x-3">
