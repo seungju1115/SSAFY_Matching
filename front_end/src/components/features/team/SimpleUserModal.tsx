@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAI } from '@/hooks/useAI'
+import { useTeam } from '@/hooks/useTeam'
+import useUserStore from '@/stores/userStore'
 import type { CandidateDtoDisplay } from '@/types/ai'
 
 // 스크롤바 숨김 스타일
@@ -78,6 +80,9 @@ const SimpleUserModal = ({
                            teamId
                          }: SimpleUserModalProps) => {
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([])
+  const [isInviting, setIsInviting] = useState(false)
+  const { inviteToTeam } = useTeam()
+  const { user: currentUser } = useUserStore()
   const {
     candidatesDisplay,
     isLoadingCandidates,
@@ -299,19 +304,35 @@ const SimpleUserModal = ({
               취소
             </button>
             <button
-                onClick={() => {
-                  if (selectedUserIds.length > 0) {
-                    const selectedUsers = recommendedUsers.filter(u => selectedUserIds.includes(u.id))
-                    if (selectedUsers.length > 0) {
+                onClick={async () => {
+                  if (selectedUserIds.length > 0 && currentUser.teamId && !isInviting) {
+                    try {
+                      setIsInviting(true)
+                      const selectedUsers = recommendedUsers.filter(u => selectedUserIds.includes(u.id))
+                      
+                      // 선택된 각 사용자에게 초대 요청 전송
+                      for (const user of selectedUsers) {
+                        await inviteToTeam(
+                          currentUser.teamId, 
+                          parseInt(user.id), 
+                          `${user.name}님을 우리 팀에 초대합니다.`
+                        )
+                      }
+                      
+                      // 성공 시 기존 콜백도 호출 (UI 업데이트 등을 위해)
                       onSelectUser(selectedUsers)
                       onClose()
+                    } catch (error) {
+                      console.error('팀원 초대 실패:', error)
+                    } finally {
+                      setIsInviting(false)
                     }
                   }
                 }}
-                disabled={selectedUserIds.length === 0}
-                className={`flex-1 px-6 py-3 rounded-xl transition-all duration-200 font-medium ${selectedUserIds.length > 0 ? 'bg-blue-600/90 hover:bg-blue-700/90 text-white shadow-lg hover:shadow-xl' : 'bg-white/10 text-white/50 cursor-not-allowed'}`}
+                disabled={selectedUserIds.length === 0 || !currentUser.teamId || isInviting}
+                className={`flex-1 px-6 py-3 rounded-xl transition-all duration-200 font-medium ${selectedUserIds.length > 0 && currentUser.teamId && !isInviting ? 'bg-blue-600/90 hover:bg-blue-700/90 text-white shadow-lg hover:shadow-xl' : 'bg-white/10 text-white/50 cursor-not-allowed'}`}
             >
-              팀원 초대하기 ({selectedUserIds.length}/3)
+              {isInviting ? '초대 중...' : `팀원 초대하기 (${selectedUserIds.length}/3)`}
             </button>
           </div>
         </div>

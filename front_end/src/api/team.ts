@@ -99,7 +99,7 @@ export const teamHelpers = {
    */
   requestToJoinTeam: (teamId: number, userId: number, message: string) =>
     teamAPI.submitTeamOffer({
-      requestType: 'JOIN',
+      requestType: 'JOIN_REQUEST',
       teamId,
       userId,
       message
