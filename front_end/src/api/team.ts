@@ -70,6 +70,13 @@ export const teamAPI = {
     apiClient.post('/team/offer', teamOffer),
 
   /**
+   * 팀 초대 거절
+   * POST /team/{teamId}/reject
+   */
+  rejectOffer: (teamId: number): Promise<ApiResponse<void>> =>
+    apiClient.post(`/team/${teamId}/reject`),
+
+  /**
    * 팀 떠나기
    * POST /team/{userId}/leave
    */

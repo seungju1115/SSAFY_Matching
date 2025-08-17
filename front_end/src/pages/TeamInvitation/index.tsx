@@ -7,7 +7,7 @@ import useUserStore from '@/stores/userStore'
 import Header from '@/components/layout/Header'
 import InvitationList from '@/components/features/invitation/InvitationList'
 import type { Team } from '@/components/features/home/TeamSection'
-import type { TeamMembershipResponse, TeamDetailResponse } from '@/types/team'
+import type { TeamMembershipResponse, TeamDetailResponse, TeamInviteRequest } from '@/types/team'
 import TeamDetailModal from '@/components/features/home/TeamDetailModal'
 
 export default function TeamInvitation() {
@@ -100,10 +100,22 @@ export default function TeamInvitation() {
   }, [user.id])
 
   const handleAccept = async (teamId: number) => {
+    if (!user.id) {
+      toast({
+        title: "오류",
+        description: "사용자 정보가 없어 초대를 수락할 수 없습니다.",
+        variant: "destructive",
+      })
+      return
+    }
+
     setIsLoading(true)
     try {
-      // API 호출 로직
-      await new Promise(resolve => setTimeout(resolve, 1000)) // 임시 딜레이
+      const inviteRequest: TeamInviteRequest = {
+        teamId: teamId,
+        userId: user.id,
+      }
+      await teamAPI.inviteMemberToTeam(inviteRequest)
       
       const team = invitations.find(inv => inv.id === teamId)
       // 목록에서 제거
@@ -133,8 +145,7 @@ export default function TeamInvitation() {
   const handleReject = async (teamId: number) => {
     setIsLoading(true)
     try {
-      // API 호출 로직
-      await new Promise(resolve => setTimeout(resolve, 1000)) // 임시 딜레이
+      await teamAPI.rejectOffer(teamId)
       
       const team = invitations.find(inv => inv.id === teamId)
       toast({
