@@ -140,11 +140,12 @@ export interface TeamOffer {
   teamId: number
 }
 
-// 팀 멤버십 응답
+// 팀 멤버십 응답 (백엔드와 일치)
 export interface TeamMembershipResponse {
-  id: number
-  teamId: number
+  requestId: number
   userId: number
+  userName: string
+  teamId: number
   requestType: RequestType
   status: RequestStatus
   message: string
