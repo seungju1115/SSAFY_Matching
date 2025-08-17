@@ -46,10 +46,10 @@ export default function TeamCard({
               <div className="text-gray-500 mb-2 flex items-center justify-between">
                 <span>필요 역할</span>
                 <span className="font-medium text-gray-800">
-                  {team.members}/{team.maxMembers}명
+                  {team.maxMembers}명
                 </span>
               </div>
-              
+
               {team.roleDistribution ? (
                 <div className="space-y-2">
                   {/* 역할별 충원율: 현재(추정)/목표 */}
@@ -61,12 +61,12 @@ export default function TeamCard({
                       const current = Math.min(target, provided)
                       const pct = target ? Math.round((current / target) * 100) : 0
                       return (
-                        <div className="flex items-center gap-2" title={`백엔드 ${current}/${target}`}>
+                        <div className="flex items-center gap-2" title={`백엔드 ${target}`}>
                           <div className="w-8 text-[10px] text-gray-600">BE</div>
                           <div className="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
                             <div className="h-2 bg-blue-400 transition-all duration-300" style={{ width: `${pct}%` }} />
                           </div>
-                          <span className="text-[11px] text-gray-700 font-medium w-14 text-right">{current}/{target}</span>
+                          <span className="text-[11px] text-gray-700 font-medium w-14 text-right">{target}</span>
                         </div>
                       )
                     })()
@@ -79,12 +79,12 @@ export default function TeamCard({
                       const current = Math.min(target, provided)
                       const pct = target ? Math.round((current / target) * 100) : 0
                       return (
-                        <div className="flex items-center gap-2" title={`프론트엔드 ${current}/${target}`}>
+                        <div className="flex items-center gap-2" title={`프론트엔드 ${target}`}>
                           <div className="w-8 text-[10px] text-gray-600">FE</div>
                           <div className="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
                             <div className="h-2 bg-green-400 transition-all duration-300" style={{ width: `${pct}%` }} />
                           </div>
-                          <span className="text-[11px] text-gray-700 font-medium w-14 text-right">{current}/{target}</span>
+                          <span className="text-[11px] text-gray-700 font-medium w-14 text-right">{target}</span>
                         </div>
                       )
                     })()
@@ -97,12 +97,12 @@ export default function TeamCard({
                       const current = Math.min(target, provided)
                       const pct = target ? Math.round((current / target) * 100) : 0
                       return (
-                        <div className="flex items-center gap-2" title={`AI ${current}/${target}`}>
+                        <div className="flex items-center gap-2" title={`AI ${target}`}>
                           <div className="w-8 text-[10px] text-gray-600">AI</div>
                           <div className="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
                             <div className="h-2 bg-purple-400 transition-all duration-300" style={{ width: `${pct}%` }} />
                           </div>
-                          <span className="text-[11px] text-gray-700 font-medium w-14 text-right">{current}/{target}</span>
+                          <span className="text-[11px] text-gray-700 font-medium w-14 text-right">{target}</span>
                         </div>
                       )
                     })()
@@ -115,12 +115,12 @@ export default function TeamCard({
                       const current = Math.min(target, provided)
                       const pct = target ? Math.round((current / target) * 100) : 0
                       return (
-                        <div className="flex items-center gap-2" title={`디자인 ${current}/${target}`}>
+                        <div className="flex items-center gap-2" title={`디자인 ${target}`}>
                           <div className="w-8 text-[10px] text-gray-600">UI</div>
                           <div className="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
                             <div className="h-2 bg-pink-400 transition-all duration-300" style={{ width: `${pct}%` }} />
                           </div>
-                          <span className="text-[11px] text-gray-700 font-medium w-14 text-right">{current}/{target}</span>
+                          <span className="text-[11px] text-gray-700 font-medium w-14 text-right">{target}</span>
                         </div>
                       )
                     })()
@@ -133,12 +133,12 @@ export default function TeamCard({
                       const current = Math.min(target, provided)
                       const pct = target ? Math.round((current / target) * 100) : 0
                       return (
-                        <div className="flex items-center gap-2" title={`PM ${current}/${target}`}>
+                        <div className="flex items-center gap-2" title={`PM ${target}`}>
                           <div className="w-8 text-[10px] text-gray-600">PM</div>
                           <div className="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
                             <div className="h-2 bg-orange-400 transition-all duration-300" style={{ width: `${pct}%` }} />
                           </div>
-                          <span className="text-[11px] text-gray-700 font-medium w-14 text-right">{current}/{target}</span>
+                          <span className="text-[11px] text-gray-700 font-medium w-14 text-right">{target}</span>
                         </div>
                       )
                     })()
@@ -153,7 +153,7 @@ export default function TeamCard({
                     ></div>
                   </div>
                   <span className="font-medium text-gray-800 text-xs">
-                    {team.members}/{team.maxMembers}
+                    {team.maxMembers}
                   </span>
                 </div>
               )}
