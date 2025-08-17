@@ -44,7 +44,7 @@ export default function TeamCard({
           <div className="grid grid-cols-1 gap-3 text-xs">
             <div className="bg-white rounded-lg p-3 border border-gray-100">
               <div className="text-gray-500 mb-2 flex items-center justify-between">
-                <span>역할 비율</span>
+                <span>필요 역할</span>
                 <span className="font-medium text-gray-800">
                   {team.members}/{team.maxMembers}명
                 </span>
