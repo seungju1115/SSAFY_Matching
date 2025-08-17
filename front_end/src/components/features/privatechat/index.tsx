@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import type { IMessage } from '@stomp/stompjs';
 import { useSocket } from '@/hooks/useSocket';
 import useUserStore from '@/stores/userStore';
@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button';
 import { Send, MessageCircle } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-
 interface PrivateChatProps {
   otherUserId: number;
 }
@@ -50,19 +49,19 @@ export default function PrivateChat({ otherUserId }: PrivateChatProps) {
     otherUserNameRef.current = otherUserName;
   }, [otherUserName]);
 
-  // 상대방 이름 조회
-  useEffect(() => {
-    console.log('[PrivateChat] useEffect: fetchOtherUserName', otherUserId);
-    const fetchOtherUserName = async () => {
-      const profile = await getUserProfile(otherUserId);
-      console.log('[PrivateChat] Fetched user profile', profile);
-      if (profile?.userName) {
-        setOtherUserName(profile.userName);
-        console.log('[PrivateChat] otherUserName set', profile.userName);
-      }
-    };
-    fetchOtherUserName();
-  }, [otherUserId, getUserProfile]);
+  const fetchOtherUserName = useCallback(async () => {
+  if (!otherUserNameRef.current) { // 이미 가져온 이름이 없을 때만
+    const profile = await getUserProfile(otherUserId);
+    if (profile?.userName) {
+      setOtherUserName(profile.userName);
+      otherUserNameRef.current = profile.userName;
+    }
+  }
+}, [otherUserId, getUserProfile]);
+
+useEffect(() => {
+  fetchOtherUserName();
+}, [fetchOtherUserName]);
 
   // 채팅방 생성/조회
   useEffect(() => {
@@ -71,11 +70,13 @@ export default function PrivateChat({ otherUserId }: PrivateChatProps) {
 
     const initPrivateChat = async () => {
       try {
-        const response = await chatAPI.createPrivateRoom({
-          roomType: 'PRIVATE',
-          user1Id: myId,
-          user2Id: otherUserId,
-        });
+        const response = await chatAPI.createPrivateRoom(
+         {
+        roomType: 'PRIVATE',
+        user1Id: myId,
+        user2Id: otherUserId,
+        }
+      );
         const newRoomId = response.data.data?.roomId;
         if (newRoomId) {
           setRoomId(newRoomId);
@@ -118,7 +119,7 @@ export default function PrivateChat({ otherUserId }: PrivateChatProps) {
   useEffect(() => {
     console.log('[PrivateChat] useEffect: subscribeToPrivate', roomId);
     if (!roomId || !isConnected || subscribedRoomId.current === roomId) return;
-
+    if (subscribedRoomId.current === roomId) return;
     subscribedRoomId.current = roomId;
     console.log('[PrivateChat] Subscribing to room', roomId);
 

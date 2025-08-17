@@ -84,6 +84,13 @@ export const teamAPI = {
     apiClient.get(`/team/${teamId}/request`),
 
   /**
+   * 팀 요청 목록 조회
+   * GET /team/{userId}/request/user
+   */
+  getUserRequests: (userId: number): Promise<ApiResponse<TeamMembershipResponse[]>> =>
+    apiClient.get(`/team/${userId}/request/user`),
+
+  /**
    * 팀 잠금 (모집 마감)
    * POST /team/{teamId}/lock
    */
