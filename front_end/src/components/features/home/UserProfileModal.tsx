@@ -1,6 +1,8 @@
 import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import type { UserSearchResponse } from '@/types/user'
+import { useTeam } from '@/hooks/useTeam'
+import useUserStore from '@/stores/userStore'
 
 // 스크롤바 숨김 스타일
 const scrollbarHideStyle = `
@@ -27,6 +29,8 @@ const UserProfileModal = ({
   user,
   onInvite
 }: UserProfileModalProps) => {
+  const { inviteToTeam } = useTeam()
+  const { user: currentUser } = useUserStore()
   // ESC로 닫기
   useEffect(() => {
     if (!isOpen) return
@@ -228,11 +232,15 @@ const UserProfileModal = ({
               닫기
             </button>
             <button
-              onClick={() => {
-                onInvite?.(user.id)
-                onClose()
+              onClick={async () => {
+                if (currentUser.teamId && user) {
+                  await inviteToTeam(currentUser.teamId, user.id, `${user.userName}님을 우리 팀에 초대합니다.`)
+                  onInvite?.(user.id)
+                  onClose()
+                }
               }}
-              className="flex-1 px-6 py-3 bg-blue-600/90 hover:bg-blue-700/90 text-white rounded-xl transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
+              disabled={!currentUser.teamId}
+              className="flex-1 px-6 py-3 bg-blue-600/90 hover:bg-blue-700/90 disabled:bg-gray-400/50 disabled:cursor-not-allowed text-white rounded-xl transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
             >
               초대하기
             </button>
