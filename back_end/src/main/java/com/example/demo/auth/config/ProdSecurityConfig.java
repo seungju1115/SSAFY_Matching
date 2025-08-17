@@ -54,6 +54,7 @@ public class ProdSecurityConfig {
                                         "/login/oauth2/code/**", "/h2-console/**", "/ws-chat/**", "/cache/**", "/dashboard/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/team", "/team/**" , "/team/search", "/users/profile/**","/users/profile" , "/hello","/users/profile/waiting").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/users/profile","/users/profile/search").permitAll()
+                                .requestMatchers(HttpMethod.DELETE, "/users/profile/**","/team/**").permitAll()
                                 .requestMatchers("/chatroom/**", "/ws-chat/**").authenticated()
                                 .anyRequest().authenticated());
 
