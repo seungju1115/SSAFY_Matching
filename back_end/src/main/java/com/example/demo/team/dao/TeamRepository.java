@@ -22,8 +22,9 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
     @Query(value = "select t.teamDomain, count(*) from Team t group by t.teamDomain")
     List<Object[]> countDomain();
 
-    @Query(value = "select new " +
-            "com.example.demo.dashboard.dto.TeamDomainCountDto(t.teamDomain, sum(t.backendCount), sum(t.frontendCount), sum(t.aiCount), sum(t.designCount), sum(t.pmCount)) from Team t group by t.teamDomain")
+    @Query("SELECT new " +
+            "com.example.demo.dashboard.dto.TeamDomainCountDto(t.teamDomain, SUM(t.backendCount), SUM(t.frontendCount), SUM(t.aiCount), SUM(t.designCount), SUM(t.pmCount)) " +
+            "FROM Team t GROUP BY t.teamDomain")
     List<TeamDomainCountDto> countDomainPositions();
 
 
