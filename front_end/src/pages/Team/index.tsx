@@ -305,6 +305,7 @@ const TeamPage: React.FC = () => {
         isOpen={isRecommendModalOpen}
         onClose={() => setIsRecommendModalOpen(false)}
         onSelectUser={handleSelectUser}
+        teamId={teamId}
       />
       {/* 팀 정보 수정 모달 */}
       <EditTeamModal
