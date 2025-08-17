@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Profile;
 @Configuration
 public class HazelcastConfig {
     @Bean
-    @Profile("local", "init")
+    @Profile({"local", "init"})
     public Config hazelcastConfigLocal() {
         Config config = new Config();
         config.setInstanceName("hazelcast-local");
