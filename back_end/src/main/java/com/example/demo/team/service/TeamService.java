@@ -213,7 +213,10 @@ public class TeamService {
         
 
         // user와 team 연결 끊기
+        team.getMembers().remove(user);
         user.setTeam(null);
+
+        if(team.getMembers().isEmpty()) {deleteTeam(team.getId());}
         log.info("User before saveAndFlush: {}", user.getId());
         log.info("User is managed by EntityManager before saveAndFlush: {}", entityManager.contains(user));
         userRepository.saveAndFlush(user);

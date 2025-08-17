@@ -363,7 +363,7 @@ export default function MakeTeam() {
                     <CardTitle className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-purple-700 bg-clip-text text-transparent">
                       역할 비율 설정
                     </CardTitle>
-                    <p className="text-sm text-gray-500 mt-1">필요한 포지션을 설정해주세요 (최대 {totalMembers}개)</p>
+                    <p className="text-sm text-gray-500 mt-1">필요한 포지션을 설정해주세요 (최대 2개)</p>
                   </div>
                 </div>
               </CardHeader>
