@@ -48,7 +48,7 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(
                 c ->
-                        c.requestMatchers("/error", "/users/profile", "/users/login", "/login/oauth2/code/**", "/h2-console/**"
+                        c.requestMatchers("/error", "/users/profile/**", "/users/login", "/login/oauth2/code/**", "/h2-console/**"
                                         , "/swagger-ui/**", "/v3/api-docs/**", "/ws-chat/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/team","/team/search").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/users/profile").permitAll()
