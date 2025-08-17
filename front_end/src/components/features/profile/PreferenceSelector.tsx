@@ -60,7 +60,6 @@ const colorStyles = {
 
 export default function PreferenceSelector({ 
   title,
-  description,
   selectedPreferences, 
   onChange, 
   suggestions,
