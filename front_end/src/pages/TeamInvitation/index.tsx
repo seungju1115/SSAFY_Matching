@@ -1,112 +1,103 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Bell } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
+import { teamAPI } from '@/api/team'
+import useUserStore from '@/stores/userStore'
 import Header from '@/components/layout/Header'
 import InvitationList from '@/components/features/invitation/InvitationList'
 import type { Team } from '@/components/features/home/TeamSection'
+import type { TeamMembershipResponse, TeamDetailResponse } from '@/types/team'
 import TeamDetailModal from '@/components/features/home/TeamDetailModal'
-
-// 임시 데이터 (실제로는 API에서 가져와야 함)
-const mockInvitations: Team[] = [
-  {
-    id: 1,
-    name: "혁신적인 웹 서비스 개발팀",
-    description: "사용자 중심의 혁신적인 웹 서비스를 개발하는 팀입니다.",
-    tech: ["React", "Node.js", "TypeScript"],
-    members: 3,
-    maxMembers: 6,
-    deadline: "2025-09-15",
-    leader: {
-      name: "김팀장",
-      avatar: "",
-      role: "팀장"
-    },
-    domain: "웹 개발",
-    projectPreferences: ["포트폴리오", "실무경험"],
-    roleDistribution: {
-      backend: 2,
-      frontend: 2,
-      ai: 0,
-      design: 1,
-      pm: 1
-    },
-    roleCurrent: {
-      backend: 1,
-      frontend: 1,
-      ai: 0,
-      design: 1,
-      pm: 0
-    }
-  },
-  {
-    id: 2,
-    name: "AI 기반 추천 시스템 개발팀",
-    description: "머신러닝을 활용한 개인화 추천 시스템을 구축하는 팀입니다.",
-    tech: ["Python", "TensorFlow", "FastAPI"],
-    members: 2,
-    maxMembers: 5,
-    deadline: "2025-10-01",
-    leader: {
-      name: "박개발",
-      avatar: "",
-      role: "팀장"
-    },
-    domain: "AI/ML",
-    projectPreferences: ["기술 도전", "포트폴리오"],
-    roleDistribution: {
-      backend: 2,
-      frontend: 1,
-      ai: 1,
-      design: 1,
-      pm: 0
-    },
-    roleCurrent: {
-      backend: 1,
-      frontend: 0,
-      ai: 1,
-      design: 0,
-      pm: 0
-    }
-  },
-  {
-    id: 3,
-    name: "모바일 게임 개발팀",
-    description: "재미있고 중독성 있는 모바일 게임을 개발하는 팀입니다.",
-    tech: ["Unity", "C#", "Firebase"],
-    members: 4,
-    maxMembers: 6,
-    deadline: "2025-08-30",
-    leader: {
-      name: "이게임",
-      avatar: "",
-      role: "팀장"
-    },
-    domain: "게임 개발",
-    projectPreferences: ["창의적", "재미"],
-    roleDistribution: {
-      backend: 1,
-      frontend: 2,
-      ai: 0,
-      design: 2,
-      pm: 1
-    },
-    roleCurrent: {
-      backend: 1,
-      frontend: 2,
-      ai: 0,
-      design: 1,
-      pm: 0
-    }
-  }
-]
 
 export default function TeamInvitation() {
   const navigate = useNavigate()
+  const { user } = useUserStore()
   const [isLoading, setIsLoading] = useState(false)
-  const [invitations, setInvitations] = useState<Team[]>(mockInvitations)
+  const [, setMembershipResponses] = useState<TeamMembershipResponse[]>([])
+  const [invitations, setInvitations] = useState<Team[]>([])
   const [isDetailOpen, setIsDetailOpen] = useState(false)
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null)
+
+  // TeamMembershipResponse를 Team 타입으로 변환하는 함수
+  const convertMembershipToTeam = async (membership: TeamMembershipResponse): Promise<Team | null> => {
+    try {
+      const teamResponse = await teamAPI.getTeamDetail(membership.teamId)
+      const teamDetail: TeamDetailResponse = teamResponse.data.data
+      
+      // TeamDetailResponse를 Team 타입으로 변환
+      const team: Team = {
+        id: teamDetail.teamId,
+        name: teamDetail.teamName,
+        description: teamDetail.teamDescription || '',
+        introduction: teamDetail.teamDescription,
+        tech: [], // TeamDetailResponse에는 기술 스택 정보가 없으므로 빈 배열
+        members: teamDetail.members.length + 1, // 리더 + 멤버들
+        maxMembers: teamDetail.backendCount + teamDetail.frontendCount + teamDetail.aiCount + teamDetail.pmCount + teamDetail.designCount,
+        deadline: '', // TeamDetailResponse에는 마감일 정보가 없음
+        leader: {
+          name: teamDetail.leader.userName || '',
+          avatar: '',
+          role: teamDetail.leader.wantedPosition?.[0] || 'UNKNOWN'
+        },
+        domains: teamDetail.teamDomain ? teamDetail.teamDomain.split(',').map(d => d.trim()) : [],
+        domain: teamDetail.teamDomain,
+        roleDistribution: {
+          backend: teamDetail.backendCount,
+          frontend: teamDetail.frontendCount,
+          ai: teamDetail.aiCount,
+          design: teamDetail.designCount,
+          pm: teamDetail.pmCount
+        }
+      }
+      
+      return team
+    } catch (error) {
+      console.error(`팀 ${membership.teamId} 정보 조회 실패:`, error)
+      return null
+    }
+  }
+
+  // 사용자의 팀 초대 요청 목록 가져오기
+  useEffect(() => {
+    const fetchInvitations = async () => {
+      if (!user.id) {
+        console.log('user.id가 없습니다:', user)
+        return
+      }
+
+      console.log('사용자 ID로 초대 목록 조회:', user.id)
+
+      setIsLoading(true)
+      try {
+        const response = await teamAPI.getUserRequests(user.id)
+        // INVITE 타입이고 PENDING 상태가 아닌 요청들만 필터링
+        const inviteRequests = response.data.data.filter(
+          request => request.requestType === 'INVITE'
+        )
+        
+        setMembershipResponses(inviteRequests)
+        
+        // 각 멤버십 응답을 Team 타입으로 변환
+        const teamPromises = inviteRequests.map(convertMembershipToTeam)
+        const teams = await Promise.all(teamPromises)
+        const validTeams = teams.filter((team): team is Team => team !== null)
+        
+        setInvitations(validTeams)
+      } catch (error) {
+        console.error('초대 목록 로딩 실패:', error)
+        toast({
+          title: "오류 발생",
+          description: "초대 목록을 불러오는 중 문제가 발생했습니다.",
+          variant: "destructive"
+        })
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchInvitations()
+  }, [user.id])
 
   const handleAccept = async (teamId: number) => {
     setIsLoading(true)
@@ -117,6 +108,7 @@ export default function TeamInvitation() {
       const team = invitations.find(inv => inv.id === teamId)
       // 목록에서 제거
       setInvitations(prev => prev.filter(inv => inv.id !== teamId))
+      setMembershipResponses((prev: TeamMembershipResponse[]) => prev.filter((resp: TeamMembershipResponse) => resp.teamId !== teamId))
       // 상세 모달이 해당 팀을 보고 있으면 닫기
       if (selectedTeam?.id === teamId) {
         setIsDetailOpen(false)
@@ -152,6 +144,7 @@ export default function TeamInvitation() {
       
       // 목록에서 제거
       setInvitations(prev => prev.filter(inv => inv.id !== teamId))
+      setMembershipResponses((prev: TeamMembershipResponse[]) => prev.filter((resp: TeamMembershipResponse) => resp.teamId !== teamId))
       // 상세 모달이 해당 팀을 보고 있으면 닫기
       if (selectedTeam?.id === teamId) {
         setIsDetailOpen(false)

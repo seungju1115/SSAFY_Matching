@@ -89,7 +89,7 @@ public class TeamController {
         return ResponseEntity.ok(ApiResponse.ok(teamMembershipRequestService.getAllTeamRequest(teamId)));
     }
 
-    @GetMapping("/{userID}/request/user")
+    @GetMapping("/{userId}/request/user")
     public ResponseEntity<ApiResponse<List<TeamMembershipResponse>>> getAllUserRequest(@PathVariable Long userId) {
         return ResponseEntity.ok(ApiResponse.ok(teamMembershipRequestService.getAllUserRequest(userId)));
     }
