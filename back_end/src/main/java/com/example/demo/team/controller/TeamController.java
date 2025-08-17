@@ -91,7 +91,7 @@ public class TeamController {
 
     @GetMapping("/{userID}/request/user")
     public ResponseEntity<ApiResponse<List<TeamMembershipResponse>>> getAllUserRequest(@PathVariable Long userId) {
-        return ResponseEntity.ok(ApiResponse.ok(teamMembershipRequestService.getAllTeamRequest(userId)));
+        return ResponseEntity.ok(ApiResponse.ok(teamMembershipRequestService.getAllUserRequest(userId)));
     }
 
     @PostMapping("/{teamId}/lock")

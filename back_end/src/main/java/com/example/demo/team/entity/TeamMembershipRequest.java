@@ -30,7 +30,7 @@ public class TeamMembershipRequest {
 
     // 요청 타입: INVITE, JOIN_REQUEST
     @Enumerated(EnumType.STRING)
-    @Column(name = "request_type", length = 10, nullable = false)
+    @Column(name = "request_type", length = 15, nullable = false)
     private RequestType requestType;
 
     // 요청 상태: PENDING, ACCEPTED, REJECTED, CANCELED
