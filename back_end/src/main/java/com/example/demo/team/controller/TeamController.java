@@ -100,4 +100,10 @@ public class TeamController {
         return ResponseEntity.ok(ApiResponse.ok());
     }
 
+    @PostMapping("/{teamId}/reject")
+    public ResponseEntity<ApiResponse<Void>> rejectOffer(@PathVariable Long teamId) {
+        teamMembershipRequestService.rejectOffer(teamId);
+        return ResponseEntity.ok(ApiResponse.ok());
+    }
+
 }
