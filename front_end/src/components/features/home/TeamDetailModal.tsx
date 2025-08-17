@@ -149,7 +149,7 @@ const TeamDetailModal = ({
                     <div className="mb-4">
                       <h4 className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
                         <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                        역할 비율 설정
+                        필요 역할 설정
                       </h4>
                       <div className="space-y-2">
                         {roleInfo.map((role) => {
