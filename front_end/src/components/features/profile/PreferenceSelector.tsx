@@ -102,7 +102,7 @@ export default function PreferenceSelector({
           </Badge>
         ))}
         {selectedPreferences.length === 0 && (
-          <p className="text-sm text-gray-500">선택된 {title}이 없습니다. 아래에서 선택해주세요.</p>
+          <p className="text-sm text-gray-500">선택된 선호가 없습니다. 아래에서 선택해주세요.</p>
         )}
       </div>
 
@@ -124,10 +124,15 @@ export default function PreferenceSelector({
 
       {/* 설명 */}
       <div className={`${styles.tipBg} p-4 rounded-md`}>
-        <h3 className={`text-sm font-medium ${styles.tipTitle} mb-2`}>{title} 선택 팁</h3>
-        <p className={`text-sm ${styles.tipText}`}>
-          {description}
-        </p>
+        <h3 className="text-sm font-medium text-gray-700 mb-2">선택 팁</h3>
+        <ul className="list-disc pl-5 space-y-1">
+          <li className="text-sm text-gray-600">
+            추후 AI 추천에서 사용될 데이터입니다.
+          </li>
+          <li className="text-sm text-gray-600">
+            자신의 성향을 잘 나타내는 단어를 선택해주세요.
+          </li>
+        </ul>
       </div>
     </div>
   )
