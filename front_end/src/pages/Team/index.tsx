@@ -238,12 +238,12 @@ const TeamPage: React.FC = () => {
                   </div>
                 </div>
                 <Separator />
-                <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">Raw Team Info (Debug)</h3>
-                  <pre className="text-xs bg-gray-100 p-2 rounded-md overflow-auto">
-                    {JSON.stringify(teamInfo, null, 2)}
-                  </pre>
-                </div>
+                {/*<div>*/}
+                {/*  <h3 className="text-sm font-medium text-gray-700 mb-2">Raw Team Info (Debug)</h3>*/}
+                {/*  <pre className="text-xs bg-gray-100 p-2 rounded-md overflow-auto">*/}
+                {/*    {JSON.stringify(teamInfo, null, 2)}*/}
+                {/*  </pre>*/}
+                {/*</div>*/}
               </CardContent>
             </Card>
 
