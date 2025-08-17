@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from "@/components/ui/button"
-import { Users, Search } from "lucide-react"
+import { Users} from "lucide-react"
 import Header from "@/components/layout/Header"
 import TeamSection from "@/components/features/home/TeamSection"
 import DeveloperSection from "@/components/features/home/DeveloperSection"
@@ -271,10 +271,6 @@ export default function Home() {
             <Button size="lg" className="text-base sm:text-lg px-6 sm:px-8 py-3 w-full sm:w-auto" onClick={handleCreateTeamClick}>
               <Users className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
               팀 만들기
-            </Button>
-            <Button size="lg" variant="outline" className="text-base sm:text-lg px-6 sm:px-8 py-3 w-full sm:w-auto">
-              <Search className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-              개발자 찾기
             </Button>
           </div>
         </div>
