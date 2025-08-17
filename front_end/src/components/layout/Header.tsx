@@ -63,13 +63,7 @@ export default function Header() {
               <span>대시보드</span>
             </button>
             <button
-              onClick={() => navigate('/teams')}
-              className="text-gray-700 hover:text-blue-600 transition-colors"
-            >
-              팀 찾기
-            </button>
-            <button
-              onClick={() => navigate('/create-team')}
+              onClick={() => navigate('/make-team')}
               className="text-gray-700 hover:text-blue-600 transition-colors"
             >
               팀 만들기
