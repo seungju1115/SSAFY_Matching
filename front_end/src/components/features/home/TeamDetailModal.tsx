@@ -125,7 +125,7 @@ const TeamDetailModal = ({
                       <div className="flex-1">
                         <h3 className="font-bold text-xl text-slate-900 mb-1">{team.leader.name} 팀장</h3>
                         <div className="text-sm text-slate-600">
-                          <span className="font-medium text-blue-600">{team.members}/{team.maxMembers}명</span>
+                          <span className="font-medium text-blue-600">{team.members}명</span>
                           <span className="text-slate-400 mx-1">•</span>
                           <span>{displayedDomain || '도메인 미정'}</span>
                         </div>

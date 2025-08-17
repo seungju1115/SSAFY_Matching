@@ -55,7 +55,7 @@ export default function TeamSection({
     <section className="mb-12 sm:mb-16">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8 gap-4">
         <div>
-          <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">팀대기 현황</h3>
+          <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">팀 대기 현황</h3>
           <p className="text-gray-600 text-sm sm:text-base">함께할 팀원을 찾고 있는 프로젝트들</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">

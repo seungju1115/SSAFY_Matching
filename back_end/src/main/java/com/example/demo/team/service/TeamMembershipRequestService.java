@@ -137,6 +137,7 @@ public class TeamMembershipRequestService {
         List<TeamMembershipRequest> requests = teamMembershipRequestRepository.findAllByTeamId(teamId);
 
         return requests.stream()
+                .filter(r -> r.getStatus() == RequestStatus.PENDING) // PENDING만 필터
                 .map(TeamMembershipResponse::fromEntity)
                 .collect(Collectors.toList());
     }
@@ -146,7 +147,24 @@ public class TeamMembershipRequestService {
         List<TeamMembershipRequest> requests = teamMembershipRequestRepository.findAllByUserId(userId);
 
         return requests.stream()
+                .filter(r -> r.getStatus() == RequestStatus.PENDING) // PENDING만 필터
                 .map(TeamMembershipResponse::fromEntity)
                 .collect(Collectors.toList());
+    }
+
+    public void rejectOffer(Long teamId) {
+
+        List<TeamMembershipRequest> requests = teamMembershipRequestRepository.findAllByTeamId(teamId);
+
+        // 조건에 맞는 요청만 필터링
+        List<TeamMembershipRequest> filtered = requests.stream()
+                .filter(r -> r.getStatus() == RequestStatus.PENDING && r.getRequestType() == RequestType.INVITE)
+                .collect(Collectors.toList());
+
+        // 상태를 REJECTED로 변경
+        filtered.forEach(r -> r.setStatus(RequestStatus.REJECTED));
+
+        // DB에 저장
+        teamMembershipRequestRepository.saveAll(filtered);
     }
 }
