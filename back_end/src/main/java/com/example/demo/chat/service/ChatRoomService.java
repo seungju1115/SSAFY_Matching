@@ -103,12 +103,12 @@ public class ChatRoomService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         // 중복 가입 방지
-        boolean alreadyMember = chatRoom.getMembers().stream()
-                .anyMatch(member -> member.getUser().getId().equals(chatRoomRequest.getUserId()));
-
-        if (alreadyMember) {
-            throw new BusinessException(ErrorCode.CHATROOM_MEMBER_ALREADY_EXISTS);
-        }
+//        boolean alreadyMember = chatRoom.getMembers().stream()
+//                .anyMatch(member -> member.getUser().getId().equals(chatRoomRequest.getUserId()));
+//
+//        if (alreadyMember) {
+//            throw new BusinessException(ErrorCode.CHATROOM_MEMBER_ALREADY_EXISTS);
+//        }
 
         chatMemberService.createChatRoomMember(user, chatRoom);
 
