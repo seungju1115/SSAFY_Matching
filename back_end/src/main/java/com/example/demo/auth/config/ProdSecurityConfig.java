@@ -13,7 +13,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfigurationSource;
+//import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.cors.CorsConfiguration;
+import java.util.List;
 
 @Profile("prod")
 @Configuration
@@ -21,24 +24,37 @@ import org.springframework.web.cors.CorsConfigurationSource;
 @RequiredArgsConstructor
 public class ProdSecurityConfig {
 
+
+    @Value("${front.url}")
+    private String frontUrl;
+
     private final JwtFilter jwtFilter;
     private final CustomOAuth2UserService oauth2UserService;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
     private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
-    private final CorsConfigurationSource corsConfigurationSource;
+//    private final CorsConfigurationSource corsConfigurationSource;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(c -> c.disable());
 
-        http.cors(c -> c.configurationSource(corsConfigurationSource));
+//        http.cors(c -> c.configurationSource(corsConfigurationSource));
+        http.cors(cors -> cors.configurationSource(request -> {
+            CorsConfiguration config = new CorsConfiguration();
+            config.setAllowedOrigins(List.of("https://i13a307.p.ssafy.io")); // 프론트엔드 Origin 명시적 허용
+            config.setAllowedMethods(List.of("*"));
+            config.setAllowedHeaders(List.of("*"));
+            config.setAllowCredentials(true);
+            return config;
+        }));
 
         http.authorizeHttpRequests(
                 c ->
                         c.requestMatchers("/error", "/users/login",
-                                        "/login/oauth2/code/**", "/h2-console/**", "/ws-chat/**").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/team", "/team/search", "/users/profile", "/hello").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/users/profile").permitAll()
+                                        "/login/oauth2/code/**", "/h2-console/**", "/ws-chat/**", "/cache/**", "/dashboard/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/team", "/team/search", "/users/profile", "/hello","/users/profile/waiting").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/users/profile","/users/profile/search").permitAll()
+                                .requestMatchers("/chatroom/**", "/ws-chat/**").authenticated()
                                 .anyRequest().authenticated());
 
         http.oauth2Login(oauth2 -> oauth2

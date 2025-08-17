@@ -24,7 +24,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/chatroom")
+@RequestMapping("/api/chatroom")
 @RequiredArgsConstructor
 @Tag(
         name = "채팅방 관리",
