@@ -46,6 +46,12 @@ spring:
         format_sql: true
         database-platform: org.hibernate.dialect.PostgreSQLDialect
 
+  sql:
+    init:
+      mode: always  # 항상 초기화 스크립트 실행
+      data-locations: classpath:bigData.sql  # smallData.sql 파일 위치 명시
+      encoding: UTF-8  # 한글 깨짐 방지
+
   h2:
     console:
       enabled: true
