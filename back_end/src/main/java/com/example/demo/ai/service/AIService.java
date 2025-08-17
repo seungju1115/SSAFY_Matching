@@ -228,13 +228,14 @@ public class AIService {
     // ==================== Spring DTO → RecSys 형식 변환 메서드들 ====================
 
     private Map<String, Object> convertTeamToRecsysFormat(TeamAIDto teamDto) {
-        return Map.of(
-                "team_id", teamDto.getTeamId().toString(),
-                "team_name", teamDto.getTeamName(),
-                "recruit_positions", convertPositionsToRecSysFormat(teamDto.getMemberWanted()),
-                "goals", convertGoalEnumsToKorean(teamDto.getGoals()),
-                "vibes", convertViveEnumsToKorean(teamDto.getVives())
-        );
+        Map<String, Object> result = new HashMap<>();
+        result.put("team_id", teamDto.getTeamId() != null ? teamDto.getTeamId().toString() : "");
+        result.put("team_name", teamDto.getTeamName() != null ? teamDto.getTeamName() : "");
+        result.put("recruit_positions", convertPositionsToRecSysFormat(teamDto.getMemberWanted()));
+        result.put("goals", convertGoalEnumsToKorean(teamDto.getGoals()));
+        result.put("vibes", convertViveEnumsToKorean(teamDto.getVives()));
+
+        return result;
     }
 
     private List<Map<String, Object>> convertMembersToRecsysFormat(List<CandidateDto> members) {
@@ -278,13 +279,16 @@ public class AIService {
 
     private List<Map<String, Object>> convertTeamPoolToRecsysFormat(List<TeamAIDto> teams) {
         return teams.stream()
-                .map(team -> Map.of(
-                        "team_id", team.getTeamId().toString(),
-                        "team_name", team.getTeamName(),
-                        "recruit_positions", convertPositionsToRecSysFormat(team.getMemberWanted()),
-                        "goals", convertGoalEnumsToKorean(team.getGoals()),
-                        "vibes", convertViveEnumsToKorean(team.getVives())
-                ))
+                .filter(Objects::nonNull) // null인 team 제거
+                .map(team -> {
+                    Map<String, Object> teamMap = new HashMap<>();
+                    teamMap.put("team_id", team.getTeamId() != null ? team.getTeamId().toString() : "");
+                    teamMap.put("team_name", team.getTeamName() != null ? team.getTeamName() : "");
+                    teamMap.put("recruit_positions", convertPositionsToRecSysFormat(team.getMemberWanted()));
+                    teamMap.put("goals", convertGoalEnumsToKorean(team.getGoals()));
+                    teamMap.put("vibes", convertViveEnumsToKorean(team.getVives()));
+                    return teamMap;
+                })
                 .collect(Collectors.toList());
     }
 
