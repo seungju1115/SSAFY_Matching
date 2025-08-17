@@ -238,12 +238,12 @@ const TeamPage: React.FC = () => {
                   </div>
                 </div>
                 <Separator />
-                <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">Raw Team Info (Debug)</h3>
-                  <pre className="text-xs bg-gray-100 p-2 rounded-md overflow-auto">
-                    {JSON.stringify(teamInfo, null, 2)}
-                  </pre>
-                </div>
+                {/*<div>*/}
+                {/*  <h3 className="text-sm font-medium text-gray-700 mb-2">Raw Team Info (Debug)</h3>*/}
+                {/*  <pre className="text-xs bg-gray-100 p-2 rounded-md overflow-auto">*/}
+                {/*    {JSON.stringify(teamInfo, null, 2)}*/}
+                {/*  </pre>*/}
+                {/*</div>*/}
               </CardContent>
             </Card>
 
@@ -259,7 +259,7 @@ const TeamPage: React.FC = () => {
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="space-y-3">
-                  {[teamInfo.leader, ...teamInfo.members].map((member) => (
+                  {[teamInfo.leader, ...teamInfo.members.filter(member => member.id !== teamInfo.leader.id)].map((member) => (
                     <div key={member.id} className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <Avatar className="w-8 h-8">
@@ -276,9 +276,9 @@ const TeamPage: React.FC = () => {
                             )}
                           </div>
                           <Badge variant="outline" className={cn("text-xs mt-1",
-                            roleColors[(member.role?.toLowerCase?.() as keyof typeof roleColors) ?? 'backend']
+                            roleColors[(member.wantedPosition?.[0]?.toLowerCase?.() as keyof typeof roleColors) ?? 'backend']
                           )}>
-                            {member.role ?? 'UNKNOWN'}
+                            {member.wantedPosition?.[0] ?? 'UNKNOWN'}
                           </Badge>
                         </div>
                       </div>
