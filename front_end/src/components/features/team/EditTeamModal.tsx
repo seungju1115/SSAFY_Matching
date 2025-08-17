@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
 import { Separator } from '@/components/ui/separator'
 import { Globe, Target, Heart, Briefcase, Code, MessageSquare, Plus, Minus } from 'lucide-react'
-import type { TeamDetailResponse, ProjectGoalEnum, ProjectViveEnum } from '@/types/team'
+import type { TeamDetailResponse, ProjectGoalEnum, ProjectViveEnum, TeamRequest } from '@/types/team'
 import { useTeam } from '@/hooks/useTeam'
 
 interface EditTeamModalProps {
@@ -31,7 +31,7 @@ interface TeamData {
 }
 
 export default function EditTeamModal({ isOpen, onClose, team }: EditTeamModalProps) {
-  const { isLoading } = useTeam()
+  const { updateTeam, isLoading } = useTeam()
 
   // 선택지 (팀 생성 페이지와 동일)
   const domainSuggestions = [
@@ -130,9 +130,44 @@ export default function EditTeamModal({ isOpen, onClose, team }: EditTeamModalPr
 
   const totalMembers = useMemo(() => Object.values(teamData.roleDistribution).reduce((s, v) => s + v, 0), [teamData.roleDistribution])
 
-  const handleSave = () => {
-    // 임시: API 매핑 비활성화. 현재 정보만 표시 후 닫기.
-    onClose()
+  // TeamData를 TeamRequest로 변환
+  const mapTeamDataToRequest = (data: TeamData): TeamRequest => {
+    // enum으로 매핑
+    const mappedPreferences = data.projectPreferences
+      .map(pref => projectPreferenceToEnumMapping[pref])
+      .filter(Boolean)
+    
+    const mappedAtmosphere = data.teamAtmosphere
+      .map(atm => atmosphereToEnumMapping[atm])
+      .filter(Boolean)
+
+    return {
+      teamId: team.teamId,
+      leaderId: team.leader.id,
+      teamDomain: data.domains.join(', '), // 도메인들을 문자열로 결합
+      teamDescription: data.introduction,
+      teamPreference: mappedPreferences,
+      teamVive: mappedAtmosphere,
+      backendCount: data.roleDistribution.backend,
+      frontendCount: data.roleDistribution.frontend,
+      aiCount: data.roleDistribution.ai,
+      pmCount: data.roleDistribution.pm,
+      designCount: data.roleDistribution.design
+    }
+  }
+
+  const handleSave = async () => {
+    try {
+      const teamRequest = mapTeamDataToRequest(teamData)
+      console.log('팀 수정 요청 데이터:', teamRequest)
+
+      await updateTeam(teamRequest)
+      console.log('팀 수정 완료')
+
+      onClose()
+    } catch (error) {
+      console.error('팀 수정 실패:', error)
+    }
   }
 
   return (

@@ -1,6 +1,8 @@
 import type { Team } from './TeamSection'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useTeam } from '@/hooks/useTeam'
+import useUserStore from '@/stores/userStore'
 
 // 스크롤바 숨김 스타일
 const scrollbarHideStyle = `
@@ -24,9 +26,11 @@ interface TeamDetailModalProps {
 const TeamDetailModal = ({ 
   isOpen, 
   onClose, 
-  team,
-  onJoinRequest
+  team
 }: TeamDetailModalProps) => {
+  const { requestJoinTeam } = useTeam()
+  const { user } = useUserStore()
+  const [isRequesting, setIsRequesting] = useState(false)
   // ESC 키로 닫기: 훅은 항상 동일한 순서로 호출되어야 하므로 early return보다 위에 둔다
   useEffect(() => {
     if (!isOpen) return
@@ -217,13 +221,24 @@ const TeamDetailModal = ({
               닫기
             </button>
             <button
-              onClick={() => {
-                onJoinRequest?.(team.id)
-                onClose()
+              onClick={async () => {
+                if (user.id && team && !isRequesting) {
+                  try {
+                    setIsRequesting(true)
+                    await requestJoinTeam(team.id, user.id, `${team.leader.name} 팀에 참여하고 싶습니다.`)
+                    // onJoinRequest?.(team.id) // 중복 요청 방지를 위해 제거
+                    onClose()
+                  } catch (error) {
+                    console.error('참여 신청 실패:', error)
+                  } finally {
+                    setIsRequesting(false)
+                  }
+                }
               }}
-              className="flex-1 px-6 py-3 bg-blue-600/90 hover:bg-blue-700/90 text-white rounded-xl transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
+              disabled={!user.id || isRequesting}
+              className="flex-1 px-6 py-3 bg-blue-600/90 hover:bg-blue-700/90 disabled:bg-gray-400/50 disabled:cursor-not-allowed text-white rounded-xl transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
             >
-              참여 신청
+              {isRequesting ? '신청 중...' : '참여 신청'}
             </button>
           </div>
         </div>

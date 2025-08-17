@@ -45,7 +45,7 @@ import type { UserDetailResponse } from './user'
 // }
 
 // Enum 타입들 (백엔드와 일치) - union type으로 대체
-export type RequestType = 'JOIN' | 'INVITE'
+export type RequestType = 'JOIN_REQUEST' | 'INVITE'
 
 export type RequestStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
 
