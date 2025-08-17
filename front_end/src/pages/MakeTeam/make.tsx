@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTeam } from '@/hooks/useTeam'
+import { useUser } from '@/hooks/useUser'
 import useUserStore from '@/stores/userStore'
 import type { ProjectGoalEnum, ProjectViveEnum } from '@/types/team'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -41,6 +42,7 @@ interface TeamData {
 export default function MakeTeam() {
   const navigate = useNavigate()
   const { createTeam, isLoading } = useTeam()
+  const { updateUserProfile } = useUser()
   const { user } = useUserStore()
   const [teamData, setTeamData] = useState<TeamData>({
     domains: [],
@@ -220,6 +222,13 @@ export default function MakeTeam() {
 
       const createdTeam = await createTeam(teamRequest)
       console.log('생성된 팀 데이터:', createdTeam)
+
+      if (user.id && createdTeam) {
+        await updateUserProfile(user.id, {
+          userStatus: 'IN_TEAM'
+        })
+          console.log('사용자 상태 업데이트 완료: IN_TEAM')
+        }
 
       // teamStore 상태 확인
       console.log('teamStore 상태:', useTeamStore.getState())
