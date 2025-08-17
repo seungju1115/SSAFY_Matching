@@ -4,9 +4,10 @@ import type { ApexOptions } from 'apexcharts'
 
 interface TeamPositionChartProps {
   selectedDomain: string
+  data?: Record<string, number[]>
 }
 
-const TeamPositionChart = ({ selectedDomain }: TeamPositionChartProps) => {
+const TeamPositionChart = ({ selectedDomain, data }: TeamPositionChartProps) => {
   const [chartData, setChartData] = useState({
     series: [{
       name: '인원 수',
@@ -101,38 +102,48 @@ const TeamPositionChart = ({ selectedDomain }: TeamPositionChartProps) => {
   // 선택된 도메인에 따라 데이터 업데이트
   useEffect(() => {
     const getDomainData = (domain: string) => {
-      const domainData: { [key: string]: number[] } = {
-        all: [176, 347, 183, 103, 68], // 전체 도메인 합계 [백엔드, 프론트엔드, AI, 디자인, PM]
-        web: [75, 145, 35, 30, 25], // 웹 개발
-        mobile: [48, 98, 58, 25, 18], // 모바일
-        ai: [35, 48, 102, 18, 12], // AI/ML
-        game: [68, 88, 25, 35, 20], // 게임
-        iot: [50, 35, 48, 18, 15] // IoT
+      if (data) {
+        // 실제 API 데이터가 있을 때
+        if (domain === 'all') {
+          // 전체 도메인 합계 계산
+          const allDomains = Object.values(data)
+          const totalData = [0, 0, 0, 0, 0] // [백엔드, 프론트엔드, AI, 디자인, PM]
+          allDomains.forEach(domainArray => {
+            domainArray.forEach((count, index) => {
+              totalData[index] += count
+            })
+          })
+          return totalData
+        } else {
+          // 특정 도메인 선택 시 해당 도메인의 데이터 반환
+          return data[domain] || [0, 0, 0, 0, 0]
+        }
+      } else {
+        // API 데이터가 없으면 빈 배열 반환
+        return [0, 0, 0, 0, 0]
       }
-
-      return domainData[domain] || domainData.all
     }
 
-    const data = getDomainData(selectedDomain)
-    
+    const positionData = getDomainData(selectedDomain)
+
     setChartData(prev => ({
       ...prev,
       series: [{
         name: '인원 수',
-        data: data
+        data: positionData
       }]
     }))
-  }, [selectedDomain])
+  }, [selectedDomain, data])
 
   return (
-    <div className="w-full">
-      <Chart
-        options={chartData.options}
-        series={chartData.series}
-        type="bar"
-        height={350}
-      />
-    </div>
+      <div className="w-full">
+        <Chart
+            options={chartData.options}
+            series={chartData.series}
+            type="bar"
+            height={350}
+        />
+      </div>
   )
 }
 
