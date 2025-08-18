@@ -12,7 +12,7 @@ import TeamDetailModal from '@/components/features/home/TeamDetailModal'
 
 export default function TeamInvitation() {
   const navigate = useNavigate()
-  const { user } = useUserStore()
+  const { user, setUser } = useUserStore()
   const [isLoading, setIsLoading] = useState(false)
   const [, setMembershipResponses] = useState<TeamMembershipResponse[]>([])
   const [invitations, setInvitations] = useState<Team[]>([])
@@ -116,6 +116,9 @@ export default function TeamInvitation() {
         userId: user.id,
       }
       await teamAPI.inviteMemberToTeam(inviteRequest)
+
+      // Zustand 스토어의 사용자 정보 업데이트
+      setUser({ ...user, teamId: teamId })
       
       const team = invitations.find(inv => inv.id === teamId)
       // 목록에서 제거
