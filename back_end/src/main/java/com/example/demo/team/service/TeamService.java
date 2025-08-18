@@ -5,6 +5,7 @@ import com.example.demo.chat.entity.ChatRoomMember;
 import com.example.demo.common.exception.BusinessException;
 import com.example.demo.common.exception.ErrorCode;
 import com.example.demo.team.entity.TeamStatus;
+import com.example.demo.user.Enum.UserStatus;
 import com.example.demo.user.dao.UserRepository;
 import com.example.demo.user.dto.UserDetailResponse;
 import com.example.demo.user.entity.User;
@@ -147,26 +148,32 @@ public class TeamService {
     }
 
     // 7. 팀 멤버 초대
+    @Transactional
     public TeamDetailResponse inviteMemberTeam(TeamInviteRequest teamInviteRequest) {
         User invitedUser = userRepository.findById(teamInviteRequest.getUserId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
         Team team = teamRepository.findById(teamInviteRequest.getTeamId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.TEAM_NOT_FOUND));
-
+        log.info(String.valueOf(invitedUser));
+        log.info(String.valueOf(team));
         // 이미 팀에 소속된 사용자라면 예외 처리
         if (invitedUser.getTeam() != null && invitedUser.getTeam().getId().equals(team.getId())) {
             throw new BusinessException(ErrorCode.USER_ALLREADY_HAS_TEAM);
         }
 
         invitedUser.setTeam(team);
+        team.getMembers().add(invitedUser);
 
+        invitedUser.setUserStatus(UserStatus.IN_TEAM);
+        userRepository.flush();
+        teamRepository.flush();
         // ✅ 팀 채팅방에 자동 추가
         ChatRoomRequest chatRoomRequest = new ChatRoomRequest();
         chatRoomRequest.setRoomId(team.getChatRoom().getId());
         chatRoomRequest.setUserId(teamInviteRequest.getUserId());
 
         chatRoomService.addMemberToTeamChatRoom(chatRoomRequest);
-
+        log.info(String.valueOf(team.getMembers().size()));
         return teamToResponse(team);
     }
 
