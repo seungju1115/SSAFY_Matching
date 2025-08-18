@@ -1,0 +1,34 @@
+# ▶️ Python 관련
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.log
+
+# ▶️ Conda 관련
+*.conda
+*.ipynb
+env/
+
+# ▶️ Node.js 관련 (프론트엔드)
+node_modules/
+build/
+dist/
+
+# ▶️ IDE / 시스템 파일
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# ▶️ 환경변수 및 로그
+.env
+logs/
+*.log
+
+# ▶️ 기타
+*.bak
+*.swp
+*.tmp

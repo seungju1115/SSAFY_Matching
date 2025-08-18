@@ -1,0 +1,90 @@
+server:
+  forward-headers-strategy: framework # 스프링에서 프록시 전달 헤더를 자동으로 인식하도록 설정.
+
+spring:
+  security:
+    headers:
+      frame-options: DISABLE
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 1071729903330-rj030egsas650um85iiu5i40dtl988bt.apps.googleusercontent.com
+            client-secret: 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
+            redirect-uri: "{baseUrl}/login/oauth2/code/google"
+            scope:
+              - profile
+              - email
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://openidconnect.googleapis.com/v1/userinfo
+            user-name-attribute: sub
+
+  logging:
+    level:
+      org.springframework.security: DEBUG
+      org.springframework.security.oauth2: DEBUG
+      org.springframework.security.oauth2.client.web: DEBUG
+
+  # PostgreSQL로 수정
+  datasource:
+    url: jdbc:postgresql://postgres:5432/team_search
+    username: postgres  # 또는 원하는 사용자명
+    password: your_password
+    driver-class-name: org.postgresql.Driver
+
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    defer-datasource-initialization: true
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  sql:
+    init:
+      mode: always  # 항상 초기화 스크립트 실행
+      data-locations: classpath:bigData.sql  # smallData.sql 파일 위치 명시
+      encoding: UTF-8  # 한글 깨짐 방지
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+
+
+jwt:
+  secret: ${JWT_SECRET_KEY:key}
+  expiration: ${JWT_EXPIRATION_TIME:time} # 1시간 (ms)
+
+front:
+  url: ${FRONT_DOMAIN}  # 도메인으로 변경 필요.
+
+recsys:
+  base-url: http://recsys:8000
+  timeout:
+    connect: 5s
+    read: 30s
+
+
+springdoc:
+  api-docs:
+    path: /api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    operationsSorter: method
+    tagsSorter: alpha
+    displayRequestDuration: true
+    tryItOutEnabled: true
+  show-actuator: false
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  writer-with-order-by-keys: true

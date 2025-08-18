@@ -11,11 +11,6 @@ export default function Login() {
 
   const [error, setError] = useState<string | null>(null)
 
-  const handleLoginSuccess = () => {
-    // 로그인 성공 시 홈으로 이동
-    navigate('/')
-  }
-
   const handleLoginError = (error: Error) => {
     setError(error.message)
   }
@@ -43,7 +38,6 @@ export default function Login() {
             <div className="space-y-4">
               <GoogleSignInButton 
                 className="py-6 text-base sm:text-lg"
-                onSuccess={handleLoginSuccess}
                 onError={handleLoginError}
               />
             </div>

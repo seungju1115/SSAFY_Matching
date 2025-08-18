@@ -1,0 +1,320 @@
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTeamStore } from '@/stores/teamStore';
+import useUserStore from '@/stores/userStore';
+import { useTeam } from '@/hooks/useTeam';
+import { teamAPI } from '@/api/team';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Separator } from '@/components/ui/separator';
+import Header from '@/components/layout/Header';
+import UserRecommendationModal from '@/components/features/team/SimpleUserModal';
+import { Crown, UserPlus, LogOut, Pencil } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import type { ProjectGoalEnum, ProjectViveEnum } from '@/types/team';
+import TeamChat from '@/components/features/teamchat';
+import EditTeamModal from '@/components/features/team/EditTeamModal';
+
+// 기존 상수들은 그대로 유지합니다.
+const projectGoalLabels: Record<ProjectGoalEnum, string> = {
+  JOB: '취업우선',
+  AWARD: '수상목표', 
+  PORTFOLIO: '포트폴리오중심',
+  STUDY: '학습중심',
+  IDEA: '아이디어실현',
+  PROFESSIONAL: '실무경험',
+  QUICK: '빠른개발',
+  QUALITY: '완성도추구'
+};
+
+const projectVibeLabels: Record<ProjectViveEnum, string> = {
+  CASUAL: '반말 지향',
+  FORMAL: '존대 지향',
+  COMFY: '편한 분위기',
+  RULE: '규칙적인 분위기',
+  LEADER: '리더 중심',
+  DEMOCRACY: '합의 중심',
+  BRANDNEW: '새로운 주제',
+  STABLE: '안정적인 주제',
+  AGILE: '애자일 방식',
+  WATERFALL: '워터폴 방식'
+};
+
+const roleColors = {
+  backend: 'bg-slate-100 text-slate-700 border-slate-200',
+  frontend: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+  ai: 'bg-violet-100 text-violet-700 border-violet-200',
+  pm: 'bg-amber-100 text-amber-700 border-amber-200',
+  design: 'bg-rose-100 text-rose-700 border-rose-200'
+};
+
+const TeamPage: React.FC = () => {
+  const navigate = useNavigate();
+
+  const {
+    isLoading,
+    error,
+    getTeamDetailById,
+    setTeamDetail,
+    setLoading,
+    setError,
+    clearError,
+  } = useTeamStore();
+  const setUser = useUserStore((state) => state.setUser);
+  const user = useUserStore((state) => state.user);
+  const { leaveTeam } = useTeam();
+  const [isRecommendModalOpen, setIsRecommendModalOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+
+  const handleSelectUser = (users: any[]) => {
+    console.log('선택된 사용자:', users);
+    // TODO: 선택 사용자 초대 로직 연동
+  };
+
+  // userStore에서 teamId 가져오기
+  const teamId = user.teamId;
+
+  const teamInfo = teamId ? getTeamDetailById(teamId) : null;
+
+  useEffect(() => {
+    const fetchTeamData = async () => {
+      if (!teamId) return;
+      if (getTeamDetailById(teamId)) return;
+      
+      clearError();
+      setLoading(true);
+      try {
+        const response = await teamAPI.getTeamDetail(teamId);
+        if (response.data.status === 200) {
+          setTeamDetail(response.data.data);
+        } else {
+          throw new Error(response.data.message);
+        }
+      } catch (err) {
+        console.error("Failed to fetch team details:", err);
+        setError('팀 정보를 불러오는 데 실패했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTeamData();
+  }, [teamId, getTeamDetailById, setTeamDetail, setLoading, setError, clearError]);
+
+  const handleLeaveTeam = async () => {
+    if (user && user.id !== null && confirm('정말로 팀을 나가시겠습니까?')) {
+      try {
+        await leaveTeam(user.id);
+              // 기존 user를 복사하고 teamId, teamName만 null로 변경
+      setUser({
+        ...user,
+        teamId: null,
+        teamName: null,
+      });
+        navigate('/');
+      } catch (error) {
+        console.error("Failed to leave team:", error);
+      }
+    }
+  };
+
+  const handleRecommendMember = () => {
+    setIsRecommendModalOpen(true);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">팀 정보를 불러오는 중...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center text-red-500">
+          <p>{error}</p>
+          <Button onClick={() => navigate('/')} className="mt-4">돌아가기</Button>
+        </div>
+      </div>
+    );
+  }
+
+  // 팀이 없는 경우 처리
+  if (!teamId) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="flex items-center justify-center pt-20">
+          <div className="text-center max-w-md">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">소속된 팀이 없습니다</h2>
+            <p className="text-gray-600 mb-6">새로운 팀을 만들거나 기존 팀에 참여해보세요.</p>
+            <div className="space-y-3">
+              <Button onClick={() => navigate('/make-team')} className="w-full">
+                팀 만들기
+              </Button>
+              <Button onClick={() => navigate('/matching')} variant="outline" className="w-full">
+                팀 찾기
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!teamInfo) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600">팀 정보를 찾을 수 없습니다.</p>
+          <Button onClick={() => navigate('/matching')} className="mt-4">돌아가기</Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-1 space-y-6">
+            <Card className="bg-white border border-gray-200 shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-lg font-medium text-gray-900">{teamInfo.teamName}</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-medium text-gray-700">팀 소개</h3>
+                    {user?.id === teamInfo.leader.id && (
+                      <Button variant="outline" size="sm" onClick={() => setIsEditOpen(true)}>
+                        <Pencil className="w-4 h-4 mr-1" />
+                        팀 정보 수정
+                      </Button>
+                    )}
+                  </div>
+                  <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
+                    {teamInfo.teamDescription}
+                  </p>
+                </div>
+                <Separator />
+                <div>
+                  <h3 className="text-sm font-medium text-gray-700 mb-2">모집 역할</h3>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="outline" className={cn("text-xs", roleColors.backend)}>BACKEND {teamInfo.backendCount}명</Badge>
+                    <Badge variant="outline" className={cn("text-xs", roleColors.frontend)}>FRONTEND {teamInfo.frontendCount}명</Badge>
+                    <Badge variant="outline" className={cn("text-xs", roleColors.ai)}>AI {teamInfo.aiCount}명</Badge>
+                    <Badge variant="outline" className={cn("text-xs", roleColors.pm)}>PM {teamInfo.pmCount}명</Badge>
+                    <Badge variant="outline" className={cn("text-xs", roleColors.design)}>DESIGN {teamInfo.designCount}명</Badge>
+                  </div>
+                </div>
+                <Separator />
+                <div>
+                  <h3 className="text-sm font-medium text-gray-700 mb-2">프로젝트 성향</h3>
+                  <div className="flex flex-wrap gap-1">
+                    {teamInfo.teamPreference?.map((pref) => (
+                      <Badge key={pref} variant="secondary" className="text-xs">
+                        {projectGoalLabels[pref]}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-gray-700 mb-2">팀 분위기</h3>
+                  <div className="flex flex-wrap gap-1">
+                    {teamInfo.teamVive?.map((vibe) => (
+                      <Badge key={vibe} variant="secondary" className="text-xs">
+                        {projectVibeLabels[vibe]}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+                <Separator />
+                {/*<div>*/}
+                {/*  <h3 className="text-sm font-medium text-gray-700 mb-2">Raw Team Info (Debug)</h3>*/}
+                {/*  <pre className="text-xs bg-gray-100 p-2 rounded-md overflow-auto">*/}
+                {/*    {JSON.stringify(teamInfo, null, 2)}*/}
+                {/*  </pre>*/}
+                {/*</div>*/}
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white border border-gray-200 shadow-sm">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg font-medium text-gray-900">팀원 목록</CardTitle>
+                  <Button onClick={handleRecommendMember} size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+                    <UserPlus className="w-4 h-4 mr-1" />
+                    추천
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="space-y-3">
+                  {[teamInfo.leader, ...teamInfo.members.filter(member => member.id !== teamInfo.leader.id)].map((member) => (
+                    <div key={member.id} className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Avatar className="w-8 h-8">
+                          <AvatarImage src={undefined} />
+                          <AvatarFallback className="bg-gray-200 text-gray-600 text-sm">
+                            {member.userName?.charAt(0) ?? '?'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-gray-900">{member.userName}</span>
+                            {member.id === teamInfo.leader.id && (
+                              <Crown className="w-3 h-3 text-amber-500 flex-shrink-0" />
+                            )}
+                          </div>
+                          <Badge variant="outline" className={cn("text-xs mt-1",
+                            roleColors[(member.wantedPosition?.[0]?.toLowerCase?.() as keyof typeof roleColors) ?? 'backend']
+                          )}>
+                            {member.wantedPosition?.[0] ?? 'UNKNOWN'}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="relative lg:col-span-2 flex flex-col h-full">
+            <TeamChat roomId={teamInfo.chatRoomId} teamId={teamId} />
+            <div className="w-full flex justify-end mt-4">
+              <Button onClick={handleLeaveTeam} variant="destructive" className="w-full lg:w-auto">
+                <LogOut className="w-4 h-4 mr-2" />
+                탈퇴하기
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* 사용자 추천 모달 */}
+      <UserRecommendationModal
+        isOpen={isRecommendModalOpen}
+        onClose={() => setIsRecommendModalOpen(false)}
+        onSelectUser={handleSelectUser}
+        teamId={teamId}
+      />
+      {/* 팀 정보 수정 모달 */}
+      <EditTeamModal
+        isOpen={isEditOpen}
+        onClose={() => setIsEditOpen(false)}
+        team={teamInfo}
+      />
+    </div>
+  );
+};
+
+export default TeamPage;

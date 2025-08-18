@@ -1,44 +1,101 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent } from '@/components/ui/card'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Star, MapPin, Search, Filter, ChevronDown } from 'lucide-react'
+import { Search, Filter, ChevronDown } from 'lucide-react'
 import type { Developer } from './DeveloperSection'
+import type { UserSearchResponse } from '@/types/user'
+import { userAPI } from '@/api/user'
+import { useEnumMapper } from '@/hooks/useEnumMapper'
+import DeveloperCard from './DeveloperCard'
 
 interface DevelopersModalProps {
   isOpen: boolean
   onClose: () => void
-  developers: Developer[]
   onViewProfile?: (developerId: number) => void
+  // 프로필 모달 열림 여부 (중첩 모달 시 ESC/바깥 클릭 무시용)
+  isProfileOpen?: boolean
 }
 
 export default function DevelopersModal({ 
   isOpen, 
   onClose, 
-  developers, 
-  onViewProfile 
+  onViewProfile,
+  isProfileOpen = false
 }: DevelopersModalProps) {
+  const [developers, setDevelopers] = useState<Developer[]>([])
+  const [isLoading, setIsLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedSkills, setSelectedSkills] = useState<string[]>([])
   const [selectedRole, setSelectedRole] = useState<string>('')
+  // 전공/비전공 필터: all | major | non-major
+  const [selectedMajor, setSelectedMajor] = useState<'all' | 'major' | 'non-major'>('all')
   const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const { mapTechStackArray, mapPositionArray, mapProjectGoalArray } = useEnumMapper()
 
-  // 모든 스킬과 역할 추출
-  const allSkills = Array.from(new Set(developers.flatMap(dev => dev.skills)))
-  const allRoles = Array.from(new Set(developers.map(dev => dev.role)))
+  // 대기중인 사용자 목록 로드
+  useEffect(() => {
+    const loadWaitingUsers = async () => {
+      if (!isOpen) return
+      
+      setIsLoading(true)
+      try {
+        const response = await userAPI.getWaitingUsers()
+        const userData = response.data.data
+        
+        // UserSearchResponse[]를 Developer[]로 변환
+        const convertedDevelopers: Developer[] = userData.map((user: UserSearchResponse) => ({
+          id: user.id,
+          name: user.userName,
+          role: user.wantedPosition?.[0] ? mapPositionArray(user.wantedPosition as any)[0] : '미정',
+          positions: mapPositionArray(user.wantedPosition as any),
+          // 카드 컴포넌트에서 기대하는 형태({ name, level })로 변환
+          techStack: mapTechStackArray(user.techStack as any).map((name: string) => ({ name, level: 3 })),
+          // 카드 하단 배지와 기본값(취업중심/학습열정)에 맞춰 ProjectGoal을 표시
+          projectPreferences: mapProjectGoalArray(user.projectGoal as any),
+          experience: user.projectExp || 0,
+          isMajor: user.major,
+          avatar: '' // 아바타 정보가 없으므로 빈 문자열
+        }))
+        
+        setDevelopers(convertedDevelopers)
+      } catch (error) {
+        console.error('대기중인 사용자 목록 로드 실패:', error)
+        setDevelopers([]) // 오류 시 빈 배열로 설정
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadWaitingUsers()
+  }, [isOpen]) // 매핑 함수는 안정적이므로 의존성에서 제거
+
+  // 모든 포지션과 역할 추출 (falsy 제거)
+  const allPositions = Array.from(new Set(
+    developers.flatMap(dev => (dev.positions && dev.positions.length > 0) ? dev.positions : [dev.role]).filter(Boolean)
+  ))
+  const allRoles = Array.from(new Set(developers.map(dev => dev.role).filter(Boolean)))
 
   // 필터링된 개발자 목록
   const filteredDevelopers = developers.filter(dev => {
-    const matchesSearch = dev.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         dev.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         dev.skills.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()))
+    const termLc = (searchTerm || '').toLowerCase()
+    const nameLc = (dev.name || '').toLowerCase()
+    const roleLc = (dev.role || '').toLowerCase()
+    const positionsLc = (dev.positions || []).map(p => (p || '').toLowerCase())
+
+    const matchesSearch = nameLc.includes(termLc) || roleLc.includes(termLc) || positionsLc.some(p => p.includes(termLc))
+
     const matchesSkills = selectedSkills.length === 0 || 
-                         selectedSkills.some(skill => dev.skills.includes(skill))
+                         selectedSkills.some(skill => (dev.positions || []).includes(skill) || dev.role === skill)
+
     const matchesRole = !selectedRole || dev.role === selectedRole
-    return matchesSearch && matchesSkills && matchesRole
+
+    // 전공 여부 필터: user.major(Boolean | undefined)를 기준으로 필터링
+    const isMajor = !!dev.isMajor
+    const matchesMajor = selectedMajor === 'all' || (selectedMajor === 'major' ? isMajor : !isMajor)
+
+    return matchesSearch && matchesSkills && matchesRole && matchesMajor
   })
 
   const toggleSkill = (skill: string) => {
@@ -50,8 +107,13 @@ export default function DevelopersModal({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-7xl max-h-[90vh] overflow-hidden flex flex-col">
+    <Dialog open={isOpen} onOpenChange={(open: boolean) => {
+      // 프로필 모달이 열려있을 때는 DevelopersModal을 닫지 않음
+      if (!open && isProfileOpen) return
+      onClose()
+    }} modal={false}>
+      <DialogContent aria-describedby={undefined} overlayClassName={isProfileOpen ? 'pointer-events-none' : undefined} className={`max-w-7xl h-[90vh] flex flex-col`}>
+        <div className="flex flex-col h-full min-h-0 overflow-hidden pointer-events-auto">
         <DialogHeader className="flex-shrink-0">
           <div className="flex items-center justify-between">
             <DialogTitle className="text-2xl font-bold">대기자 전체보기</DialogTitle>
@@ -108,18 +170,46 @@ export default function DevelopersModal({
                 </div>
               </div>
 
-              {/* 기술 스택 필터 */}
+              {/* 전공 여부 필터 */}
               <div className="space-y-2">
-                <p className="text-sm font-medium text-gray-700">기술 스택</p>
+                <p className="text-sm font-medium text-gray-700">전공 여부</p>
                 <div className="flex flex-wrap gap-2">
-                  {allSkills.slice(0, 12).map(skill => (
+                  <Badge
+                    variant={selectedMajor === 'all' ? 'default' : 'outline'}
+                    className="cursor-pointer"
+                    onClick={() => setSelectedMajor('all')}
+                  >
+                    전체
+                  </Badge>
+                  <Badge
+                    variant={selectedMajor === 'major' ? 'default' : 'outline'}
+                    className="cursor-pointer"
+                    onClick={() => setSelectedMajor('major')}
+                  >
+                    전공
+                  </Badge>
+                  <Badge
+                    variant={selectedMajor === 'non-major' ? 'default' : 'outline'}
+                    className="cursor-pointer"
+                    onClick={() => setSelectedMajor('non-major')}
+                  >
+                    비전공
+                  </Badge>
+                </div>
+              </div>
+
+              {/* 포지션 필터 */}
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-gray-700">포지션</p>
+                <div className="flex flex-wrap gap-2">
+                  {allPositions.slice(0, 12).map((position: string) => (
                     <Badge
-                      key={skill}
-                      variant={selectedSkills.includes(skill) ? "default" : "outline"}
+                      key={position}
+                      variant={selectedSkills.includes(position) ? "default" : "outline"}
                       className="cursor-pointer"
-                      onClick={() => toggleSkill(skill)}
+                      onClick={() => toggleSkill(position)}
                     >
-                      {skill}
+                      {position}
                     </Badge>
                   ))}
                 </div>
@@ -129,66 +219,29 @@ export default function DevelopersModal({
         </div>
 
         {/* 개발자 목록 */}
-        <div className="flex-1 overflow-y-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 p-1">
-            {filteredDevelopers.map((dev) => (
-              <Card key={dev.id} className="hover:shadow-md transition-shadow duration-200 h-fit">
-                <CardContent className="p-4">
-                  <div className="space-y-3">
-                    {/* 개발자 기본 정보 */}
-                    <div className="flex items-center space-x-3">
-                      <Avatar className="h-10 w-10 flex-shrink-0">
-                        <AvatarImage src={dev.avatar} />
-                        <AvatarFallback className="text-sm">{dev.name[0]}</AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-sm truncate">{dev.name}</h4>
-                        <p className="text-xs text-gray-600">{dev.role}</p>
-                      </div>
-                      <div className="flex items-center space-x-1 text-xs text-gray-500">
-                        <Star className="h-3 w-3 text-yellow-400 fill-current" />
-                        <span>{dev.rating}</span>
-                      </div>
-                    </div>
-
-                    {/* 기술 스택 */}
-                    <div className="flex flex-wrap gap-1">
-                      {dev.skills.slice(0, 2).map((skill) => (
-                        <Badge key={skill} variant="outline" className="text-xs px-2 py-0.5">{skill}</Badge>
-                      ))}
-                      {dev.skills.length > 2 && (
-                        <Badge variant="secondary" className="text-xs px-2 py-0.5">+{dev.skills.length - 2}</Badge>
-                      )}
-                    </div>
-
-                    {/* 경력 및 위치 */}
-                    <div className="flex items-center justify-between text-xs text-gray-600">
-                      <span>경력 {dev.experience}</span>
-                      <div className="flex items-center space-x-1">
-                        <MapPin className="h-3 w-3" />
-                        <span>{dev.location}</span>
-                      </div>
-                    </div>
-
-                    {/* 프로필 보기 버튼 */}
-                    <Button 
-                      className="w-full h-8" 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => onViewProfile?.(dev.id)}
-                    >
-                      프로필 보기
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {filteredDevelopers.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-gray-500">검색 조건에 맞는 개발자가 없습니다.</p>
+        <div className="flex-1 min-h-0 overflow-y-auto">
+          {isLoading ? (
+            <div className="flex justify-center items-center h-32">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
             </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 p-1">
+                {filteredDevelopers.map((dev) => (
+                  <DeveloperCard 
+                    key={dev.id}
+                    developer={dev}
+                    onClick={(developerId) => onViewProfile?.(developerId)}
+                  />
+                ))}
+              </div>
+
+              {filteredDevelopers.length === 0 && (
+                <div className="text-center py-12">
+                  <p className="text-gray-500">검색 조건에 맞는 개발자가 없습니다.</p>
+                </div>
+              )}
+            </>
           )}
         </div>
 
@@ -197,6 +250,7 @@ export default function DevelopersModal({
           <p className="text-sm text-gray-600 text-center">
             총 {filteredDevelopers.length}명의 개발자가 있습니다.
           </p>
+        </div>
         </div>
       </DialogContent>
     </Dialog>

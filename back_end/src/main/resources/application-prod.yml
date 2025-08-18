@@ -1,11 +1,16 @@
+server:
+  forward-headers-strategy: framework # 스프링에서 프록시 전달 헤더를 자동으로 인식하도록 설정.
+
 spring:
   security:
+    headers:
+      frame-options: DISABLE
     oauth2:
       client:
         registration:
           google:
-            client-id: 191095046109-t21kv1o2632n6rou7pdi26isfkvht1eb.apps.googleusercontent.com
-            client-secret: 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
+            client-id: 1071729903330-rj030egsas650um85iiu5i40dtl988bt.apps.googleusercontent.com
+            client-secret: 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
             redirect-uri: "{baseUrl}/login/oauth2/code/google"
             scope:
               - profile
@@ -17,33 +22,50 @@ spring:
             user-info-uri: https://openidconnect.googleapis.com/v1/userinfo
             user-name-attribute: sub
 
+  logging:
+    level:
+      org.springframework.security: DEBUG
+      org.springframework.security.oauth2: DEBUG
+      org.springframework.security.oauth2.client.web: DEBUG
+
+  # PostgreSQL로 수정
   datasource:
     url: jdbc:postgresql://postgres:5432/team_search
     username: postgres  # 또는 원하는 사용자명
     password: your_password
     driver-class-name: org.postgresql.Driver
 
+
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: true
     properties:
       hibernate:
         format_sql: true
         database-platform: org.hibernate.dialect.PostgreSQLDialect
 
+
   h2:
     console:
       enabled: true
       path: /h2-console
 
+
+
 jwt:
-  secret: Nzg5ZjE0NzRlM2FjZjY4YzBkMTIzZmFhZjQ1NmY2ZDQ5YTc0MTg0MTNkZWIwZTkxY2YwYTc2ZTVjYmYzYjA3ZQ==
-  expiration: 3600000 # 1시간 (ms)
-  
-  # 배포 시 수정 필요
+  secret: ${JWT_SECRET_KEY:key}
+  expiration: ${JWT_EXPIRATION_TIME:time} # 1시간 (ms)
+
 front:
-  url: http://localhost:5173
+  url: ${FRONT_DOMAIN}  # 도메인으로 변경 필요.
+
+recsys:
+  base-url: http://recsys:8000
+  timeout:
+    connect: 5s
+    read: 30s
+
 
 springdoc:
   api-docs:

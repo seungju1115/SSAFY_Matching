@@ -1,15 +1,14 @@
 package com.example.demo.user.dto;
 
-import com.example.demo.user.Enum.PersonalPrefEnum;
-import com.example.demo.user.Enum.PositionEnum;
-import com.example.demo.user.Enum.ProjectPrefEnum;
-import com.example.demo.user.Enum.TechEnum;
+import com.example.demo.user.Enum.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 
 @Setter
@@ -17,7 +16,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Schema(description = "사용자 프로필 수정 요청 (부분 수정)")
-public class UserProfileUpdateRequest {
+public class UserProfileUpdateRequest implements Serializable {
 
     @Schema(description = "사용자 이름", example = "홍길동")
     private String userName;
@@ -26,19 +25,19 @@ public class UserProfileUpdateRequest {
     private String userProfile;
 
     @Schema(description = "전공 여부", example = "true")
-    private boolean major;
+    private Boolean major;
 
     @Schema(description = "이전 반", example = "7")
     private Integer lastClass;
 
     @Schema(description = "희망 포지션", example = "FULLSTACK")
-    private PositionEnum wantedPosition;
+    private List<PositionEnum> wantedPosition;
 
     @Schema(description = "프로젝트 선호도", example = "[\"도전적인 성향\", \"새로운 기술 적극 사용\"]")
-    private Set<ProjectPrefEnum> projectPref;
+    private Set<ProjectGoalEnum> projectGoal;
 
     @Schema(description = "개인 성향", example = "[\"내향적인 편\", \"컨벤션 잘 지키는 편\"]")
-    private Set<PersonalPrefEnum> personalPref;
+    private Set<ProjectViveEnum> projectVive;
 
     @Schema(description = "프로젝트 경험", example = "추가된 프로젝트 경험")
     private String projectExp;
@@ -51,4 +50,10 @@ public class UserProfileUpdateRequest {
 
     @Schema(description = "변경할 팀 ID", example = "10")
     private Long teamId;
+
+    @Schema(
+            description = "유저 상태",
+            example = "[\"INACTIVE\", \"WAITING\", \"IN_TEAM\"]"
+    )
+    private UserStatus userStatus;
 }

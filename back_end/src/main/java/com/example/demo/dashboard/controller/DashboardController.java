@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/dashboard")
@@ -70,25 +72,69 @@ public class DashboardController {
                                     name = "대시보드 통계 데이터",
                                     value = """
                     {
-                        "whole": 150,
-                        "matchedMajor": 45,
-                        "mathcedUnmajor": 25,
-                        "unmatchedMajor": 55,
-                        "unmatchedUnmajor": 25,
-                        "matched_back": 30,
-                        "matched_front": 25,
-                        "matched_misc": 15,
-                        "unmatched_misc": 20,
-                        "unmatched_back": 35,
-                        "unmatched_front": 25,
-                        "domain": {
-                            "WEB": 45,
-                            "MOBILE": 32,
-                            "AI": 28,
-                            "IOT": 15,
-                            "GAME": 12,
-                            "DATA": 18
-                        }
+                                                  "whole": 10,
+                                                  "matchedMajor": 4,
+                                                  "mathcedUnmajor": 1,
+                                                  "unmatchedMajor": 3,
+                                                  "unmatchedUnmajor": 2,
+                                                  "ai_main": 4,
+                                                  "back_main": 2,
+                                                  "front_main": 0,
+                                                  "design_main": 4,
+                                                  "pm_main": 0,
+                                                  "ai_sub": 0,
+                                                  "back_sub": 4,
+                                                  "front_sub": 5,
+                                                  "design_sub": 0,
+                                                  "pm_sub": 1,
+                                                  "domain": {
+                                                    "서버 개발": 1,
+                                                    "AI/ML": 1,
+                                                    "UX/UI": 1,
+                                                    "전체 개발": 1,
+                                                    "웹 개발": 1
+                                                  },
+                                                  "domainPos": {
+                                                    "서버 개발": [
+                                                      3,
+                                                      0,
+                                                      0,
+                                                      1,
+                                                      1
+                                                    ],
+                                                    "AI/ML": [
+                                                      1,
+                                                      1,
+                                                      1,
+                                                      1,
+                                                      3
+                                                    ],
+                                                    "UX/UI": [
+                                                      1,
+                                                      2,
+                                                      1,
+                                                      1,
+                                                      0
+                                                    ],
+                                                    "전체 개발": [
+                                                      2,
+                                                      1,
+                                                      2,
+                                                      1,
+                                                      1
+                                                    ],
+                                                    "웹 개발": [
+                                                      1,
+                                                      1,
+                                                      2,
+                                                      1,
+                                                      0
+                                                    ]
+                                                  },
+                                                  "techstacks": {
+                                                    DOCKER : 51
+                                                    JAVA : 39
+                                                  }
                     }
                     """
                             )
@@ -100,63 +146,12 @@ public class DashboardController {
             )
     })
     @GetMapping("/graph")
-    @Cacheable(value = "dashboardCache", key = "'graph'")
-    public DashboardResponseDto getDashboard() {
+    public ResponseEntity<DashboardResponseDto> getDashboard() {
+        long time = System.nanoTime();
         DashboardResponseDto dto = dashboardService.getDashboard();
-        return dto;
-    }
-
-    @Operation(
-            summary = "포지션별 요약 통계 조회",
-            description = """
-            포지션별 상세 요약 통계 정보를 조회합니다.
-            
-            **현재 상태:**
-            - 구현 예정 상태 (빈 DTO 반환)
-            - 향후 포지션별 세부 통계 제공 예정
-            
-            **예정 기능:**
-            - 포지션별 사용자 수
-            - 포지션별 매칭률
-            - 포지션별 선호 기술 스택
-            - 포지션별 프로젝트 선호도
-            - 포지션별 팀 구성 현황
-            
-            **활용 계획:**
-            - 포지션 밸런스 분석
-            - 인기 포지션 트렌드
-            - 교육과정 기획 참고 자료
-            - 멘토링 배정 기준
-            
-            **참고:** 현재는 개발 중이며, 추후 실제 데이터로 채워질 예정입니다.
-            """,
-            tags = {"대시보드"}
-    )
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "포지션별 통계 조회 성공 (현재는 빈 데이터)",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = SummaryResoponseDto.class),
-                            examples = @ExampleObject(
-                                    name = "포지션 요약 데이터 (예정)",
-                                    value = """
-                    {
-                        "note": "현재 구현 중입니다. 향후 포지션별 상세 통계가 제공될 예정입니다."
-                    }
-                    """
-                            )
-                    )
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "500",
-                    description = "서버 내부 오류"
-            )
-    })
-    @GetMapping("/position")
-    public SummaryResoponseDto getPosition() {
-        SummaryResoponseDto dto = new SummaryResoponseDto();
-        return dto;
+        long elapsed = System.nanoTime() - time;
+        return ResponseEntity.ok()
+                .header("X-Execution-Time-Ms", String.valueOf(elapsed))
+                .body(dto);
     }
 }

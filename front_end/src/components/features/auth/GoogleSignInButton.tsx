@@ -2,21 +2,18 @@ import { Button } from "@/components/ui/button"
 
 interface GoogleSignInButtonProps {
   className?: string
-  onSuccess?: () => void
   onError?: (error: Error) => void
 }
 
 export function GoogleSignInButton({
   className,
-  onSuccess,
   onError
 }: GoogleSignInButtonProps) {
   const handleGoogleSignIn = async () => {
     try {
-      // 실제 구현에서는 Firebase Auth 또는 다른 OAuth 제공자를 통해 구글 로그인을 구현합니다
-      console.log('Google Sign In clicked')
-      // 성공 시 콜백 호출
-      onSuccess?.()
+      // 백엔드 OAuth 로그인 API로 리다이렉트
+      const baseUrl = window.location.origin
+      window.location.href = `${baseUrl}/users/login/google`
     } catch (error) {
       console.error('Google Sign In failed:', error)
       // 에러 시 콜백 호출

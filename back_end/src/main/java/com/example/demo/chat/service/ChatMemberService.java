@@ -3,6 +3,8 @@ package com.example.demo.chat.service;
 import com.example.demo.chat.dao.ChatRoomMemberRepository;
 import com.example.demo.chat.entity.ChatRoom;
 import com.example.demo.chat.entity.ChatRoomMember;
+import com.example.demo.common.exception.BusinessException;
+import com.example.demo.common.exception.ErrorCode;
 import com.example.demo.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,9 @@ public class ChatMemberService {
 
     @Transactional
     public ChatRoomMember createChatRoomMember(User user, ChatRoom chatRoom) {
+        if (chatRoomMemberRepository.existsByUserAndChatRoom(user, chatRoom)) {
+            throw new BusinessException(ErrorCode.CHATROOM_MEMBER_ALREADY_EXISTS);
+        }
         ChatRoomMember member = new ChatRoomMember();
         member.setUser(user);
         member.setChatRoom(chatRoom);

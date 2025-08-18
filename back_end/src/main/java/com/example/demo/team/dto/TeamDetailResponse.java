@@ -1,31 +1,88 @@
 package com.example.demo.team.dto;
 
+import com.example.demo.user.Enum.ProjectGoalEnum;
+import com.example.demo.user.Enum.ProjectViveEnum;
+import com.example.demo.user.dto.UserDetailResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import com.example.demo.team.entity.TeamStatus;
 
-import java.io.Serializable;
+
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @Schema(description = "팀 상세 정보 응답")
-public class TeamDetailResponse implements Serializable {
+public class TeamDetailResponse{
 
     @Schema(description = "팀 ID", example = "1")
     private Long teamId;
 
+    @Schema(description = "채팅방 Id", example = "1")
+    private Long chatRoomId;
+
     @Schema(description = "팀 이름", example = "프로젝트 A팀")
     private String teamName;
 
-    @Schema(description = "팀장 사용자 ID", example = "5")
-    private Long leaderId;
+    @Schema(description = "팀장 정보", example = "leader")
+    private UserDetailResponse leader;
 
     @Schema(
-            description = "팀원 ID 목록",
-            example = "[5, 12, 18, 23]"
+            description = "팀원 정보 목록",
+            example = "[member1, member2]"
     )
-    private List<Long> membersId;
+    private List<UserDetailResponse> members;
+
+    @Schema(
+            description = "팀 도메인",
+            example = "domainTest11",
+            required = true
+    )
+    private String teamDomain;
+
+    @Schema(
+            description = "팀 분위기/성향 (Enum Set)",
+            example = "[\"ENTHUSIASTIC\", \"CHALLENGING\"]"
+    )
+    private Set<ProjectViveEnum> teamVive;
+
+    @Schema(
+            description = "팀 목표/선호사항 (Enum Set)",
+            example = "[\"PORTFOLIO\", \"COMMERCIALIZATION\"]",
+            requiredMode = Schema.RequiredMode.REQUIRED
+    )
+    private Set<ProjectGoalEnum> teamPreference;
+
+    @Schema(description = "백엔드 개발자 인원", example = "2")
+    private int backendCount;
+
+    @Schema(description = "프론트엔드 개발자 인원", example = "2")
+    private int frontendCount;
+
+    @Schema(description = "AI 개발자 인원", example = "1")
+    private int aiCount;
+
+    @Schema(description = "기획자(PM) 인원", example = "1")
+    private int pmCount;
+
+    @Schema(description = "디자이너 인원", example = "0")
+    private int designCount;
+
+    @Schema(
+            description = "팀 상세 설명",
+            example = "저희는 사이드 프로젝트를 통해 함께 성장하고 싶은 주니어 개발자 그룹입니다."
+    )
+    private String teamDescription;
+
+    @Schema(
+            description = "팀 멤버 상태",
+            example = "FULL"
+    )
+    private TeamStatus teamStatus;
 }

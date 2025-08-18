@@ -1,10 +1,7 @@
 package com.example.demo.user.dto;
 
 import com.example.demo.team.entity.Team;
-import com.example.demo.user.Enum.PersonalPrefEnum;
-import com.example.demo.user.Enum.PositionEnum;
-import com.example.demo.user.Enum.ProjectPrefEnum;
-import com.example.demo.user.Enum.TechEnum;
+import com.example.demo.user.Enum.*;
 import com.example.demo.user.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -13,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -20,7 +18,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "사용자 프로필 응답")
-public class UserProfileResponse implements Serializable {
+public class UserProfileResponse {
 
     @Schema(description = "사용자 ID", example = "1")
     private Long id;
@@ -38,19 +36,19 @@ public class UserProfileResponse implements Serializable {
     private String userProfile;
 
     @Schema(description = "전공 여부", example = "true")
-    private boolean major;
+    private Boolean major;
 
     @Schema(description = "이전 반", example = "7")
     private Integer lastClass;
 
     @Schema(description = "희망 포지션", example = "BACKEND")
-    private PositionEnum wantedPosition;
+    private List<PositionEnum> wantedPosition;
 
     @Schema(description = "프로젝트 선호도")
-    private Set<ProjectPrefEnum> projectPref;
+    private Set<ProjectGoalEnum> projectGoal;
 
     @Schema(description = "개인 성향")
-    private Set<PersonalPrefEnum> personalPref;
+    private Set<ProjectViveEnum> projectVive;
 
     @Schema(description = "프로젝트 경험", example = "Spring Boot를 이용한 웹 개발 경험")
     private String projectExp;
@@ -71,24 +69,45 @@ public class UserProfileResponse implements Serializable {
         Team team = user.getTeam();
 
         UserProfileResponse response = new UserProfileResponse();
+
+        if (user.getId() != null) response.setId(user.getId());
+        if (user.getUserName() != null)  response.setUserName(user.getUserName());
+        if (user.getRole() != null) response.setRole(user.getRole());
+        if (user.getEmail() != null) response.setEmail(user.getEmail());
+        if (user.getMajor() != null) response.setMajor(user.getMajor());
+        if (user.getLastClass() != null) response.setLastClass(user.getLastClass());
+        if (user.getUserProfile() != null) response.setUserProfile(user.getUserProfile());
+        if (user.getWantedPosition() != null) response.setWantedPosition(user.getWantedPosition());
+        if (user.getProjectGoal() != null) response.setProjectGoal(user.getProjectGoal());
+        if (user.getProjectVive() != null) response.setProjectVive(user.getProjectVive());
+        if (user.getProjectExp() != null) response.setProjectExp(user.getProjectExp());
+        if (user.getQualification() != null) response.setQualification(user.getQualification());
+        if (user.getTechStack() != null) response.setTechStack(user.getTechStack());
+
+        if (team != null) {
+            response.setTeamId(team.getId());
+            if (team.getTeamName() != null) response.setTeamName(team.getTeamName());
+        }
+
+        return response;
+    }
+
+    public static UserProfileResponse makeToUserProfileResponse(User user) {
+        UserProfileResponse response = new UserProfileResponse();
         response.setId(user.getId());
         response.setUserName(user.getUserName());
         response.setRole(user.getRole());
         response.setEmail(user.getEmail());
-        response.setUserProfile(user.getUserProfile());
-        response.setMajor(user.isMajor());
+        response.setMajor(user.getMajor());
         response.setLastClass(user.getLastClass());
-        response.setWantedPosition(user.getWantedPosition());
-        response.setProjectPref(user.getProjectPref());
-        response.setPersonalPref(user.getPersonalPref());
-        response.setProjectExp(user.getProjectExp());
-        response.setQualification(user.getQualification());
-        response.setTechStack(user.getTechStack());
 
-        if (team != null) {
-            response.setTeamId(team.getId());
-            response.setTeamName(team.getTeamName());
-        }
+        if (user.getUserProfile() != null) response.setUserProfile(user.getUserProfile());
+        if (user.getWantedPosition() != null) response.setWantedPosition(user.getWantedPosition());
+        if (user.getProjectGoal() != null) response.setProjectGoal(user.getProjectGoal());
+        if (user.getProjectVive() != null) response.setProjectVive(user.getProjectVive());
+        if (user.getProjectExp() != null) response.setProjectExp(user.getProjectExp());
+        if (user.getQualification() != null) response.setQualification(user.getQualification());
+        if (user.getTechStack() != null) response.setTechStack(user.getTechStack());
 
         return response;
     }

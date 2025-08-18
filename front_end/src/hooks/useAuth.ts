@@ -1,12 +1,12 @@
 // 인증 관련 커스텀 훅
-import { useUserStore } from '../store/userStore'
+import useUserStore from '../stores/userStore'
 
 export const useAuth = () => {
-  const { user, setUser } = useUserStore()
+  const { user } = useUserStore()
   
   const login = (_credentials: any) => {
     // 로그인 로직
-    setUser(null) // 임시
+    // setUser(null) // 임시
   }
   
   const logout = () => {

@@ -1,13 +1,10 @@
 // UserController.java - 완전한 Swagger 설정
 package com.example.demo.user.controller;
 
-import com.example.demo.user.dto.SearchUserRequest;
-import com.example.demo.user.dto.SearchUserResponse;
-import com.example.demo.user.dto.UserProfileRequest;
-import com.example.demo.user.dto.UserProfileResponse;
-import com.example.demo.user.dto.UserProfileUpdateRequest;
+import com.example.demo.common.response.ApiResponse;
+import com.example.demo.user.dto.*;
+import com.example.demo.user.dto.UserSearchRequest;
 import com.example.demo.user.service.UserService;
-import com.example.demo.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -60,25 +57,25 @@ public class UserController {
                                     name = "내 프로필 조회 성공",
                                     value = """
                     {
-                        "status": 200,
-                        "message": "요청이 성공했습니다",
-                        "data": {
-                            "id": 1,
-                            "userName": "홍길동",
-                            "role": "TRAINEE",
-                            "email": "hong@example.com",
-                            "userProfile": "안녕하세요! 백엔드 개발자를 꿈꾸는 홍길동입니다.",
-                            "major": true,
-                            "lastClass": 13,
-                            "wantedPosition": "BACKEND",
-                            "projectPref": ["WEB", "MOBILE"],
-                            "personalPref": ["LEADER", "COOPERATIVE"],
-                            "projectExp": "Spring Boot를 이용한 웹 개발 경험",
-                            "qualification": "정보처리기사",
-                            "techStack": ["JAVA", "SPRING", "MYSQL"],
-                            "teamId": 5,
-                            "teamName": "프로젝트팀A"
-                        }
+                      "status": 200,
+                      "message": "요청 성공",
+                      "data": {
+                        "id": 1,
+                        "userName": "홍길동",
+                        "role": "student",
+                        "email": "honggildong@gmail.com",
+                        "userProfile": "저는 ...",
+                        "major": false,
+                        "lastClass": 3,
+                        "wantedPosition": ["BACKEND", "AI"],
+                        "projectGoal": ["STABLE", "CHALLENGE"],
+                        "projectVive": ["COMMUNICATE", "CONCENTRATE"],
+                        "projectExp": "졸업 프로젝트로 쇼핑몰 제작 경험 있음",
+                        "qualification": "정보처리기사, SQLD",
+                        "techStack": ["SPRING", "DOCKER", "MYSQL"],
+                        "teamId": 42,
+                        "teamName": "코드마스터즈"
+                      }
                     }
                     """
                             )
@@ -152,12 +149,13 @@ public class UserController {
             새로운 사용자 프로필을 생성합니다.
             
             **필수 입력 정보:**
+            - 사용자 이메일
             - 사용자 이름
             - 전공 여부
-            - 기수 정보
-            - 희망 포지션
+            - 지난 반 정보
             
             **선택 입력 정보:**
+            - 희망 포지션
             - 자기소개
             - 기술 스택
             - 프로젝트 선호도
@@ -249,7 +247,7 @@ public class UserController {
             
             **수정 가능한 정보:**
             - 기본 정보 (이름, 자기소개)
-            - 전공 정보, 기수
+            - 전공, 비전공, 지난 반
             - 희망 포지션
             - 기술 스택
             - 프로젝트 선호도 및 개인 성향
@@ -310,9 +308,11 @@ public class UserController {
             조건에 맞는 팀이 없는 사용자들을 검색합니다.
             
             **검색 조건:**
-            - 희망 포지션 (FRONTEND, BACKEND, FULLSTACK 등)
-            - 기술 스택 (Java, React, Python 등)
-            - 프로젝트 선호도 (WEB, MOBILE, AI 등)
+            - 전공, 비전공(true, false)
+            - 희망 포지션 (FRONTEND, BACKEND 등)
+            - 기술 스택 (JAVA, REACT, PYTHON 등)
+            - 프로젝트 목표 (PROFESSIONAL, JOB 등)
+            - 개인 성향 (RULE, LEADER 등)
             
             **검색 로직:**
             - 모든 조건은 AND 조건으로 적용
@@ -338,20 +338,51 @@ public class UserController {
                                     value = """
                     {
                         "status": 200,
-                        "message": "요청이 성공했습니다",
+                        "message": "요청 성공",
                         "data": [
                             {
-                                "id": 2,
-                                "userName": "김개발",
-                                "userProfile": "프론트엔드 개발자입니다",
+                                "id": 6,
+                                "userName": "홍길동",
+                                "userProfile": "새로운 팀을 찾고 있는 백엔드 개발자입니다.",
                                 "major": true,
-                                "lastClass": 13,
-                                "wantedPosition": "FRONTEND",
-                                "techStack": ["JAVASCRIPT", "REACT", "VUE"],
-                                "projectPref": ["WEB", "MOBILE"],
-                                "personalPref": ["COOPERATIVE", "CREATIVE"],
-                                "projectExp": "React 기반 SPA 개발 경험",
-                                "qualification": "웹디자인기능사"
+                                "lastClass": 4,
+                                "wantedPosition": [
+                                    "BACKEND",
+                                    "AI"
+                                ],
+                                "techStack": [],
+                                "projectGoal": [
+                                    "PROFESSIONAL",
+                                    "JOB"
+                                ],
+                                "projectVive": [
+                                    "RULE",
+                                    "LEADER"
+                                ],
+                                "projectExp": "Java Spring 프로젝트 경험",
+                                "qualification": "정보처리기사"
+                            },
+                            {
+                                "id": 10,
+                                "userName": "조현우",
+                                "userProfile": "팀 리딩 경험이 있는 PM 지망생입니다.",
+                                "major": true,
+                                "lastClass": 4,
+                                "wantedPosition": [
+                                    "PM",
+                                    "BACKEND"
+                                ],
+                                "techStack": [],
+                                "projectGoal": [
+                                    "PROFESSIONAL",
+                                    "JOB"
+                                ],
+                                "projectVive": [
+                                    "FORMAL",
+                                    "LEADER"
+                                ],
+                                "projectExp": "프로젝트 관리 경험 2회",
+                                "qualification": "PMP 준비중"
                             }
                         ]
                     }
@@ -365,15 +396,51 @@ public class UserController {
             )
     })
     @PostMapping("/search")
-    public ResponseEntity<ApiResponse> searchUsersWithoutTeam(
+    public ResponseEntity<ApiResponse> searchUsersWithoutTeamWithCondition(
             @Parameter(
                     description = "팀원 검색 조건",
                     required = true,
-                    schema = @Schema(implementation = SearchUserRequest.class)
+                    schema = @Schema(implementation = UserSearchRequest.class)
             )
-            @Valid @RequestBody SearchUserRequest request
+            @Valid @RequestBody UserSearchRequest request
     ) {
-        List<SearchUserResponse> users = userService.searchUsersWithoutTeam(request);
+        List<UserSearchResponse> users = userService.searchUsersWithoutTeam(request);
         return ResponseEntity.ok(ApiResponse.ok(users));
+    }
+
+    @Operation(
+            summary = "대기중인 사용자 조회",
+            description = """
+            UserStatus가 WAITING인 사용자들을 조회합니다.
+            
+            **조회 조건:**
+            - userStatus = WAITING (팀을 찾고 있는 상태)
+            - 팀에 소속되지 않은 사용자들
+            
+            **반환 정보:**
+            - 기본 프로필 정보
+            - 희망 포지션 및 기술 스택
+            - 프로젝트 선호도
+            
+            **활용 시나리오:**
+            - 팀 구성 시 대기중인 개발자 목록 보기
+            - 매칭 시스템에서 활용
+            """,
+            tags = {"사용자 프로필 관리"}
+    )
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "대기중인 사용자 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class)
+                    )
+            )
+    })
+    @GetMapping("/waiting")
+    public ResponseEntity<ApiResponse> getWaitingUsers() {
+        List<UserSearchResponse> waitingUsers = userService.getWaitingUsers();
+        return ResponseEntity.ok(ApiResponse.ok(waitingUsers));
     }
 }

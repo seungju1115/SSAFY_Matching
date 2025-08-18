@@ -1,5 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTeam } from '@/hooks/useTeam'
+import { useUser } from '@/hooks/useUser'
+import useUserStore from '@/stores/userStore'
+import type { ProjectGoalEnum, ProjectViveEnum } from '@/types/team'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -17,34 +21,40 @@ import {
   Sparkles,
   Globe
 } from 'lucide-react'
+import {useTeamStore} from "@/stores/teamStore.ts";
 
 // 팀 생성 데이터 타입
 interface TeamData {
   domains: string[]
   projectPreferences: string[]
   teamAtmosphere: string[]
+  wantedPosition: string[]
   roleDistribution: {
-    backend: number
-    frontend: number
-    ai: number
-    design: number
-    pm: number
+    BACKEND: number
+    FRONTEND: number
+    AI: number
+    DESIGN: number
+    PM: number
   }
   introduction: string
 }
 
 export default function MakeTeam() {
   const navigate = useNavigate()
+  const { createTeam, isLoading } = useTeam()
+  const { updateUserProfile } = useUser()
+  const { user } = useUserStore()
   const [teamData, setTeamData] = useState<TeamData>({
     domains: [],
     projectPreferences: [],
     teamAtmosphere: [],
+    wantedPosition: [],
     roleDistribution: {
-      backend: 1,
-      frontend: 1,
-      ai: 0,
-      design: 0,
-      pm: 0
+      BACKEND: 0,
+      FRONTEND: 0,
+      AI: 0,
+      DESIGN: 0,
+      PM: 0
     },
     introduction: ''
   })
@@ -58,17 +68,38 @@ export default function MakeTeam() {
 
   // 프로젝트 성향 선택지
   const projectPreferenceSuggestions = [
-    '취업우선', '수상목표', '개발경험우선', '포트폴리오중심',
-    '학습중심', '혁신추구', '실무경험', '창업지향',
-    '오픈소스', '사회공헌', '빠른개발', '완성도추구'
+    '취업우선', '수상목표', '포트폴리오중심', '학습중심', '아이디어실현', '실무경험', '빠른개발', '완성도추구'
   ]
 
   // 팀 분위기 선택지
   const atmosphereSuggestions = [
-    '반말 지향', '존대 지향', '편한 분위기', '체계적 분위기',
-    '자유로운', '규칙적인', '소통 활발', '집중 중시',
-    '유연한 시간', '정해진 시간', '온라인 중심', '오프라인 중심'
+    '반말 지향', '존대 지향', '편한 분위기', '규칙적인 분위기', '리더 중심', '합의 중심', '새로운 주제', '안정적인 주제', '애자일 방식', '워터폴 방식'
   ]
+
+  // UI 텍스트를 백엔드 enum으로 매핑
+  const projectPreferenceToEnumMapping: Record<string, ProjectGoalEnum> = {
+    '취업우선': 'JOB',
+    '수상목표': 'AWARD',
+    '포트폴리오중심': 'PORTFOLIO',
+    '학습중심': 'STUDY',
+    '아이디어실현': 'IDEA',
+    '실무경험': 'PROFESSIONAL',
+    '빠른개발': 'QUICK',
+    '완성도추구': 'QUALITY',
+  }
+
+  const atmosphereToEnumMapping: Record<string, ProjectViveEnum> = {
+    '반말 지향': 'CASUAL',
+    '존대 지향': 'FORMAL',
+    '편한 분위기': 'COMFY',
+    '규칙적인 분위기': 'RULE',
+    '리더 중심': 'LEADER',
+    '합의 중심': 'DEMOCRACY',
+    '새로운 주제': 'BRANDNEW',
+    '안정적인 주제': 'STABLE',
+    '애자일 방식': 'AGILE',
+    '워터폴 방식': 'WATERFALL',
+  }
 
   // 태그 추가/제거 함수
   const toggleTag = (category: 'domains' | 'projectPreferences' | 'teamAtmosphere', tag: string) => {
@@ -81,21 +112,131 @@ export default function MakeTeam() {
   }
 
   // 역할 인원 조정
+  const [roleIncrements, setRoleIncrements] = useState<Record<string, number>>({
+    BACKEND: 0,
+    FRONTEND: 0,
+    AI: 0,
+    DESIGN: 0,
+    PM: 0
+  });
+
   const adjustRole = (role: keyof typeof teamData.roleDistribution, increment: boolean) => {
-    setTeamData(prev => ({
-      ...prev,
-      roleDistribution: {
-        ...prev.roleDistribution,
-        [role]: Math.max(0, Math.min(10, prev.roleDistribution[role] + (increment ? 1 : -1)))
+    if (increment) {
+      // 현재 총 증가량 계산
+      const totalIncrements = Object.values(roleIncrements).reduce((sum, count) => sum + count, 0);
+
+      // 최대 2개까지만 증가 허용
+      if (totalIncrements >= 2) {
+        return;
       }
-    }))
+
+      setTeamData(prev => ({
+        ...prev,
+        roleDistribution: {
+          ...prev.roleDistribution,
+          [role]: Math.max(0, Math.min(10, prev.roleDistribution[role] + 1))
+        }
+      }));
+
+      // 해당 역할의 증가 횟수 업데이트
+      setRoleIncrements(prev => ({
+        ...prev,
+        [role]: (prev[role] || 0) + 1
+      }));
+
+    } else {
+      // 해당 역할이 증가된 적이 있는 경우에만 감소 허용
+      if (roleIncrements[role] > 0) {
+        setTeamData(prev => ({
+          ...prev,
+          roleDistribution: {
+            ...prev.roleDistribution,
+            [role]: Math.max(0, Math.min(10, prev.roleDistribution[role] - 1))
+          }
+        }));
+
+        setRoleIncrements(prev => ({
+          ...prev,
+          [role]: prev[role] - 1
+        }));
+      }
+    }
+  };
+
+
+  // TeamData를 TeamRequest로 매핑
+  const mapTeamDataToRequest = (data: TeamData): {
+    leaderId: number;
+    teamDomain: string;
+    teamDescription: string;
+    teamPreference: ("JOB" | "AWARD" | "PORTFOLIO" | "STUDY" | "IDEA" | "PROFESSIONAL" | "QUICK" | "QUALITY")[];
+    teamVive: ("CASUAL" | "FORMAL" | "COMFY" | "RULE" | "LEADER" | "DEMOCRACY" | "BRANDNEW" | "STABLE" | "AGILE" | "WATERFALL")[];
+    wantedPosition: string[];
+    backendCount: number;
+    frontendCount: number;
+    aiCount: number;
+    pmCount: number;
+    designCount: number
+  } => {
+    // enum으로 매핑
+    const mappedPreferences = data.projectPreferences
+      .map(pref => projectPreferenceToEnumMapping[pref])
+      .filter(Boolean)
+    
+    const mappedAtmosphere = data.teamAtmosphere
+      .map(atm => atmosphereToEnumMapping[atm])
+      .filter(Boolean)
+
+    // 증가된 역할들을 문자열 배열로 가져오는 헬퍼 함수
+    const getAddedRolesArray = (): string[] => {
+      const result: string[] = [];
+      Object.entries(roleIncrements).forEach(([role, count]) => {
+        for (let i = 0; i < count; i++) {
+          result.push(role);
+        }
+      });
+      return result;
+    };
+    console.log(getAddedRolesArray());
+    return {
+
+      leaderId: user.id || 0,
+      teamDomain: data.domains.join(', '), // 도메인들을 문자열로 결합
+      teamDescription: data.introduction,
+      teamPreference: mappedPreferences,
+      teamVive: mappedAtmosphere,
+      wantedPosition: getAddedRolesArray(),
+      backendCount: data.roleDistribution.BACKEND,
+      frontendCount: data.roleDistribution.FRONTEND,
+      aiCount: data.roleDistribution.AI,
+      pmCount: data.roleDistribution.PM,
+      designCount: data.roleDistribution.DESIGN
+    }
   }
 
   // 팀 생성 처리
-  const handleCreateTeam = () => {
-    console.log('팀 생성 데이터:', teamData)
-    // API 호출 로직 추가
-    navigate('/')
+  const handleCreateTeam = async () => {
+    try {
+      const teamRequest = mapTeamDataToRequest(teamData)
+      console.log('팀 생성 요청 데이터:', teamRequest)
+
+      const createdTeam = await createTeam(teamRequest)
+      console.log('생성된 팀 데이터:', createdTeam)
+
+      if (user.id && createdTeam) {
+        await updateUserProfile(user.id, {
+          userStatus: 'IN_TEAM'
+        })
+          console.log('사용자 상태 업데이트 완료: IN_TEAM')
+        }
+
+      // teamStore 상태 확인
+      console.log('teamStore 상태:', useTeamStore.getState())
+
+      navigate('/')
+    } catch (error) {
+      console.error('팀 생성 실패:', error)
+    }
   }
 
   // 전체 팀원 수 계산
@@ -222,7 +363,7 @@ export default function MakeTeam() {
                     <CardTitle className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-purple-700 bg-clip-text text-transparent">
                       역할 비율 설정
                     </CardTitle>
-                    <p className="text-sm text-gray-500 mt-1">필요한 역할별 인원 수를 설정해주세요 (총 {totalMembers}명)</p>
+                    <p className="text-sm text-gray-500 mt-1">필요한 포지션을 설정해주세요 (최대 2개)</p>
                   </div>
                 </div>
               </CardHeader>
@@ -230,11 +371,11 @@ export default function MakeTeam() {
               <CardContent className="pt-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {[
-                    { key: 'backend', label: '백엔드', icon: Code, color: 'bg-blue-100 text-blue-800' },
-                    { key: 'frontend', label: '프론트엔드', icon: Globe, color: 'bg-green-100 text-green-800' },
-                    { key: 'ai', label: 'AI', icon: Sparkles, color: 'bg-purple-100 text-purple-800' },
-                    { key: 'design', label: '디자인', icon: Heart, color: 'bg-pink-100 text-pink-800' },
-                    { key: 'pm', label: 'PM', icon: Users, color: 'bg-orange-100 text-orange-800' }
+                    { key: 'BACKEND', label: '백엔드', icon: Code, color: 'bg-blue-100 text-blue-800' },
+                    { key: 'FRONTEND', label: '프론트엔드', icon: Globe, color: 'bg-green-100 text-green-800' },
+                    { key: 'AI', label: 'AI', icon: Sparkles, color: 'bg-purple-100 text-purple-800' },
+                    { key: 'DESIGN', label: '디자인', icon: Heart, color: 'bg-pink-100 text-pink-800' },
+                    { key: 'PM', label: 'PM', icon: Users, color: 'bg-orange-100 text-orange-800' }
                   ].map(({ key, label, icon: Icon, color }) => (
                     <div key={key} className="flex items-center justify-between p-4 bg-white/50 rounded-lg border">
                       <div className="flex items-center space-x-3">
@@ -348,11 +489,11 @@ export default function MakeTeam() {
           <div className="flex justify-center mt-16">
             <Button
               onClick={handleCreateTeam}
-              disabled={totalMembers === 0 || teamData.domains.length === 0 || !teamData.introduction.trim()}
+              disabled={isLoading || totalMembers === 0 || teamData.domains.length === 0 || !teamData.introduction.trim()}
               className="group w-64 h-16 text-lg font-semibold bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               <Users className="h-6 w-6 mr-2" />
-              팀 생성하기
+              {isLoading ? '생성 중...' : '팀 생성하기'}
             </Button>
           </div>
         </div>

@@ -1,30 +1,24 @@
 package com.example.demo.user.entity;
 
-import com.example.demo.user.Enum.PersonalPrefEnum;
-import com.example.demo.user.Enum.PositionEnum;
-import com.example.demo.user.Enum.ProjectPrefEnum;
-import com.example.demo.user.Enum.TechEnum;
+import com.example.demo.team.entity.TeamLockRequest;
+import com.example.demo.user.Enum.*;
 import com.example.demo.chat.entity.ChatRoomMember;
 import com.example.demo.team.entity.Team;
 import com.example.demo.team.entity.TeamMembershipRequest;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "USERS"
         , indexes= {
         @Index(name = "user_major_idx", columnList = "major"),
-        @Index(name = "user_position_idx", columnList = "wanted_position"),
+//        @Index(name = "user_position_idx", columnList = "wanted_position"),
         @Index(name = "user_team_idx", columnList = "team_id")
         }
         )
@@ -36,44 +30,52 @@ public class User {
     @Column(name = "user_id")
     private Long id;
 
-    @Column(name="user_name", length = 10, nullable = false)
-    @NotBlank
-    @Size(max = 10)
-    private String userName;
-
+    // 학생인지 프로인지 구분, 기본값 학생
     @Column(name="role", length = 10, nullable = false)
     @NotBlank
     @Size(max = 10)
-    private String role;
+    private String role = "student";
 
     @ManyToOne
     @JoinColumn(name = "team_id")
     private Team team;
 
+    // 사용자 상태 (INACTIVE: 대기중아님, WAITING: 대기중, IN_TEAM: 팀참여)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "user_status", nullable = false)
+    private UserStatus userStatus = UserStatus.INACTIVE;
+
+    // 기초정보
+    @Column(name="user_name", length = 10, nullable = false)
+    @NotBlank
+    @Size(max = 10)
+    private String userName;
+
+    // 기초정보
     @Column(name= "user_email",unique = true, nullable = false, length = 50)
     @NotBlank
     @Size(max = 50)
     private String email;
 
-    @Column(name="user_profile", length = 550)
-    @Size(max = 550)
-    private String userProfile;
-
-    //private String projectStep;
-
+    // 기초정보
     @Column(name = "major",  nullable = false)
-    private boolean major=false;
+    private Boolean major;
 
+    // 기초정보
     @Column(name = "last_class", nullable = false)
     @NotNull
     private Integer lastClass;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "wanted_position",  nullable = false)
-    @NotNull
-    private PositionEnum wantedPosition;
+    @Column(name="user_profile", length = 550)
+    @Size(max = 550)
+    private String userProfile;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @ElementCollection(targetClass = PositionEnum.class, fetch = FetchType.LAZY)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "wanted_position")
+    private List<PositionEnum> wantedPosition;
+
+    @OneToMany(mappedBy = "user")
     private List<ChatRoomMember> chatRoomMembers = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
@@ -90,23 +92,20 @@ public class User {
     @ElementCollection(targetClass = TechEnum.class, fetch = FetchType.LAZY)
     @Enumerated(EnumType.STRING)
     @Column(name="tech_stack",  nullable = true, length = 100)
-    @NotEmpty
     @Size(max = 100)
     private Set<TechEnum> techStack;
 
-    @ElementCollection(targetClass = ProjectPrefEnum.class, fetch = FetchType.LAZY)
+    @ElementCollection(targetClass = ProjectGoalEnum.class, fetch = FetchType.LAZY)
     @Enumerated(EnumType.STRING)
-    @Column(name = "project_preference", nullable = false, length = 50)
-    @NotEmpty
+    @Column(name = "project_preference", nullable = true, length = 50)
     @Size(max = 50)
-    private Set<ProjectPrefEnum> projectPref;
+    private Set<ProjectGoalEnum> projectGoal;
 
-    @ElementCollection(targetClass = PersonalPrefEnum.class, fetch = FetchType.LAZY)
+    @ElementCollection(targetClass = ProjectViveEnum.class, fetch = FetchType.LAZY)
     @Enumerated(EnumType.STRING)
-    @Column(name = "personal_preference", nullable = false, length = 50)
-    @NotEmpty
+    @Column(name = "personal_preference", nullable = true, length = 50)
     @Size(max = 50)
-    private Set<PersonalPrefEnum> personalPref;
+    private Set<ProjectViveEnum> projectVive;
 
     //@ManyToMany
     //@JoinTable(

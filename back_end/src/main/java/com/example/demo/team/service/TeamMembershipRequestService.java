@@ -1,5 +1,7 @@
 package com.example.demo.team.service;
 
+import com.example.demo.common.exception.BusinessException;
+import com.example.demo.common.exception.ErrorCode;
 import com.example.demo.team.dao.TeamMembershipRequestRepository;
 import com.example.demo.team.dao.TeamRepository;
 import com.example.demo.team.dto.*;
@@ -9,11 +11,24 @@ import com.example.demo.team.entity.Team;
 import com.example.demo.team.entity.TeamMembershipRequest;
 import com.example.demo.user.dao.UserRepository;
 import com.example.demo.user.entity.User;
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.cp.lock.FencedLock;
+import com.hazelcast.cp.lock.exception.LockAcquireLimitReachedException;
+import com.hazelcast.map.IMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.exception.LockAcquisitionException;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.SQLException;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -22,54 +37,90 @@ public class TeamMembershipRequestService {
     public final TeamMembershipRequestRepository teamMembershipRequestRepository;
     public final TeamRepository teamRepository;
     public final UserRepository userRepository;
-    private final TeamService teamService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final HazelcastInstance hazelcastInstance;
 
     @Transactional
-    public void requestTeamToMember(TeamOffer teamOffer){
-        Team team = teamRepository.findById(teamOffer.getTeamId()).orElseThrow(()-> new RuntimeException("no team"));
-        User user = userRepository.findById(teamOffer.getUserId()).orElseThrow(()-> new RuntimeException("no user"));
+    public void requestTeamToMember(TeamOffer teamOffer) {
+        Team team = teamRepository.findById(teamOffer.getTeamId()).orElseThrow(() -> new BusinessException(ErrorCode.TEAM_NOT_FOUND));
+        User user = userRepository.findById(teamOffer.getUserId()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        boolean exists = team.getMembershipRequests().stream()
-                .anyMatch(req ->
-                        req.getUser().equals(user)
-                                && req.getRequestType() == RequestType.INVITE
-                                && req.getStatus() != RequestStatus.REJECTED
-                );
+        String key = team.getId() + "+" + user.getId();
+        IMap<String,String> lock = hazelcastInstance.getMap("teamMembershipRequestLock");
+        String lockValue = UUID.randomUUID().toString();
+        boolean lockAcquired = false;
+        try {
+            log.info("락 획득 시도 중");
+            String existingLockValue = lock.putIfAbsent(key, lockValue,5,TimeUnit.SECONDS);
+            if(existingLockValue == null) {
+                lockAcquired = true;
+                log.info("락 획득 성공");
+            }
+            else {
+                throw new LockAcquireLimitReachedException("요청이 처리 중입니다. 잠시 후 다시 시도해주세요.");
+            }
+            boolean exists = team.getMembershipRequests().stream()
+                    .anyMatch(req -> req.getUser().equals(user) && req.getStatus() != RequestStatus.REJECTED);
 
-        if (exists) {
-            System.out.println("이미 초대 요청이 존재합니다.");
-            return;
+            if (exists) {
+                throw new BusinessException(ErrorCode.TEAM_REQUEST_ALLREADY_EXIST);
+            }
+            saveTeamOffer(teamOffer, team, user);
+            log.info("락 획득 후 요청 처리 완료");
+        }
+        finally {
+            if (lockAcquired) {
+                lock.remove(key, lockValue);
+                log.info("락 해제됨");
+            }
+
         }
 
-        saveTeamOffer(teamOffer, team, user);
         messagingTemplate.convertAndSend("/queue/team/offer/" + teamOffer.getUserId(), teamOffer.getMessage());
     }
-
     @Transactional
     public void requestMemberToTeam(TeamOffer teamOffer) {
-        Team team = teamRepository.findById(teamOffer.getTeamId()).orElseThrow(()-> new RuntimeException("no team"));
-        User user = userRepository.findById(teamOffer.getUserId()).orElseThrow(()-> new RuntimeException("no user"));
+        Team team = teamRepository.findById(teamOffer.getTeamId()).orElseThrow(() -> new BusinessException(ErrorCode.TEAM_NOT_FOUND));
+        User user = userRepository.findById(teamOffer.getUserId()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        boolean exists = user.getMembershipRequests().stream()
-                .anyMatch(req ->
-                        req.getTeam().equals(team)
-                                && req.getRequestType() == RequestType.JOIN_REQUEST
-                                && req.getStatus() != RequestStatus.REJECTED
-                );
+        String key = team.getId() + "+" + user.getId();
+        IMap<String, String> lock = hazelcastInstance.getMap("teamMembershipRequestLock");
+        String lockValue = UUID.randomUUID().toString();
+        boolean lockAcquired = false;
+        try {
+            log.info("락 획득 시도 중");
+            String existingLockValue = lock.putIfAbsent(key, lockValue,5,TimeUnit.SECONDS);
+            if(existingLockValue == null) {
+                lockAcquired = true;
+                log.info("락 획득 성공");
+            }
+            else {
+                throw new LockAcquireLimitReachedException("요청이 처리 중입니다. 잠시 후 다시 시도해주세요.");
+            }
 
-        if (exists) {
-            System.out.println("이미 초대 요청이 존재합니다.");
-            return;
+            boolean exists = team.getMembershipRequests().stream()
+                    .anyMatch(req -> req.getTeam().equals(team) && req.getStatus() != RequestStatus.REJECTED);
+            if (exists) {
+                throw new BusinessException(ErrorCode.TEAM_REQUEST_ALLREADY_EXIST);
+            }
+            saveTeamOffer(teamOffer, team, user);
+            log.info("락 획득 후 요청 처리 완료");
         }
-        saveTeamOffer(teamOffer, team, user);
+        finally {
+            if (lockAcquired) {
+                lock.remove(key, lockValue);
+                log.info("락 해제됨");
+            }
+        }
 
-        for (TeamMemberResponse teamMemberResponse : teamService.getTeamMembers(teamOffer.getTeamId())) {
-            messagingTemplate.convertAndSend("/queue/team/offer/" + teamMemberResponse.getMemberId(), teamOffer.getMessage());
+
+        for (User member : team.getMembers()) {
+            messagingTemplate.convertAndSend("/queue/team/offer/" + member.getId(), teamOffer.getMessage());
         }
     }
 
-    private void saveTeamOffer(TeamOffer teamOffer, Team team, User user) {
+    @Transactional
+    public void saveTeamOffer(TeamOffer teamOffer, Team team, User user) {
 
         TeamMembershipRequest request = new TeamMembershipRequest();
         request.setTeam(team);
@@ -79,5 +130,41 @@ public class TeamMembershipRequestService {
         request.setMessage(teamOffer.getMessage()); // 메시지가 있다면
 
         teamMembershipRequestRepository.save(request);
+    }
+
+    public List<TeamMembershipResponse> getAllTeamRequest(Long teamId) {
+
+        List<TeamMembershipRequest> requests = teamMembershipRequestRepository.findAllByTeamId(teamId);
+
+        return requests.stream()
+                .filter(r -> r.getStatus() == RequestStatus.PENDING) // PENDING만 필터
+                .map(TeamMembershipResponse::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    public List<TeamMembershipResponse> getAllUserRequest(Long userId) {
+
+        List<TeamMembershipRequest> requests = teamMembershipRequestRepository.findAllByUserId(userId);
+
+        return requests.stream()
+                .filter(r -> r.getStatus() == RequestStatus.PENDING) // PENDING만 필터
+                .map(TeamMembershipResponse::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    public void rejectOffer(Long teamId) {
+
+        List<TeamMembershipRequest> requests = teamMembershipRequestRepository.findAllByTeamId(teamId);
+
+        // 조건에 맞는 요청만 필터링
+        List<TeamMembershipRequest> filtered = requests.stream()
+                .filter(r -> r.getStatus() == RequestStatus.PENDING && r.getRequestType() == RequestType.INVITE)
+                .collect(Collectors.toList());
+
+        // 상태를 REJECTED로 변경
+        filtered.forEach(r -> r.setStatus(RequestStatus.REJECTED));
+
+        // DB에 저장
+        teamMembershipRequestRepository.saveAll(filtered);
     }
 }

@@ -1,3 +1,6 @@
+server:
+  forward-headers-strategy: framework # 스프링에서 프록시 전달 헤더를 자동으로 인식하도록 설정.
+
 spring:
   security:
     headers:
@@ -19,6 +22,12 @@ spring:
             user-info-uri: https://openidconnect.googleapis.com/v1/userinfo
             user-name-attribute: sub
 
+  logging:
+    level:
+      org.springframework.security: DEBUG
+      org.springframework.security.oauth2: DEBUG
+      com.example.demo: DEBUG
+
   datasource:
     url: jdbc:h2:~/test
     driver-class-name: org.h2.Driver
@@ -28,11 +37,18 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create-drop
+    defer-datasource-initialization: true
     show-sql: false
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.H2Dialect
+
+  sql:
+    init:
+      mode: always  # 항상 초기화 스크립트 실행
+      data-locations: classpath:bigData.sql  # smallData.sql 파일 위치 명시
+      encoding: UTF-8  # 한글 깨짐 방지
 
   h2:
     console:
@@ -47,7 +63,14 @@ jwt:
   expiration: 3600000 # 1시간 (ms)
 
 front:
-  url: http://localhost:8081
+  url: http://localhost:80
+
+recsys:
+  base-url: http://recsys:8000
+  timeout:
+    connect: 5s
+    read: 30s
+
 
 springdoc:
   api-docs:
