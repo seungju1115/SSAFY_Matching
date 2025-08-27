@@ -9,6 +9,7 @@
 Java 17, Spring Boot 3, React, JPA, Spring Security, Postgres, Docker, AWS, Nginx, Jenkins, Gitlab, Jira
 
 ## 아키텍처
+![아키텍처](./image/아키텍처.png)
 
 ## 주요 기능
 
@@ -38,32 +39,38 @@ Java 17, Spring Boot 3, React, JPA, Spring Security, Postgres, Docker, AWS, Ngin
 ## 스크린샷
 
 ### 메인 화면
+![메인화면](./image/메인.png)
 
 ### 로그인 화면
+![로그인 화면](./image/로그인.png)
 
 ### 대시보드 화면
-
-![스크린샷 2025-08-27 225047.png](attachment:46155ac2-07c2-4824-86fb-e672a054d412:스크린샷_2025-08-27_224821.png)
+![대시보드 화면](./image/대시보드.png)
 
 ### 회원가입 화면
+![회원가입 화면](./image/회원가입.png)
 
 ### 팀 생성 화면
+![팀 생성 화면](./image/팀_생성.png)
 
 ### 팀 페이지 화면
-
-![스크린샷 2025-08-27 225515.png](attachment:8893f4ec-6df6-4e4e-98f3-689969ec2c2c:스크린샷_2025-08-27_225047.png)
+![팀 페이지 화면](./image/팀_페이지.png)
 
 ### AI 추천 화면
+![AI 추천 화면](./image/팀원_추천.png)
 
 ### 대기자 등록 화면
+![대기자 등록 화면1](./image/대기자등록1.png)
+![대기자 등록 화면2](./image/대기자등록2.png)
 
 ### 대기자 상세보기 모달
+![대기자 상세보기 모달](./image/대기자_상세보기.png)
 
 ### 팀 상세보기 모달
-
-![스크린샷 2025-08-27 225641.png](attachment:47bb764d-7388-4dc8-8633-92e523b6907f:스크린샷_2025-08-27_225515.png)
+![팀 상세보기 모달](./image/팀_상세보기.png)
 
 ### 알림 화면
+![알림 화면](./image/알림.png)
 
 ## 기여도와 역할
 
